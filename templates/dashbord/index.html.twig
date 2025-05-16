@@ -1,0 +1,175 @@
+{% extends 'appbase.html.twig' %}
+
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .small-box {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 1.5rem;
+  }
+
+  .small-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .small-box .inner {
+    padding: 1.5rem;
+  }
+
+  .small-box .inner h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .small-box .inner p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .small-box .icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 3rem;
+    opacity: 0.2;
+  }
+
+  .small-box .small-box-footer {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    display: block;
+    text-align: center;
+  }
+
+  .small-box .small-box-footer:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 1);
+  }
+</style>
+{% endblock %}
+
+
+{% block main %}
+<div class="container-fluid">
+  <!-- Row: Statistiques principales -->
+  <div class="row">
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-primary">
+        <div class="inner">
+          <h3>{{ total_produits }}</h3>
+          <p>Produits</p>
+        </div>
+        <div class="icon"><i class="bi bi-box-seam"></i></div>
+        <a href="{{ path('app_produit') }}" class="small-box-footer">Voir plus <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3>{{ ventes_du_jour }}</h3>
+          <p>Ventes aujourd'hui</p>
+        </div>
+        <div class="icon"><i class="bi bi-cart-fill"></i></div>
+        <a href="{{ path('app_vente') }}" class="small-box-footer">Voir plus <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-danger">
+        <div class="inner">
+          <h3>{{ credits_en_cours }}</h3>
+          <p>Crédits Clients</p>
+        </div>
+        <div class="icon"><i class="bi bi-credit-card"></i></div>
+        <a href="{{ path('app_credit_client') }}" class="small-box-footer">Gérer <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-warning">
+        <div class="inner">
+          <h3>{{ solde_caisse|number_format(0, '.', ' ') }} FCFA</h3>
+          <p>Solde de caisse</p>
+        </div>
+        <div class="icon"><i class="bi bi-cash-stack"></i></div>
+        <a href="{{ path('app_finance') }}" class="small-box-footer">Voir détails <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row: Graphique + Alertes stock -->
+  <div class="row">
+    <!-- Graphique des ventes -->
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header border-0">
+          <div class="d-flex justify-content-between">
+            <h3 class="card-title">Ventes mensuelles</h3>
+            <a href="{{ path('app_vente') }}" class="link-primary">Voir plus</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="d-flex mb-3">
+            <p class="d-flex flex-column">
+              <span class="fw-bold fs-5">{{ ventes_total_mois|default(0) }}</span>
+              <span>Totales sur le mois</span>
+            </p>
+            <p class="ms-auto d-flex flex-column text-end">
+              <span class="text-success"><i class="bi bi-arrow-up"></i> {{ pourcentage_progression|default('0') }}%</span>
+              <span class="text-secondary">par rapport au mois dernier</span>
+            </p>
+          </div>
+          <div id="chart-ventes" class="position-relative" style="height: 250px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stocks faibles -->
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-header border-0">
+          <h3 class="card-title">Alertes stock faibles</h3>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            {% for produit in produits_stock_faible %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ produit.nom }}</span>
+                <span class="badge bg-danger rounded-pill">{{ produit.stockActuel }}</span>
+              </li>
+            {% else %}
+              <li class="list-group-item text-muted text-center">Aucune alerte</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %} 
+
+<script>
+  const chart = new ApexCharts(document.querySelector("#chart-ventes"), {
+    chart: {
+      type: 'line',
+      height: 250
+    },
+    series: [{
+      name: "Ventes",
+      data: {{ ventes_par_mois|json_encode|raw }}
+    }],
+    xaxis: {
+      categories: {{ mois_labels|json_encode|raw }}
+    }
+  });
+  chart.render();
+</script>
+{% endblock %}

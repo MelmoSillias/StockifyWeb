@@ -1,0 +1,220 @@
+{% extends 'appbase.html.twig' %}
+
+{% block title %}Créances Fournisseurs{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .form-section {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      border-radius: 0.5rem;
+      background-color: #f5f5f5;
+      border-left: 5px solid #0d6efd;
+      padding: 1rem;
+      height: 100%;
+    }
+
+    .stat-card.success { border-left-color: #198754; }
+    .stat-card.warning { border-left-color: #ffc107; }
+    .stat-card.danger { border-left-color: #dc3545; }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #212529;
+    }
+
+    .print-footer {
+      position: fixed;
+      bottom: 50px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+
+    @media (prefers-color-scheme: dark) {
+  body {
+    background-color: #343a40;
+    color: #f8f9fa;
+  }
+
+  .form-section {
+    background-color: #495057;
+    border-color: #6c757d;
+  }
+
+  .stat-card {
+    background-color: #343a40;
+  }
+
+  .stat-label {
+    color: #adb5bd;
+  }
+
+  .stat-value {
+    color: #f8f9fa;
+  }
+}
+
+  </style>
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid px-4">
+
+  {# Formulaire d’ajout de créance fournisseur #}
+  <div class="form-section shadow-sm">
+    <form id="formAjoutCreanceFournisseur">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Fournisseur</label>
+          <input type="text" class="form-control" id="fournisseur" name="fournisseur" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Montant (devise)</label>
+          <input type="number" class="form-control" id="montant_devise" name="montant_devise" step="0.01" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Devise</label>
+          <input type="text" class="form-control" id="devise" name="devise" placeholder="USD, EUR, etc." required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" id="btnSubmitCreanceForm" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Ajouter</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {# Tableau des créances #}
+  <div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="m-0 text-primary"><i class="bi bi-truck me-2"></i>Liste des Créances Fournisseurs</h6>
+      <div class="d-flex gap-2">
+        <button id="btnPrintCreances" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> Imprimer</button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="row mb-3 g-2">
+        <div class="col-md-3"><input id="filtre-periode" class="form-control form-control-sm" placeholder="Période" /></div>
+        <div class="col-md-3"><input id="filtre-fournisseur" class="form-control form-control-sm" placeholder="Fournisseur" /></div>
+        <div class="col-md-3">
+          <select id="filtre-statut" class="form-select form-select-sm">
+            <option value="">-- Tous les statuts --</option>
+            <option value="impayé">Impayé</option>
+            <option value="partiel">Partiellement payé</option>
+            <option value="payé">Payé</option>
+          </select>
+        </div>
+        <div class="col-md-3 text-end">
+          <button id="btn-filtrer-creances" class="btn btn-sm btn-primary"><i class="bi bi-filter"></i> Filtrer</button>
+        </div>
+      </div>
+      <div class="table-responsive"> 
+
+        <table id="creancesTable" class="table table-bordered table-hover table-striped w-100">
+          <thead class="">
+            <tr>
+              <th></th>
+              <th>ID</th>
+              <th>Fournisseur</th>
+              <th>Date</th>
+              <th>Devise</th>
+              <th>Total</th>
+              <th>Restant</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# Bloc pour statistiques globales liées à la période #}
+  <div id="statsCreanceFournisseur" class="row g-3 mt-4">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-label">Créances totales</div>
+        <div class="stat-value" id="stat-creance-total">--</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card success">
+        <div class="stat-label">Payées</div>
+        <div class="stat-value" id="stat-creance-payees">--</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card danger">
+        <div class="stat-label">Restantes</div>
+        <div class="stat-value" id="stat-creance-restantes">--</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal fade" id="modalPaiementCreance" tabindex="-1" aria-labelledby="paiementCreanceLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="paiementCreanceLabel">
+          <i class="bi bi-cash-coin me-2"></i>Paiement Créance Fournisseur</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formPaiementCreance">
+          <input type="hidden" id="creanceId" />
+
+          <div class="mb-2">
+            <label class="form-label">Montant payé (en FCFA)</label>
+            <input type="number" class="form-control" id="montantFCFA" min="1" required />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Taux de change</label>
+            <input type="number" class="form-control" id="tauxChange" min="0.0001" step="0.0001" required />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Montant équivalent (devise)</label>
+            <input type="text" class="form-control bg-light" id="montantDevise" disabled />
+          </div>
+
+          <div class="text-muted small mb-2" id="creanceRestantInfo">Montant restant : ...</div>
+
+          <div class="d-grid gap-2 mt-2">
+            <button type="submit" class="btn btn-success">Valider</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %} 
+  <script src="{{ asset('assets/appjs/creance_fournisseur.js') }}"></script>
+{% endblock %}

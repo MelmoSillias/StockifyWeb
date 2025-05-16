@@ -1,0 +1,135 @@
+{% extends 'appbase.html.twig' %}
+
+{% block title %}Finance{% endblock %}
+
+{% block main %}
+    <div class="container-fluid px-4">
+  <div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="bi bi-bank me-2"></i>Gestion de la Caisse
+      </h6>
+      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalAddTransaction">
+        <i class="bi bi-plus-circle me-1"></i> Ajouter Transaction
+      </button>
+    </div>
+
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-3"><input type="text" id="filter-periode" class="form-control form-control-sm" placeholder="Période" /></div>
+        <div class="col-md-2">
+          <select id="filter-type" class="form-select form-select-sm">
+            <option value="">Type</option>
+            <option value="entrée">Entrée</option>
+            <option value="sortie">Sortie</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select id="filter-motif" class="form-select form-select-sm">
+            <option value="">Motif</option>
+            <option value="vente">Vente</option>
+            <option value="paiement créance">Paiement Créance</option>
+            <option value="règlement crédit">Règlement Crédit</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="col-md-3"><input type="text" id="filter-libelle" class="form-control form-control-sm" placeholder="Libellé" /></div>
+        <div class="col-md-2 text-end">
+          <button class="btn btn-sm btn-primary" id="btnFiltrerTransactions">
+            <i class="bi bi-filter me-1"></i> Filtrer
+          </button>
+        </div>
+      </div>
+
+      <div class="row mb-3 text-center">
+        <div class="col">
+          <div class="border border-success rounded py-2 ">
+            <div class="text-muted small">Entrées</div>
+            <div id="total-entrees" class="fw-bold text-success fs-5">0 FCFA</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="border border-danger rounded py-2">
+            <div class="text-muted small">Sorties</div>
+            <div id="total-sorties" class="fw-bold text-danger fs-5">0 FCFA</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="border border-primary rounded py-2">
+            <div class="text-muted small">Solde</div>
+            <div id="solde-net" class="fw-bold text-primary fs-5">0 FCFA</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive"> 
+        <table class="table table-bordered table-hover table-striped" id="transactionsTable">
+          <thead >
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Montant</th>
+              <th>Libellé</th>
+              <th>Motif</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Modal Ajout Transaction #}
+<div class="modal fade" id="modalAddTransaction" tabindex="-1" aria-labelledby="modalAddTransactionLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="formAddTransaction">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalAddTransactionLabel">
+            <i class="bi bi-cash-stack me-2"></i>Nouvelle Transaction
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="type" class="form-label">Type</label>
+            <select id="type" name="type" class="form-select" required>
+              <option value="entrée">Entrée</option>
+              <option value="sortie">Sortie</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label for="montant" class="form-label">Montant</label>
+            <input type="number" id="montant" name="montant" class="form-control" step="0.01" required />
+          </div>
+          <div class="mb-2">
+            <label for="libelle" class="form-label">Libellé</label>
+            <input type="text" id="libelle" name="libelle" class="form-control" />
+          </div>
+          <div class="mb-2">
+            <label for="motif" class="form-label">Motif</label>
+            <input type="text" id="motif" name="motif" class="form-control" required />
+          </div>
+          <div class="mb-2">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="description" rows="2" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">Enregistrer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+ 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/appjs/finance.js') }}"></script>
+{% endblock %}
