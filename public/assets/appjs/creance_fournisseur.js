@@ -127,8 +127,7 @@ $('#montantFCFA, #tauxChange').on('input', function () {
     $('#modalPaiementCreance').modal('show');
   });
 
-  $(document).on('click', '.btn-print', function () {
-    console.log("Paiement click détecté !");
+  $(document).on('click', '.btn-print', function () { 
   const id = $(this).data('id');
 
   $.get(`/api/creances/${id}/details`, function (res) {
@@ -195,10 +194,16 @@ $('#montantFCFA, #tauxChange').on('input', function () {
       <div class="footer">Merci pour votre confiance - Auto Banamba</div>
     </body></html>`;
 
-    const win = window.open('', '', 'width=1000,height=800');
-    win.document.write(html);
-    win.document.close();
-    win.print();
+    const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
   });
 });
 
@@ -333,10 +338,16 @@ if (montantDevise > montantMax) {
     </body></html>
   `;
 
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  win.print();
+  const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
 });
 
 

@@ -254,10 +254,16 @@ function afficherDetailsCredit(row, creditId) {
       </html>
     `;
 
-    const win = window.open('', '_blank', 'width=900,height=800');
-    win.document.write(html);
-    win.document.close();
-    win.print();
+    const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
   });
 });
 
@@ -265,9 +271,7 @@ function afficherDetailsCredit(row, creditId) {
     // Impression de la liste
     $('#btnPrintCredits').on('click', function () {
   const content = document.querySelector('.print-area').innerHTML;
-
-  const win = window.open('', '', 'width=1000,height=800');
-  win.document.write(`
+  const html = `
     <html>
       <head>
         <title>Impression des Crédits</title>
@@ -282,9 +286,17 @@ function afficherDetailsCredit(row, creditId) {
         ${content}
       </body>
     </html>
-  `);
-  win.document.close();
-  win.print();
+  `
+ const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
 });
 
   

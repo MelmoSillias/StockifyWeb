@@ -22,6 +22,7 @@ $(document).ready(function () {
           {
             data: null,
             render: row => `
+              <button class="btn btn-sm btn-success btn-add" data-id="${row.id}"><i class="bi bi-plus"></i></button>
               <button class="btn btn-sm btn-primary btn-edit" data-id="${row.id}"><i class="bi bi-pencil"></i></button>
               <button class="btn btn-sm btn-danger btn-delete" data-id="${row.id}"><i class="bi bi-trash"></i></button>
               <button class="btn btn-sm btn-secondary btn-lot" data-id="${row.id}"><i class="bi bi-box-seam"></i></button>
@@ -85,7 +86,7 @@ $(document).ready(function () {
         description: $('#produit-description').val(),
         seuil_alerte: $('#produit-seuil').val(),
         actif: $('#produit-actif').is(':checked'),
-        prix_de_vente: $('#produit-prix-vente').val(),
+        prix_de_vente: $('#produit-prix-de-vente').val(),
       };
   
       $.ajax({

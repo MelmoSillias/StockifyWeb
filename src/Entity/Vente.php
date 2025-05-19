@@ -37,6 +37,9 @@ class Vente
     #[ORM\OneToMany(mappedBy: 'vente', targetEntity: DetailVente::class)]
     private iterable $detailsVente;
 
+    #[ORM\Column]
+    private ?float $benefice = null;
+
     public function __construct()
     {
         $this->detailsVente = [];
@@ -141,6 +144,17 @@ class Vente
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getBenefice() : float
+    {
+        return $this->benefice;
+    }
+
+    public function setBenefice(float $benefice): static
+    {
+        $this->benefice = $benefice;
         return $this;
     }
 }

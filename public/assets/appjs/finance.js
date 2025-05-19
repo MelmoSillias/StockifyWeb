@@ -180,12 +180,73 @@ $(document).ready(function () {
           <div class="footer">Merci pour votre confiance - Auto Banamba</div>
         </body></html>
       `;
-      const win = window.open('', '', 'width=900,height=700');
-      win.document.write(html);
-      win.document.close();
-      win.print();
+      const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
     });
   });
+
+  $('#printTransactions').on('click', function () {
+        const tableClone = $('#transactionsTable').clone();
+      
+        // Retirer les colonnes inutiles
+        tableClone.find('thead th:last-child').remove();
+        tableClone.find('tbody tr').each(function () {
+          $(this).find('td:last-child').remove();
+        });
+      
+        // Récupérer les paramètres de filtre actuels de DataTable
+        const ajaxParams = tableFinance.ajax.params ? tableFinance.ajax.params() : {};
+        const periode = ajaxParams.periode || $('#filter-periode').val() || '';
+        const type = ajaxParams.type || $('#filter-type').val() || '';
+        const motif = ajaxParams.motif || $('#filter-motif').val() || '';
+        const libelle = ajaxParams.libelle || $('#filter-libelle').val() || '';
+
+        const htmlContent = `
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <title>Liste des Transactions</title>
+              <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+              <style>
+          body { padding: 20px; font-family: sans-serif; }
+          table { width: 100%; border-collapse: collapse; font-size: 14px; }
+          th, td { padding: 8px; border: 1px solid #ccc; }
+          h3 { margin-bottom: 20px; }
+              </style>
+            </head>
+            <body>
+              <h3>Liste des Transactions</h3>
+              <h5>
+                Période : <span>${periode}</span><br>
+                Type : <span>${type}</span><br>
+                Motif : <span>${motif}</span><br>
+                Libellé : <span>${libelle}</span>
+              </h5>
+              ${tableClone.prop('outerHTML')}
+            </body>
+          </html>
+        `;
+      
+      const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+      
+        printWindow.onload = function () {
+          printWindow.focus();
+          printWindow.print();
+          setTimeout(() => printWindow.close(), 500);
+        };
+      });
 
   // Annulation des transactions libres
   $(document).on('click', '.btn-delete', function () {

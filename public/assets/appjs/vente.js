@@ -279,7 +279,7 @@ $(document).ready(function () {
         <thead><tr><th>Produit</th><th>Qté</th><th>PU</th><th>Total</th></tr></thead><tbody>`;
         lignes.forEach(l => {
             const total = l.quantite * l.prix_unitaire;
-            html += `<tr><td>${l.produit}</td><td>${l.quantite}</td><td>${l.prix_unitaire}</td><td>${total}</td></tr>`;
+            
         });
         html += '</tbody></table>';
         return html;
