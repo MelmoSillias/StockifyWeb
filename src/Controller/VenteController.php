@@ -276,11 +276,7 @@ public function create(
                 $montantCredit += $montant;
             }
 
-            // Bénéfice via lignes de vente
-            foreach ($vente->getDetailsVente() as $ligne) {
-                $pme = $ligne->getProduit()?->getPme() ?? 0;
-                $benefice += ($ligne->getPrixUnitaireVente() - $pme) * $ligne->getQuantite();
-            }
+            $benefice += $vente->getBenefice();
         }
 
         return $this->json([
