@@ -224,7 +224,7 @@ public function create(
             'date' => $vente->getDate()->format('Y-m-d H:i'),
             'client' => $vente->getNomClient(),
             'type' => ucfirst($vente->getType()), // "Espèces" ou "Crédit"
-            'montant_paye' => $vente->getMontantPaye(),
+            'montant_paye' => $vente->getMontantPaye(), 
             'lignes' => $lignes,
         ]);
     }

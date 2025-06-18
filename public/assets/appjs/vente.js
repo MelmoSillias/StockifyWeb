@@ -447,12 +447,11 @@ $(document).ready(function () {
             <div style="margin-top: 15px; text-align: right;">
             <p><strong>Total :</strong> ${total.toFixed(2)} FCFA</p>
             <p><strong>Payé :</strong> ${vente.montant_paye} FCFA</p>
-            <p><strong>Reste :</strong> ${(total - vente.montant_paye).toFixed(2)} FCFA</p>
-            <p><strong>Bénéfice estimé :</strong> ${benefice.toFixed(2)} FCFA</p>
+            <p><strong>Reste :</strong> ${(total - vente.montant_paye).toFixed(2)} FCFA</p> 
             </div>
 
             <div style="margin-top: 30px; display: flex; justify-content: space-between;">
-            <div><strong>Cachet / Signature</strong></div>
+            <div><strong>Cachet de l'entreprise</strong></div>
             <div><strong>Signature client</strong></div>
             </div>
 

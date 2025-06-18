@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use function PHPSTORM_META\map;
+
 final class CreanceFournisseurController extends AbstractController
 {
     #[Route('/creance/fournisseur', name: 'app_creance_fournisseur')]
@@ -150,7 +152,12 @@ final class CreanceFournisseurController extends AbstractController
             ];
         }
 
-        return $this->json(['paiements' => $paiements]);
+        return $this->json(['paiements' => $paiements,
+                            'founisseur' => $creance->getFournisseurNom(),
+                            'montant_restant' => $creance->getMontantRestant(),
+                            'devise' => $creance->getDevise(),
+                            'date' => $creance->getDate(),
+                        ]);
     }
     #[Route('/api/paiements-fournisseur/{id}', name: 'api_paiement_fournisseur_delete', methods: ['DELETE'])]
     public function deletePaiement(

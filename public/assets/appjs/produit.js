@@ -198,8 +198,7 @@ $('#produitsTable').on('click', '.btn-edit', function () {
         quantite: parseInt($('#lot-quantite').val()),
         prix_unitaire_achat: parseFloat($('#lot-prix').val()),
         date_achat: $('#lot-date').val(),
-        fournisseur: $('#lot-fournisseur').val(),
-        devise: $('#lot-devise').val()
+        fournisseur: $('#lot-fournisseur').val(), 
       };
   
       $.ajax({

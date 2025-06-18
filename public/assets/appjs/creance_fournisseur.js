@@ -26,8 +26,8 @@ $(document).ready(function () {
         { data: 'fournisseur' },
         { data: 'date' },
         { data: 'devise' },
-        { data: 'montant_total' },
-        { data: 'montant_restant' },
+        { data: 'montant_total'},
+        { data: 'montant_restant', render: r => {r.toFixed(2)} },
         {
           data: 'statut',
           render: s => {
@@ -80,11 +80,21 @@ $(document).ready(function () {
 
   $('#btnSubmitCreanceForm').on('click', function (e) {
     e.preventDefault();
+    const fournisseur = $('#fournisseur').val();
+    const montant = $('#montant_devise').val();
+    const devise = $('#devise').val();
+    const date = $('#date').val();
+
+    if (!fournisseur || !montant || !devise || !date) {
+      showToastModal({ message: 'Veillez rensigner tout les champs.', type: 'warning' });
+      return;
+    }
+
     const data = {
-      fournisseur: $('#fournisseur').val(),
-      montant_devise: parseFloat($('#montant_devise').val()),
-      devise: $('#devise').val(),
-      date: $('#date').val(),
+      fournisseur,
+      montant_devise: parseFloat(montant),
+      devise,
+      date,
     };
 
     $.post('/api/creances/create', data, function () {
@@ -175,10 +185,10 @@ $('#montantFCFA, #tauxChange').on('input', function () {
 
       <div class="d-flex justify-content-between mb-3">
         <div><strong>Fournisseur :</strong> ${res.fournisseur || '---'}</div>
-        <div><strong>Date :</strong> ${now}</div>
+        <div><strong>Date :</strong> ${res.date}</div>
       </div>
 
-      <div><strong>Montant restant :</strong> ${(Number(res.montant_restant) || 0).toLocaleString()} ${res.devise}</div>
+      <div><strong>Montant restant :</strong> ${(res.montant_restant || 0).toLocaleString()} ${res.devise}</div>
 
       <h6 class="mt-4">Paiements effectués</h6>
       <table class="table table-sm table-bordered">
