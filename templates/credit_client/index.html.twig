@@ -1,0 +1,181 @@
+{% extends 'appbase.html.twig' %}
+{% block title %}Créances Clients
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    @media print {
+      body {
+        font-size: 12px;
+        color: #000;
+        background: white;
+      }
+
+      .no-print, .dataTables_length, .dataTables_filter, .dataTables_paginate, .dataTables_info {
+        display: none !important;
+      }
+
+      .table th, .table td {
+        padding: 4px !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc;
+      }
+
+      .container-fluid, .container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .row {
+        margin: 0;
+      }
+    }
+  </style>
+{% endblock %}
+
+
+{% block main %}
+	<div class="container-fluid px-4">
+		<div class="card shadow mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h6 class="m-0 font-weight-bold text-primary">
+					<i class="bi bi-credit-card me-2"></i>Liste des Crédits Clients
+				</h6>
+				<div>
+					<button id="btnPrintCredits" class="btn btn-outline-secondary btn-sm">
+						<i class="bi bi-printer"></i>
+						Imprimer
+					</button>
+				</div>
+			</div>
+
+			<div class="card-body">
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<input id="filtre-periode" class="form-control form-control-sm" placeholder="Période de vente"/>
+					</div>
+					<div class="col-md-3">
+						<input id="filtre-client" class="form-control form-control-sm" placeholder="Nom client"/>
+					</div>
+					<div class="col-md-3">
+						<select id="filtre-statut" class="form-select form-select-sm">
+							<option value="">-- Tous les statuts --</option>
+							<option value="impayé">Impayé</option>
+							<option value="partiel">Partiellement payé</option>
+							<option value="payé">Payé</option>
+						</select>
+					</div>
+					<div class="col-md-3 text-end">
+						<button id="btn-filtrer-credits" class="btn btn-sm btn-primary">
+							<i class="bi bi-filter"></i>
+							Filtrer
+						</button>
+					</div>
+				</div>
+        <div class="print-area table-responsive">
+				<table id="creditsTable" class="table table-bordered table-hover table-striped w-100">
+					<thead class="">
+						<tr>
+							<th></th>
+							<th>ID</th>
+							<th>Vente</th>
+							<th>Client</th>
+							<th>Montant total</th>
+							<th>Restant</th>
+							<th>Statut</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+        </div>
+			</div>
+		</div>
+
+		<div id="creditStats" class="row mt-4">
+			<div class="col-md-4">
+				<div class="card bg-info text-center">
+					<div class="card-body">
+						<h6 class="text-muted">Crédits total</h6>
+						<h5>
+							<span id="stat-nb-total">--</span>
+							crédits /
+							<span id="stat-montant-total">--</span>
+							FCFA</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card bg-success text-white text-center">
+					<div class="card-body">
+						<h6>Réglés</h6>
+						<h5>
+							<span id="stat-nb-payes">--</span>
+							/
+							<span id="stat-montant-payes">--</span>
+							FCFA</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card bg-warning text-dark text-center">
+					<div class="card-body">
+						<h6>Partiels / Impayés</h6>
+						<h5>
+							Partiels :
+							<span id="stat-nb-partiels">--</span>
+							(<span id="stat-montant-partiels">--</span>
+							FCFA)<br>
+							Impayés :
+							<span id="stat-nb-impayes">--</span>
+							(<span id="stat-montant-impayes">--</span>
+							FCFA)
+						</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 mt-3 text-center">
+				<strong>Recette effective :
+					<span id="stat-recette" class="text-primary">--</span>
+					FCFA</strong>
+			</div>
+		</div>
+
+	</div>
+
+	{# Modal Paiement #}
+	<div class="modal fade" id="modalPaiementCredit" tabindex="-1" aria-labelledby="paiementCreditLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-sm">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" id="paiementCreditLabel">
+						<i class="bi bi-wallet2 me-2"></i>Remboursement Crédit</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+				</div>
+				<div class="modal-body">
+					<form id="formPaiementCredit">
+						<input type="hidden" id="creditId"/>
+						<div class="mb-3">
+							<label for="montantAPayer" class="form-label">Montant à payer</label>
+							<input type="number" class="form-control" id="montantAPayer" min="0.01" step="0.01"/>
+							<div class="form-text" id="creditRestantInfo"></div>
+						</div>
+						<div class="d-grid gap-2">
+							<button type="submit" class="btn btn-success">Valider</button>
+							<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %} 
+	<script src="{{ asset('assets/appjs/credit_client.js') }}"></script>
+{% endblock %}

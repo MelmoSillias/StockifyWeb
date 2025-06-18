@@ -1,0 +1,313 @@
+{% extends 'appbase.html.twig' %}
+
+{% block title %}Produits
+{% endblock %}
+{% block stylesheets %}
+	<style>
+		.stat-card {
+			border-left: 4px solid;
+			border-radius: 0.25rem;
+			padding: 1rem;
+			height: 100%;
+			box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+		}
+
+		.stat-card.primary {
+			border-color: #007bff;
+		}
+
+		.stat-card.success {
+			border-color: #28a745;
+		}
+
+		.stat-card.info {
+			border-color: #17a2b8;
+		}
+
+		.stat-card .card-title {
+			margin-bottom: 0.5rem;
+			font-size: 1rem;
+			color: #495057;
+		}
+
+		.stat-card .card-value {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: #212529;
+		}
+	</style>
+{% endblock %}
+
+
+{% block main %}
+	<div class="container-fluid px-4">
+		<div class="row mb-3">
+			<div class="row">
+				<div class="col-md-4 mb-2">
+					<div class="card stat-card primary shadow-sm">
+						<div class="card-body flex flex-row justify-content-center align-items-center">
+							<h5 class="text-muted">Produits actifs</h5>
+							<div class="card-value text-primary" id="stat-total-produits">0</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 mb-2">
+					<div class="card stat-card success shadow-sm">
+						<div class="card-body flex flex-row justify-content-center align-items-center">
+							<h5 class="text-muted ">Stock total</h5>
+							<div class="card-value text-success" id="stat-total-stock">0</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4 mb-2">
+					<div class="card stat-card info shadow-sm">
+						<div class="card-body flex flex-row justify-content-center align-items-center">
+							<h5 class="text-muted">Valeur estimée</h5>
+							<div class="card-value text-info" id="stat-valeur-estimee">0 FCFA</div>
+						</div>
+					</div>
+				</div>
+			</div> 
+
+            	<div class="row">
+                <div class="col-md-12 d-flex align-items-center justify-content-end gap-2 p-3">
+                    <button class="btn btn-success btn-lg shadow-sm" id="btn-add-product">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Ajouter
+                    </button> 
+                    <button class="btn btn-outline-secondary btn-lg shadow-sm" id="btn-print-products">
+                        <i class="bi bi-printer me-1"></i>
+                        Imprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+	
+        <div class="card shadow">
+            <div class="card-header text-primary bold">
+                <h3 class="card-title">Produits</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="produitsTable" class="table table-bordered table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nom</th>
+                                <th>Référence</th>
+                                <th>Catégorie</th>
+                                <th>Stock</th>
+                                <th>PME</th>
+                                <th>Valeur</th>
+                                <th>Prix de vente</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {# Rempli par AJAX #}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	{# Modal de création/modification de produit #}
+	<div class="modal fade" id="produitModal" tabindex="-1" aria-labelledby="produitModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<form id="produitForm">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="produitModalLabel">Ajouter un produit</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+					</div>
+					<div class="modal-body">
+						<input type="hidden" id="produit-id" name="id">
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label for="produit-nom" class="form-label">Nom</label>
+								<input type="text" class="form-control" id="produit-nom" name="nom" required>
+							</div>
+							<div class="col-md-6">
+								<label for="produit-prix-de-vente" class="form-label">Prix de vente</label>
+								<input type="number" class="form-control" id="produit-prix-de-vente" name="prix de vente">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label for="produit-categorie" class="form-label">Catégorie</label>
+								<input type="text" class="form-control" id="produit-categorie" name="categorie">
+							</div>
+							<div class="col-md-6">
+								<label for="produit-seuil" class="form-label">Seuil d'alerte</label>
+								<input type="number" class="form-control" id="produit-seuil" name="seuil_alerte">
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="produit-description" class="form-label">Description</label>
+							<textarea class="form-control" id="produit-description" name="description" rows="2"></textarea>
+						</div>
+						<div class="form-check form-switch mb-3">
+							<input class="form-check-input" type="checkbox" id="produit-actif" name="actif" checked>
+							<label class="form-check-label" for="produit-actif">Actif</label>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+						<button type="submit" class="btn btn-primary">Enregistrer</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modModProduitModal" tabindex="-1" aria-labelledby="modProduitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form id="modModProduitForm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modProduitModalLabel">Modifier un produit</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modProduit-id" name="id">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="modProduit-nom" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="modProduit-nom" name="nom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="modProduit-prix-de-vente" class="form-label">Prix de vente</label>
+                            <input type="number" class="form-control" id="modProduit-prix-de-vente" name="prix de vente">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="modProduit-categorie" class="form-label">Catégorie</label>
+                            <input type="text" class="form-control" id="modProduit-categorie" name="categorie">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="modProduit-seuil" class="form-label">Seuil d'alerte</label>
+                            <input type="number" class="form-control" id="modProduit-seuil" name="seuil_alerte">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modProduit-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="modProduit-description" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="modProduit-actif" name="actif" checked>
+                        <label class="form-check-label" for="modProduit-actif">Actif</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="ModProSubmitBtn">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+	{# Modal d’ajout de stock à un produit (création de LotProduit) #}
+	<div class="modal fade" id="stockModal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-md modal-dialog-centered">
+			<div class="modal-content">
+				<form id="lotForm">
+					<div class="modal-header bg-secondary text-white">
+						<h5 class="modal-title" id="stockModalLabel">Ajouter un lot de stock</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+					</div>
+					<div class="modal-body">
+						<input type="hidden" id="lot-produit-id" name="produit_id">
+						<div class="mb-3">
+							<label for="lot-quantite" class="form-label">Quantité</label>
+							<input type="number" class="form-control" id="lot-quantite" name="quantite" required>
+						</div>
+						<div class="mb-3">
+							<label for="lot-prix" class="form-label">Prix unitaire d’achat (FCFA)</label>
+							<input type="number" step="0.01" class="form-control" id="lot-prix" name="prix_unitaire_achat" required>
+						</div>
+						<div class="mb-3">
+							<label for="lot-date" class="form-label">Date d’achat</label>
+							<input type="text" class="form-control" id="lot-date" name="date_achat" required>
+						</div>
+						<div class="mb-3">
+							<label for="lot-fournisseur" class="form-label">Fournisseur (optionnel)</label>
+							<input type="text" class="form-control" id="lot-fournisseur" name="fournisseur">
+						</div>
+						<div class="mb-3">
+							<label for="lot-devise" class="form-label">Devise (optionnelle)</label>
+							<input type="text" class="form-control" id="lot-devise" name="devise" placeholder="FCFA, EUR, USD...">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+						<button type="submit" class="btn btn-success">Ajouter le stock</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	
+
+	<div class="modal fade" id="lotsModal" tabindex="-1" aria-labelledby="lotsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="lotsModalLabel">Lots du produit</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" id="lotsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+                <th>Date</th>
+                <th>Fournisseur</th>
+                <th>Devise</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>{# injecté via JS #}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteLotModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <i class="bi bi-exclamation-triangle fs-1 text-danger mb-3"></i>
+        <h5 class="mb-3">Confirmer la suppression de ce lot ?</h5>
+        <div class="d-flex justify-content-center gap-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-danger" id="btn-confirm-delete-lot">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+	<script src="{{ asset('assets/appjs/produit.js') }}"></script>
+{% endblock %}

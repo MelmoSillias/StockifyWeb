@@ -1,0 +1,178 @@
+🔧 Modèle de Données – Entités Principales
+🧱 1. Produits
+Produit
+
+id
+
+nom
+
+reference (optionnel)
+
+categorie
+
+description
+
+stock_actuel
+
+pme (calculé automatiquement)
+
+seuil_alerte (optionnel)
+
+actif (bool)
+
+LotProduit (chaque ajout de stock crée un lot, pour le calcul du PME)
+
+id
+
+produit_id (FK)
+
+quantite
+
+prix_unitaire_achat
+
+date_achat
+
+fournisseur (optionnel)
+
+devise (optionnelle, si utilisé avec créances fournisseurs)
+
+🔁 2. Mouvements de Stock
+MouvementStock
+
+id
+
+produit_id (FK)
+
+type (entrée, sortie)
+
+quantite
+
+date
+
+source (vente, retour, ajout manuel, etc.)
+
+commentaire (optionnel)
+
+🛒 3. Guichet de Vente
+Vente
+
+id
+
+date
+
+nom_client (facultatif)
+
+type (espèce, crédit)
+
+total
+
+montant_payé
+
+reste
+
+user_id (FK, si on garde la traçabilité)
+
+DetailVente
+
+id
+
+vente_id (FK)
+
+produit_id (FK)
+
+quantite
+
+prix_unitaire_vente
+
+📜 4. Crédits Clients
+CreditClient
+
+id
+
+vente_id (FK)
+
+client_nom (optionnel, redondant pour sécurité)
+
+montant_total
+
+montant_restant
+
+statut (en cours / réglé)
+
+PaiementCreditClient
+
+id
+
+credit_id (FK)
+
+montant
+
+date
+
+user_id (FK)
+
+💸 5. Créances Fournisseurs
+CreanceFournisseur
+
+id
+
+fournisseur_nom
+
+devise (ex: EUR, USD)
+
+taux_change (au moment de la dette)
+
+montant_total
+
+montant_restant
+
+PaiementCreanceFournisseur
+
+id
+
+creance_id (FK)
+
+montant_paye_devise
+
+taux_applique
+
+montant_en_caisse
+
+date
+
+user_id (FK)
+
+💰 6. Finances (Caisse)
+TransactionCaisse
+
+id
+
+date
+
+type (entrée, sortie)
+
+montant
+
+description (libellé visible)
+
+motif
+
+vente_id (optionnel)
+
+paiement_credit_id (optionnel)
+
+paiement_fournisseur_id (optionnel)
+
+👥 7. Utilisateurs / Accès
+User
+
+id
+
+nom_utilisateur
+
+mot_de_passe
+
+role (admin, vendeur, caisse, etc.)
+
+actif
+
