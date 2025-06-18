@@ -98,23 +98,9 @@ final class CreditClientController extends AbstractController
         $transaction = new TransactionCaisse();
         $transaction->setType('entrée');
         $transaction->setMontant($montant);
-<<<<<<< HEAD
-        $transaction->setDate(new \DateTime());
-        // Associer le paiement à la transaction si une méthode existe, sinon commenter ou adapter la ligne suivante
-        // $transaction->setPaiementCreditClient($paiement);
-        // Essayez d'utiliser une méthode existante, par exemple :
-        $transaction->setPaiementCredit($paiement);
-        // Si aucune méthode n'existe, commentez ou supprimez la ligne ci-dessus
-        $transaction->setDescription('Paiement crédit client #' . $credit->getId());
-=======
-
-        $transaction->setDate(new \DateTime());
-        $transaction->setPaiementCredit($paiement);
-
-        // Si aucune méthode n'existe, commentez ou supprimez la ligne ci-dessus
-        $transaction->setDescription('Paiement crédit client #' . $credit->getId());
+        $transaction->setDate(new \DateTime()); 
+        $transaction->setDescription('Paiement crédit client #' . $credit->getId());  
         $transaction->setMotif("Paiement de credit");
->>>>>>> 3c07aa183ea8e63fe96112c1fb5f74caef8dfdd6
         $em->persist($transaction);
 
         $em->flush();
