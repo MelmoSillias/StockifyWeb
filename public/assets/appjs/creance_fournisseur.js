@@ -26,8 +26,14 @@ $(document).ready(function () {
         { data: 'fournisseur' },
         { data: 'date' },
         { data: 'devise' },
-        { data: 'montant_total'},
-        { data: 'montant_restant', render: r => {r.toFixed(2)} },
+        {
+          data: 'montant_total',
+          render: (data, _, row) => `${parseFloat(data).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${row.devise}`
+        },
+        {
+          data: 'montant_restant',
+          render: (data, _, row) => `${parseFloat(data).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${row.devise}`
+        },
         {
           data: 'statut',
           render: s => {

@@ -238,18 +238,18 @@ public function delete(
     PaiementCreanceFournisseurRepository $repo,
     TransactionCaisseRepository $trxRepo,
     EntityManagerInterface $em
-): JsonResponse {
-    foreach ($creance->getPaiements() as $paiement) {
-        $trx = $trxRepo->findOneBy(['paiement_fournisseur' => $paiement]);
-        if ($trx) $em->remove($trx);
-        $em->remove($paiement);
+    ): JsonResponse {
+        foreach ($creance->getPaiements() as $paiement) {
+            $trx = $trxRepo->findOneBy(['paiement_fournisseur' => $paiement]);
+            if ($trx) $em->remove($trx);
+            $em->remove($paiement);
+        }
+
+        $em->remove($creance);
+        $em->flush();
+
+        return $this->json(['message' => 'Créance supprimée']);
     }
-
-    $em->remove($creance);
-    $em->flush();
-
-    return $this->json(['message' => 'Créance supprimée']);
-}
 
 
 }
