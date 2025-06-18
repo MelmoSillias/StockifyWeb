@@ -52,6 +52,7 @@ public function create(
     $vente->setMontantPaye($data['montant_paye']);
     
     $total = 0;
+    
 
     foreach ($data['lignes'] as $ligne) {
         $produit = $produitRepo->find($ligne['produit_id']);
@@ -110,6 +111,7 @@ public function create(
     }
 
     $vente->setTotal($total);
+    $vente->setBenefice($data['benefice']);
     $reste = max(0, $total - $vente->getMontantPaye());
     $vente->setReste($reste);
     $em->persist($vente);

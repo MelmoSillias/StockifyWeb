@@ -25,7 +25,7 @@ $(document).ready(function () {
 
             ligne.find('.pme-affiche').text(`${produit.pme} FCFA`);
             ligne.find('.stock-restant').text(`${produit.stock_actuel} dispo`);
-            ligne.find('.prix-unitaire').val(produit.pme);
+            ligne.find('.prix-unitaire').val(produit.prix_de_vente = 0 | produit.prix_de_vente < produit.pme ? produit.pme : produit.prix_de_vente);
             ligne.find('.prix-de-vente-ligne').text(`${produit.prix_de_vente} FCFA`);
         }
 
@@ -194,6 +194,7 @@ $(document).ready(function () {
             client: $('#client').val(),
             type_paiement: $('#type_paiement').val(),
             montant_paye: parseFloat($('#montant_paye').val()) || 0,
+            benefice: parseFloat($('#venteBenefice').text()),
             lignes: lignes
         };
 
@@ -279,7 +280,7 @@ $(document).ready(function () {
         <thead><tr><th>Produit</th><th>Qté</th><th>PU</th><th>Total</th></tr></thead><tbody>`;
         lignes.forEach(l => {
             const total = l.quantite * l.prix_unitaire;
-            
+            html += `<tr><td>${l.produit}</td><td>${l.quantite}</td><td>${l.prix_unitaire}</td><td>${total}</td></tr>`;
         });
         html += '</tbody></table>';
         return html;
