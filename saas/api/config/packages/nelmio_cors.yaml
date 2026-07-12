@@ -1,0 +1,27 @@
+nelmio_cors:
+    defaults:
+        origin_regex: true
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+        allow_headers: ['Content-Type', 'Authorization', 'X-Account-Id', 'X-Shop-Id']
+        allow_credentials: true
+        expose_headers: ['Link']
+        max_age: 3600
+    paths:
+        '^/api':
+            origin_regex: true
+            allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+            allow_headers: ['Content-Type', 'Authorization', 'X-Account-Id', 'X-Shop-Id']
+            allow_credentials: true
+            expose_headers: ['Link']
+            max_age: 3600
+
+        '^/api/login_check':
+            origin_regex: true
+            allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+            allow_methods: ['POST']
+            allow_headers: ['Content-Type', 'Authorization', 'X-Account-Id', 'X-Shop-Id']
+            allow_credentials: true
+            expose_headers: ['Link']
+            max_age: 3600

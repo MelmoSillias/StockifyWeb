@@ -1,0 +1,24 @@
+:root[data-layout-theme='dune'] {
+  --layout-page-bg: #faf3ea;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(255, 248, 239, 0.98), rgba(253, 230, 200, 0.38));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(120, 53, 15, 0.96), rgba(154, 52, 18, 0.88));
+  --layout-topbar-bg: rgba(255, 248, 241, 0.82);
+}
+
+:root.app-dark[data-layout-theme='dune'] {
+  --layout-page-bg: #140c07;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(245, 158, 11, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(20, 12, 7, 0.99), rgba(92, 39, 12, 0.96));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(68, 30, 11, 0.98), rgba(120, 53, 15, 0.94));
+  --layout-topbar-bg: rgba(31, 18, 10, 0.82);
+  --layout-panel-bg: rgba(33, 18, 10, 0.84);
+  --layout-panel-border: rgba(251, 191, 36, 0.16);
+  --layout-text-color: rgba(255, 247, 237, 0.95);
+  --layout-text-muted: rgba(253, 186, 116, 0.72);
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='dune'] {
+  --layout-shell-bg: #140c07;
+  --layout-sidebar-bg: #78350f;
+}

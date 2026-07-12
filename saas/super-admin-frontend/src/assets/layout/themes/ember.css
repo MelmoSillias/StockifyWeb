@@ -1,0 +1,24 @@
+:root[data-layout-theme='ember'] {
+  --layout-page-bg: #fff4ed;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(255, 247, 237, 0.98), rgba(254, 215, 170, 0.38));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(67, 20, 7, 0.95), rgba(154, 52, 18, 0.88));
+  --layout-topbar-bg: rgba(255, 251, 235, 0.8);
+}
+
+:root.app-dark[data-layout-theme='ember'] {
+  --layout-page-bg: #160903;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(245, 158, 11, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(22, 9, 3, 0.99), rgba(67, 20, 7, 0.97));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(39, 12, 6, 0.98), rgba(120, 53, 15, 0.94));
+  --layout-topbar-bg: rgba(33, 13, 8, 0.82);
+  --layout-panel-bg: rgba(39, 13, 7, 0.84);
+  --layout-panel-border: rgba(251, 191, 36, 0.16);
+  --layout-text-color: rgba(255, 247, 237, 0.95);
+  --layout-text-muted: rgba(253, 186, 116, 0.72);
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='ember'] {
+  --layout-shell-bg: #160903;
+  --layout-sidebar-bg: #431407;
+}

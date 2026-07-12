@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+    upload-dir: 'public/uploads'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/**/Domain/Entity/'
+            - '../src/**/Domain/Enum/'
+            - '../src/**/Domain/Exception/'
+            - '../src/**/Domain/Event/'
+            - '../src/**/Domain/ValueObject/'
+            - '../src/**/Domain/Trait/'
+            - '../src/**/Application/**/Command/*Command.php'
+            - '../src/**/Application/**/Query/*Query.php'
+            - '../src/**/Application/**/Dto/'
+
+    # DIP — repository interfaces bound to Doctrine implementations
+    App\Catalog\Domain\Repository\ProductRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductRepository
+
+    App\Catalog\Domain\Repository\ProductCategoryRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductCategoryRepository
+
+    App\Catalog\Domain\Repository\ProductVariantRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductVariantRepository
+
+    App\Catalog\Domain\Repository\UnitOfMeasureRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineUnitOfMeasureRepository
+
+    App\IdentityAccess\Domain\Repository\UserRepositoryInterface:
+        alias: App\IdentityAccess\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
+
+    App\IdentityAccess\Domain\Repository\RefreshTokenRepositoryInterface:
+        alias: App\IdentityAccess\Infrastructure\Persistence\Doctrine\DoctrineRefreshTokenRepository
+
+    App\Inventory\Domain\Repository\StockLotRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockLotRepository
+
+    App\Inventory\Domain\Repository\StockMovementRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockMovementRepository
+
+    App\Inventory\Domain\Repository\StockPolicyRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockPolicyRepository
+
+    App\Inventory\Domain\Repository\StockLotAllocationRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockLotAllocationRepository
+
+    App\SharedKernel\Application\Event\DomainEventDispatcherInterface:
+        alias: App\SharedKernel\Infrastructure\Event\SymfonyDomainEventDispatcher

@@ -1,0 +1,24 @@
+:root[data-layout-theme='canopy'] {
+  --layout-page-bg: #eef8f1;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(242, 252, 245, 0.98), rgba(187, 247, 208, 0.34));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(20, 83, 45, 0.96), rgba(22, 101, 52, 0.9));
+  --layout-topbar-bg: rgba(244, 255, 247, 0.82);
+}
+
+:root.app-dark[data-layout-theme='canopy'] {
+  --layout-page-bg: #08150d;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(8, 21, 13, 0.98), rgba(20, 83, 45, 0.96));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(8, 47, 24, 0.98), rgba(20, 83, 45, 0.94));
+  --layout-topbar-bg: rgba(11, 30, 18, 0.82);
+  --layout-panel-bg: rgba(11, 30, 19, 0.84);
+  --layout-panel-border: rgba(74, 222, 128, 0.16);
+  --layout-text-color: rgba(240, 253, 244, 0.95);
+  --layout-text-muted: rgba(134, 239, 172, 0.72);
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='canopy'] {
+  --layout-shell-bg: #08150d;
+  --layout-sidebar-bg: #14532d;
+}

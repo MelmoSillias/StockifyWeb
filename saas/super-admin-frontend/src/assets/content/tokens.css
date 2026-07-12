@@ -1,0 +1,70 @@
+:root {
+  --content-space-3xs: calc(var(--layout-spacing-unit) * 0.25);
+  --content-space-2xs: calc(var(--layout-spacing-unit) * 0.35);
+  --content-space-xs: calc(var(--layout-spacing-unit) * 0.5);
+  --content-space-sm: calc(var(--layout-spacing-unit) * 0.75);
+  --content-space-md: calc(var(--layout-spacing-unit) * 1);
+  --content-space-lg: calc(var(--layout-spacing-unit) * 1.5);
+  --content-space-xl: calc(var(--layout-spacing-unit) * 2);
+  --content-space-page: clamp(var(--layout-spacing-unit), 2vw, calc(var(--layout-spacing-unit) * 1.5));
+  --content-space-section: clamp(calc(var(--layout-spacing-unit) * 0.75), 2vw, calc(var(--layout-spacing-unit) * 1.25));
+  --content-space-panel: clamp(var(--layout-spacing-unit), 2vw, calc(var(--layout-spacing-unit) * 1.5));
+  --content-radius-sm: var(--layout-radius-sm);
+  --content-radius-md: var(--layout-radius);
+  --content-radius-lg: var(--layout-radius-lg);
+  --content-radius-xl: calc(var(--layout-radius-lg) * 1.5);
+  --content-radius-pill: 999px;
+  --content-font-overline: var(--layout-font-size-xs);
+  --content-font-meta: var(--layout-font-size-sm);
+  --content-font-body: var(--layout-font-size-base);
+  --content-font-heading: var(--layout-font-size-xl);
+  --content-font-title: var(--layout-font-size-2xl);
+  --content-font-display: var(--layout-font-size-3xl);
+  --content-shadow-panel: var(--layout-shadow-panel);
+  --content-shadow-soft: var(--layout-shadow-soft);
+  --content-transition-fast: var(--layout-transition-fast);
+  --content-transition-panel: var(--layout-transition-panel);
+  --content-text-strong: var(--layout-text-color);
+  --content-text-muted: var(--layout-text-muted);
+  --content-surface-base: color-mix(in srgb, var(--layout-panel-bg) 98%, var(--layout-page-bg));
+  --content-surface-panel: color-mix(in srgb, var(--layout-panel-bg) 92%, transparent);
+  --content-surface-panel-strong: color-mix(in srgb, var(--layout-panel-bg) 96%, transparent);
+  --content-surface-soft: color-mix(in srgb, var(--layout-panel-bg) 88%, var(--layout-page-bg));
+  --content-surface-contrast-soft: color-mix(in srgb, var(--layout-text-color) 6%, var(--layout-panel-bg));
+  --content-border-subtle: var(--layout-panel-border);
+  --content-hero-bg:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--layout-accent-soft) 80%, transparent), transparent 34%),
+    var(--layout-shell-bg);
+  --content-tone-accent: var(--layout-accent);
+  --content-tone-accent-strong: var(--layout-accent-strong);
+  --content-tone-accent-soft: var(--layout-accent-soft);
+  --content-tone-info: var(--p-blue-500);
+  --content-tone-info-strong: var(--p-blue-700);
+  --content-tone-info-soft: color-mix(in srgb, var(--p-blue-500) 12%, var(--content-surface-base));
+  --content-tone-success: var(--p-green-500);
+  --content-tone-success-strong: var(--p-green-700);
+  --content-tone-success-soft: color-mix(in srgb, var(--p-green-500) 12%, var(--content-surface-base));
+  --content-tone-danger: var(--p-red-500);
+  --content-tone-danger-strong: var(--p-red-700);
+  --content-tone-danger-soft: color-mix(in srgb, var(--p-red-500) 10%, var(--content-surface-base));
+  --content-gradient-accent: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--content-tone-accent) 82%, var(--content-surface-base)),
+    var(--content-tone-accent-strong)
+  );
+  --content-gradient-info: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--content-tone-info) 88%, var(--content-surface-base)),
+    var(--content-tone-info-strong)
+  );
+  --content-gradient-success: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--content-tone-success) 88%, var(--content-surface-base)),
+    var(--content-tone-success-strong)
+  );
+  --content-gradient-danger: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--content-tone-danger) 88%, var(--content-surface-base)),
+    var(--content-tone-danger-strong)
+  );
+}

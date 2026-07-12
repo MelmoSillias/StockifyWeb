@@ -1,0 +1,24 @@
+:root[data-layout-theme='ocean'] {
+  --layout-page-bg: #eaf5fb;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(236, 248, 255, 0.96), rgba(214, 234, 248, 0.92));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(8, 47, 73, 0.95), rgba(14, 116, 144, 0.92));
+  --layout-topbar-bg: rgba(240, 249, 255, 0.84);
+}
+
+:root.app-dark[data-layout-theme='ocean'] {
+  --layout-page-bg: #03131d;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(6, 182, 212, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(3, 19, 29, 0.98), rgba(8, 47, 73, 0.97));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(4, 26, 40, 0.98), rgba(8, 47, 73, 0.95));
+  --layout-topbar-bg: rgba(6, 26, 38, 0.82);
+  --layout-panel-bg: rgba(8, 27, 40, 0.86);
+  --layout-panel-border: rgba(103, 232, 249, 0.14);
+  --layout-text-color: rgba(236, 254, 255, 0.94);
+  --layout-text-muted: rgba(165, 243, 252, 0.68);
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='ocean'] {
+  --layout-shell-bg: #03131d;
+  --layout-sidebar-bg: #082f49;
+}

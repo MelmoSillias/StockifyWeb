@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Catalog\Domain\Entity;
+
+use App\Catalog\Domain\Enum\CategoryStatus;
+use App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductCategoryRepository;
+use App\SharedKernel\Domain\Trait\TenantScopedTrait;
+use App\SharedKernel\Domain\Trait\TimestampableTrait;
+use App\SharedKernel\Domain\Trait\UuidEntityTrait;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
+
+#[ORM\Entity(repositoryClass: DoctrineProductCategoryRepository::class)]
+#[ORM\Table(name: 'product_categories')]
+#[ORM\UniqueConstraint(name: 'uniq_category_shop_name_parent', columns: ['shop_id', 'name', 'parent_id'])]
+class ProductCategory
+{
+    use UuidEntityTrait;
+    use TimestampableTrait;
+    use TenantScopedTrait;
+
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?ProductCategory $parent = null;
+
+    #[ORM\Column(length: 255)]
+    private string $name;
+
+    #[ORM\Column]
+    private int $sortOrder = 0;
+
+    #[ORM\Column(enumType: CategoryStatus::class)]
+    private CategoryStatus $status = CategoryStatus::Active;
+
+    public function __construct(Uuid $accountId, Uuid $shopId, string $name, ?ProductCategory $parent = null)
+    {
+        $this->initializeUuid();
+        $this->initializeTimestamps();
+        $this->setTenantScope($accountId, $shopId);
+        $this->name = $name;
+        $this->parent = $parent;
+    }
+
+    public function getParent(): ?ProductCategory
+    {
+        return $this->parent;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+        $this->touch();
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
+    public function getStatus(): CategoryStatus
+    {
+        return $this->status;
+    }
+}

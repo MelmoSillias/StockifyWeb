@@ -1,0 +1,6 @@
+node_modules
+dist
+.vite
+*.local
+.env
+src/generated/shop-config.generated.js

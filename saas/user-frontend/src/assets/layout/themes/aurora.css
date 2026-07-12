@@ -1,0 +1,25 @@
+:root[data-layout-theme='aurora'] {
+  --layout-page-bg: #f3f0ff;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), rgba(221, 214, 254, 0.48));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(49, 46, 129, 0.96), rgba(30, 64, 175, 0.92));
+  --layout-topbar-bg: rgba(250, 245, 255, 0.84);
+}
+
+:root.app-dark[data-layout-theme='aurora'] {
+  --layout-page-bg: #0c0820;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(244, 63, 94, 0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(129, 140, 248, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(12, 8, 32, 0.98), rgba(30, 27, 75, 0.97));
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(30, 27, 75, 0.98), rgba(49, 46, 129, 0.95));
+  --layout-topbar-bg: rgba(24, 19, 49, 0.82);
+  --layout-panel-bg: rgba(26, 20, 56, 0.84);
+  --layout-panel-border: rgba(165, 180, 252, 0.16);
+  --layout-text-color: rgba(245, 243, 255, 0.95);
+  --layout-text-muted: rgba(196, 181, 253, 0.74);
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='aurora'] {
+  --layout-shell-bg: #0c0820;
+  --layout-sidebar-bg: #312e81;
+}
