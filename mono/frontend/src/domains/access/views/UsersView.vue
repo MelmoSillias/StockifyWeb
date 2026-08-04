@@ -9,8 +9,10 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
+          :reloading="loading"
           @update:search-term="searchTerm = $event"
           @create="openCreate"
+          @reload="load"
         >
           <template #actions>
             <AppTablePrintExportBar table-type="users" :search-term="searchTerm" />
@@ -18,7 +20,13 @@
         </AppTablePanelHeader>
       </template>
       <template #content>
-        <AppTableState :loading="loading" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucun utilisateur">
+        <AppTableState
+          :loading="loading"
+          :error="error"
+          :is-empty="!loading && filteredItems.length === 0"
+          empty-title="Aucun utilisateur"
+          @retry="load"
+        >
           <DataTable
             :value="filteredItems"
             data-key="id"
@@ -102,6 +110,7 @@ const { hasPermission } = usePermissions()
 const items = ref([])
 const roles = ref([])
 const loading = ref(false)
+const error = ref(null)
 const submitting = ref(false)
 const searchTerm = ref('')
 const dialogVisible = ref(false)
@@ -128,10 +137,13 @@ const filteredItems = computed(() => {
 
 const load = async () => {
   loading.value = true
+  error.value = null
   try {
     const [users, roleList] = await Promise.all([accessService.listUsers(), accessService.listRoles()])
     items.value = users
     roles.value = roleList
+  } catch (err) {
+    error.value = err?.message || 'Impossible de charger les utilisateurs.'
   } finally {
     loading.value = false
   }

@@ -25,16 +25,20 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher une variante..."
           show-search
+          :reloading="variantsStore.loading"
           @update:search-term="searchTerm = $event"
           @create="dialog.openCreate()"
+          @reload="loadVariants(selectedProductId)"
         />
       </template>
       <template #content>
         <AppTableState
           :loading="variantsStore.loading"
+          :error="variantsStore.error"
           :is-empty="!variantsStore.loading && !selectedProductId"
           empty-title="Sélectionnez un produit"
           empty-text="Choisissez un produit pour afficher et gérer ses variantes."
+          @retry="loadVariants(selectedProductId)"
         >
           <DataTable
             v-if="selectedProductId"

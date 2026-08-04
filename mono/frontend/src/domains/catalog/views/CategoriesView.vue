@@ -9,16 +9,20 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher une catégorie..."
           show-search
+          :reloading="categoriesStore.loading"
           @update:search-term="searchTerm = $event"
           @create="dialog.openCreate()"
+          @reload="load"
         />
       </template>
       <template #content>
         <AppTableState
           :loading="categoriesStore.loading || productsStore.loading"
+          :error="categoriesStore.error || productsStore.error"
           :is-empty="!categoriesStore.loading && categoryTree.length === 0"
           empty-title="Aucune catégorie"
           empty-text="Créez une catégorie pour structurer votre catalogue."
+          @retry="load"
         >
           <TreeTable
             v-model:expandedKeys="expandedKeys"
@@ -281,12 +285,14 @@ const categoryRowActions = (category) => [
   }
 ]
 
-onMounted(async () => {
+const load = async () => {
   try {
     await Promise.all([categoriesStore.fetchAll(), productsStore.fetchAll()])
   } catch (error) {
     showError(error?.message || 'Impossible de charger les catégories.')
   }
-})
+}
+
+onMounted(load)
 </script>
 

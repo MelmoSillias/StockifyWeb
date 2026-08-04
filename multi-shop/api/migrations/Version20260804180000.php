@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+final class Version20260804180000 extends AbstractMigration
+{
+    public function getDescription(): string
+    {
+        return 'Add tenantAccountId and mustChangePassword to users';
+    }
+
+    public function up(Schema $schema): void
+    {
+        $this->addSql('ALTER TABLE users ADD tenant_account_id BINARY(16) DEFAULT NULL COMMENT \'(DC2Type:uuid)\'');
+        $this->addSql('ALTER TABLE users ADD must_change_password TINYINT(1) NOT NULL DEFAULT 0');
+    }
+
+    public function down(Schema $schema): void
+    {
+        $this->addSql('ALTER TABLE users DROP tenant_account_id');
+        $this->addSql('ALTER TABLE users DROP must_change_password');
+    }
+}

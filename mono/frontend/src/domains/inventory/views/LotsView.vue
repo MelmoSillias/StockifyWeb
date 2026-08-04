@@ -30,15 +30,19 @@
           create-label="Réception lot"
           :show-create="Boolean(selectedVariantId)"
           :show-search="false"
+          :reloading="inventoryStore.loading"
           @create="receiveDialog.openCreate()"
+          @reload="loadLots(selectedVariantId)"
         />
       </template>
       <template #content>
         <AppTableState
           :loading="inventoryStore.loading"
+          :error="inventoryStore.error"
           :is-empty="!inventoryStore.loading && !selectedVariantId"
           empty-title="Sélectionnez une variante"
           empty-text="Choisissez une variante pour consulter ses lots."
+          @retry="loadLots(selectedVariantId)"
         >
           <DataTable
             v-if="selectedVariantId"

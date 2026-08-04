@@ -10,11 +10,27 @@
           <div class="audit-filters">
             <InputText v-model="filters.action" placeholder="Action..." @keyup.enter="load" />
             <Button icon="pi pi-search" label="Filtrer" @click="load" />
+            <Button
+              icon="pi pi-refresh"
+              text
+              rounded
+              severity="secondary"
+              :loading="loading"
+              aria-label="Actualiser"
+              v-tooltip.top="'Actualiser'"
+              @click="load()"
+            />
           </div>
         </div>
       </template>
       <template #content>
-        <AppTableState :loading="loading" :is-empty="!loading && items.length === 0" empty-title="Aucune entrée">
+        <AppTableState
+          :loading="loading"
+          :error="error"
+          :is-empty="!loading && items.length === 0"
+          empty-title="Aucune entrée"
+          @retry="load()"
+        >
           <DataTable :value="items" data-key="id" striped-rows responsive-layout="scroll" paginator :rows="meta.limit" :total-records="meta.total" lazy @page="onPage">
             <Column field="occurred_at" header="Date" style="width: 180px">
               <template #body="{ data }">{{ formatDate(data.occurred_at) }}</template>
@@ -52,6 +68,7 @@ import { accessService } from '@/domains/access/services/accessService'
 
 const items = ref([])
 const loading = ref(false)
+const error = ref(null)
 const filters = reactive({ action: '' })
 const meta = reactive({ total: 0, page: 1, limit: 50 })
 
@@ -62,6 +79,7 @@ const formatDate = (value) => {
 
 const load = async (page = 1) => {
   loading.value = true
+  error.value = null
   meta.page = page
   try {
     const response = await accessService.listAuditLogs({
@@ -71,6 +89,8 @@ const load = async (page = 1) => {
     })
     items.value = response.data ?? []
     meta.total = response.meta?.total ?? items.value.length
+  } catch (err) {
+    error.value = err?.message || 'Impossible de charger le journal d\'audit.'
   } finally {
     loading.value = false
   }

@@ -7,7 +7,8 @@ Gestion de stock pour boutique.
 | Dossier | Rôle |
 |---------|------|
 | **`mono/`** | **Actif** — instance mono-magasin (API + frontend + docs) |
-| `saas/` | **En pause** — version multi-tenant / multi-boutique |
+| **`multi-shop/`** | **Expérimental** — multi-boutique OWNER + Shop (chemin vers SaaS) |
+| `saas/` | **En pause** — version multi-tenant / multi-boutique (référence) |
 | `mvc/` | Legacy Symfony MVC (référence) |
 | `simui/` | Modèle UI de référence (ne pas déployer) |
 

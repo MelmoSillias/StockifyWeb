@@ -8,7 +8,9 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher client ou référence..."
           show-search
+          :reloading="loading"
           @update:search-term="searchTerm = $event"
+          @reload="loadItems"
         >
           <template #actions>
             <AppTablePrintExportBar table-type="creances" :search-term="searchTerm" />
@@ -36,10 +38,12 @@
         <CreancesTable
           :items="items"
           :loading="loading"
+          :error="error"
           :search-term="searchTerm"
           :status-filter="localStatusFilter"
           :payment-loading-id="paymentLoadingId"
           @pay="openPayment"
+          @retry="loadItems"
         />
       </template>
     </Card>
@@ -73,6 +77,7 @@ const { showSuccess, showError } = useEntityActions()
 
 const items = ref([])
 const loading = ref(false)
+const error = ref(null)
 const searchTerm = ref('')
 const statusFilter = ref('open')
 const paymentVisible = ref(false)
@@ -98,10 +103,12 @@ const localStatusFilter = computed(() => {
 
 const loadItems = async () => {
   loading.value = true
+  error.value = null
   try {
     items.value = await creancesService.list({ status: statusFilter.value || 'open' })
-  } catch (error) {
-    showError(error?.message || 'Impossible de charger les créances.')
+  } catch (err) {
+    error.value = err?.message || 'Impossible de charger les créances.'
+    showError(error.value)
   } finally {
     loading.value = false
   }

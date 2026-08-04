@@ -1,9 +1,11 @@
 <template>
   <AppTableState
     :loading="loading"
+    :error="error"
     :is-empty="!loading && filteredItems.length === 0"
     empty-title="Aucune dette"
     :empty-text="emptyText"
+    @retry="$emit('retry')"
   >
     <DataTable
       v-model:expandedRows="expandedRows"
@@ -120,6 +122,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  error: {
+    type: String,
+    default: null
+  },
   showFournisseurColumn: {
     type: Boolean,
     default: true
@@ -142,7 +148,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['pay'])
+const emit = defineEmits(['pay', 'retry'])
 
 const { isMobile } = useBreakpoint()
 const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))

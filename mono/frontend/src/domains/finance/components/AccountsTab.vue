@@ -6,15 +6,19 @@
         :count-label="`${accountsStore.items.length} compte(s)`"
         create-label="Nouveau compte"
         show-create
+        :reloading="accountsStore.loading"
         @create="dialog.openCreate()"
+        @reload="accountsStore.fetchAll"
       />
     </template>
     <template #content>
       <AppTableState
         :loading="accountsStore.loading"
+        :error="accountsStore.error"
         :is-empty="!accountsStore.loading && accountsStore.items.length === 0"
         empty-title="Aucun compte"
         empty-text="Créez un compte pour suivre votre trésorerie."
+        @retry="accountsStore.fetchAll"
       >
         <DataTable
           :value="accountsStore.items"

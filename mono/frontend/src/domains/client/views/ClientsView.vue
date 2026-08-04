@@ -10,8 +10,10 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher un client..."
           show-search
+          :reloading="clientsStore.loading"
           @update:search-term="searchTerm = $event"
           @create="dialog.openCreate()"
+          @reload="load"
         >
           <template #actions>
             <AppTablePrintExportBar table-type="clients" :search-term="searchTerm" />
@@ -21,9 +23,11 @@
       <template #content>
         <AppTableState
           :loading="clientsStore.loading"
+          :error="clientsStore.error"
           :is-empty="!clientsStore.loading && filteredItems.length === 0"
           empty-title="Aucun client"
           empty-text="Créez un client pour le retrouver lors des ventes et commandes."
+          @retry="load"
         >
           <DataTable
             :value="filteredItems"
@@ -228,13 +232,15 @@ const confirmDelete = (client) => {
   })
 }
 
-onMounted(async () => {
+const load = async () => {
   try {
     await clientsStore.fetchAll()
   } catch (error) {
     showError(error?.message || 'Impossible de charger la clientèle.')
   }
-})
+}
+
+onMounted(load)
 </script>
 
 <style scoped>

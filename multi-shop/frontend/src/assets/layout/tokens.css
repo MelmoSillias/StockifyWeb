@@ -1,0 +1,274 @@
+:root {
+  --layout-font-space: 'Space Grotesk', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  --layout-font-sora: 'Sora', 'Aptos', 'Segoe UI', sans-serif;
+  --layout-font-plex: 'IBM Plex Sans', 'Bahnschrift', 'Segoe UI', sans-serif;
+  --layout-font-manrope: 'Manrope', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  --layout-font-outfit: 'Outfit', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  --layout-font-jakarta: 'Plus Jakarta Sans', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  --layout-font-urbanist: 'Urbanist', 'Segoe UI Variable Text', 'Segoe UI', sans-serif;
+  --layout-font-family: var(--layout-font-space);
+  --layout-text-scale-factor: 1;
+  --layout-sidebar-base-width: 16rem;
+  --layout-sidebar-collapsed-base-width: 5.75rem;
+  --layout-topbar-base-height: 4rem;
+  --layout-sidebar-width: calc(var(--layout-sidebar-base-width) * var(--layout-text-scale-factor));
+  --layout-sidebar-collapsed-width: calc(var(--layout-sidebar-collapsed-base-width) * var(--layout-text-scale-factor));
+  --layout-topbar-height: calc(var(--layout-topbar-base-height) * var(--layout-text-scale-factor));
+  --layout-content-width: 96rem;
+  --bp-compact: 1279px;
+  --bp-tablet: 1023px;
+  --bp-mobile: 767px;
+  --bp-narrow: 479px;
+  --bp-min: 360px;
+  --touch-target-min: 2.75rem;
+  --layout-shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.12);
+  --layout-shadow-panel: 0 8px 32px rgba(15, 23, 42, 0.06);
+  --layout-radius: 0.75rem;
+  --layout-radius-md: var(--layout-radius);
+  --layout-radius-lg: 1rem;
+  --layout-radius-sm: 0.5rem;
+  --layout-spacing-unit: 1rem;
+  --layout-page-bg: #f8fafc;
+  --layout-shell-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.95));
+  --layout-sidebar-bg: #0f172a;
+  --layout-sidebar-bg-hover: rgba(255, 255, 255, 0.06);
+  --layout-sidebar-border: rgba(255, 255, 255, 0.06);
+  --layout-sidebar-text: rgba(255, 255, 255, 0.92);
+  --layout-sidebar-text-muted: rgba(255, 255, 255, 0.58);
+  --layout-topbar-bg: rgba(255, 255, 255, 0.88);
+  --layout-panel-bg: rgba(255, 255, 255, 0.92);
+  --layout-panel-border: rgba(148, 163, 184, 0.14);
+  --layout-text-color: #0f172a;
+  --layout-text-muted: #64748b;
+  --layout-accent: #10b981;
+  --layout-accent-strong: #047857;
+  --layout-accent-soft: rgba(16, 185, 129, 0.12);
+  --layout-font-size-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --layout-font-size-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+  --layout-font-size-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --layout-font-size-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --layout-font-size-xl: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  --layout-font-size-2xl: clamp(1.3rem, 1.15rem + 0.75vw, 1.5rem);
+  --layout-font-size-3xl: clamp(1.6rem, 1.4rem + 1vw, 1.875rem);
+}
+
+:root[data-layout-accent='emerald'] {
+  --layout-accent: #10b981;
+  --layout-accent-strong: #047857;
+  --layout-accent-soft: rgba(16, 185, 129, 0.14);
+}
+
+:root[data-layout-accent='cyan'] {
+  --layout-accent: #06b6d4;
+  --layout-accent-strong: #0e7490;
+  --layout-accent-soft: rgba(6, 182, 212, 0.14);
+}
+
+:root[data-layout-accent='amber'] {
+  --layout-accent: #f59e0b;
+  --layout-accent-strong: #b45309;
+  --layout-accent-soft: rgba(245, 158, 11, 0.16);
+}
+
+:root[data-layout-accent='rose'] {
+  --layout-accent: #f43f5e;
+  --layout-accent-strong: #be123c;
+  --layout-accent-soft: rgba(244, 63, 94, 0.14);
+}
+
+:root[data-layout-surface='slate'] {
+  --layout-panel-bg: rgba(255, 255, 255, 0.88);
+  --layout-panel-border: rgba(148, 163, 184, 0.2);
+}
+
+:root[data-layout-surface='stone'] {
+  --layout-panel-bg: rgba(255, 250, 245, 0.92);
+  --layout-panel-border: rgba(168, 162, 158, 0.22);
+}
+
+:root[data-layout-surface='zinc'] {
+  --layout-panel-bg: rgba(250, 250, 250, 0.9);
+  --layout-panel-border: rgba(113, 113, 122, 0.2);
+}
+
+:root[data-layout-font='space'] {
+  --layout-font-family: var(--layout-font-space);
+}
+
+:root[data-layout-font='sora'] {
+  --layout-font-family: var(--layout-font-sora);
+}
+
+:root[data-layout-font='plex'] {
+  --layout-font-family: var(--layout-font-plex);
+}
+
+:root[data-layout-font='manrope'] {
+  --layout-font-family: var(--layout-font-manrope);
+}
+
+:root[data-layout-font='outfit'] {
+  --layout-font-family: var(--layout-font-outfit);
+}
+
+:root[data-layout-font='jakarta'] {
+  --layout-font-family: var(--layout-font-jakarta);
+}
+
+:root[data-layout-font='urbanist'] {
+  --layout-font-family: var(--layout-font-urbanist);
+}
+
+:root[data-layout-density='compact'] {
+  --layout-spacing-unit: 0.78rem;
+  --layout-sidebar-base-width: 14rem;
+  --layout-sidebar-collapsed-base-width: 5rem;
+}
+
+:root[data-layout-density='comfortable'] {
+  --layout-spacing-unit: 1rem;
+  --layout-sidebar-base-width: 16rem;
+  --layout-sidebar-collapsed-base-width: 5.75rem;
+}
+
+:root[data-layout-density='spacious'] {
+  --layout-spacing-unit: 1.18rem;
+  --layout-sidebar-base-width: 18rem;
+  --layout-sidebar-collapsed-base-width: 6.5rem;
+}
+
+:root[data-layout-text-scale='small'] {
+  --layout-text-scale-factor: 0.94;
+  --layout-font-size-xs: clamp(0.66rem, 0.62rem + 0.2vw, 0.72rem);
+  --layout-font-size-sm: clamp(0.76rem, 0.72rem + 0.22vw, 0.84rem);
+  --layout-font-size-base: clamp(0.86rem, 0.82rem + 0.24vw, 0.95rem);
+  --layout-font-size-lg: clamp(0.96rem, 0.92rem + 0.24vw, 1.05rem);
+  --layout-font-size-xl: clamp(1.04rem, 0.98rem + 0.42vw, 1.18rem);
+  --layout-font-size-2xl: clamp(1.18rem, 1.08rem + 0.64vw, 1.38rem);
+  --layout-font-size-3xl: clamp(1.42rem, 1.26rem + 0.82vw, 1.7rem);
+}
+
+:root[data-layout-text-scale='normal'] {
+  --layout-text-scale-factor: 1;
+}
+
+:root[data-layout-text-scale='large'] {
+  --layout-text-scale-factor: 1.08;
+  --layout-font-size-xs: clamp(0.74rem, 0.68rem + 0.28vw, 0.8rem);
+  --layout-font-size-sm: clamp(0.86rem, 0.8rem + 0.28vw, 0.94rem);
+  --layout-font-size-base: clamp(0.98rem, 0.9rem + 0.3vw, 1.08rem);
+  --layout-font-size-lg: clamp(1.08rem, 1rem + 0.3vw, 1.2rem);
+  --layout-font-size-xl: clamp(1.2rem, 1.08rem + 0.56vw, 1.36rem);
+  --layout-font-size-2xl: clamp(1.42rem, 1.24rem + 0.82vw, 1.64rem);
+  --layout-font-size-3xl: clamp(1.76rem, 1.5rem + 1.12vw, 2.08rem);
+}
+
+:root[data-layout-radius='sharp'] {
+  --layout-radius: 0.375rem;
+  --layout-radius-lg: 0.5rem;
+  --layout-radius-sm: 0.25rem;
+}
+
+:root[data-layout-radius='soft'] {
+  --layout-radius: 0.75rem;
+  --layout-radius-lg: 1rem;
+  --layout-radius-sm: 0.5rem;
+}
+
+:root[data-layout-radius='round'] {
+  --layout-radius: 1rem;
+  --layout-radius-lg: 1.5rem;
+  --layout-radius-sm: 0.75rem;
+}
+
+:root[data-layout-motion='calm'] {
+  --layout-transition-fast: 140ms ease;
+  --layout-transition-panel: 180ms ease;
+  --layout-transition-page: 200ms ease;
+}
+
+:root[data-layout-motion='expressive'] {
+  --layout-transition-fast: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  --layout-transition-panel: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  --layout-transition-page: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root[data-layout-motion='reduced'] {
+  --layout-transition-fast: 0ms;
+  --layout-transition-panel: 0ms;
+  --layout-transition-page: 0ms;
+}
+
+:root.app-dark {
+  --layout-page-bg: #06080d;
+  --layout-shell-bg: linear-gradient(180deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.98));
+  --layout-topbar-bg: rgba(9, 14, 28, 0.76);
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.96));
+  --layout-panel-bg: rgba(13, 18, 32, 0.84);
+  --layout-panel-border: rgba(148, 163, 184, 0.16);
+  --layout-text-color: rgba(241, 245, 249, 0.94);
+  --layout-text-muted: rgba(203, 213, 225, 0.72);
+}
+
+:root.app-dark[data-layout-theme] {
+  --layout-page-bg: #06080d;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(15, 23, 42, 0.82), transparent 34%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.98));
+  --layout-topbar-bg: rgba(9, 14, 28, 0.76);
+  --layout-sidebar-bg: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.96));
+  --layout-panel-bg: rgba(13, 18, 32, 0.84);
+  --layout-panel-border: rgba(148, 163, 184, 0.16);
+}
+
+/* Gradient Mode: Solid Colors */
+:root[data-layout-gradient='solid'] {
+  --layout-shell-bg: var(--layout-page-bg);
+  --layout-sidebar-bg: #0f172a;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='graphite'] {
+  --layout-shell-bg: #eef2f7;
+  --layout-sidebar-bg: #1e293b;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='ocean'] {
+  --layout-shell-bg: #eaf5fb;
+  --layout-sidebar-bg: #0e7490;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='ember'] {
+  --layout-shell-bg: #fff4ed;
+  --layout-sidebar-bg: #9a3412;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='aurora'] {
+  --layout-shell-bg: #f3f0ff;
+  --layout-sidebar-bg: #4338ca;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='canopy'] {
+  --layout-shell-bg: #eef8f1;
+  --layout-sidebar-bg: #166534;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='dune'] {
+  --layout-shell-bg: #faf3ea;
+  --layout-sidebar-bg: #9a3412;
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='cosmos'] {
+  --layout-shell-bg: #f4f7ff;
+  --layout-sidebar-bg: #312e81;
+}
+
+:root[data-layout-gradient='solid'].app-dark {
+  --layout-shell-bg: #06080d;
+  --layout-sidebar-bg: #0f172a;
+}
+
+/* Logo mark gradient - solid override */
+:root[data-layout-gradient='solid'] .app-sidebar__logo-mark,
+:root[data-layout-gradient='solid'] .app-topbar__brand-mark {
+  background: var(--layout-accent-strong);
+}

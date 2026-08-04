@@ -64,7 +64,9 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher un paiement..."
           show-search
+          :reloading="paymentsStore.loading"
           @update:search-term="searchTerm = $event"
+          @reload="loadPayments"
         >
           <template #actions>
             <AppTablePrintExportBar table-type="paiements" :search-term="searchTerm" />
@@ -74,9 +76,11 @@
       <template #content>
         <AppTableState
           :loading="paymentsStore.loading"
+          :error="paymentsStore.error"
           :is-empty="!paymentsStore.loading && filteredItems.length === 0"
           empty-title="Aucun paiement"
           empty-text="Aucun paiement ne correspond aux filtres sélectionnés."
+          @retry="loadPayments"
         >
           <DataTable
             :value="filteredItems"
@@ -266,8 +270,16 @@ const paymentRowActions = (payment) => [
   }
 ]
 
+const loadPayments = async () => {
+  try {
+    await paymentsStore.fetchAll()
+  } catch (error) {
+    showError(error?.message || 'Impossible de charger les paiements.')
+  }
+}
+
 onMounted(async () => {
   await load().catch(() => {})
-  paymentsStore.fetchAll().catch(() => {})
+  await loadPayments()
 })
 </script>

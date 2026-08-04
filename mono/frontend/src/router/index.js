@@ -123,6 +123,17 @@ const routes = [
         }
       },
       {
+        path: 'commerce/quotes',
+        name: 'commerce-quotes',
+        component: () => import('@/domains/commerce/views/QuotesView.vue'),
+        meta: {
+          title: 'Devis',
+          section: 'Commerce',
+          layoutKey: 'commerce-quotes',
+          permission: 'commerce.devis.view'
+        }
+      },
+      {
         path: 'commerce/sales',
         name: 'commerce-sales',
         component: () => import('@/domains/commerce/views/SalesView.vue'),

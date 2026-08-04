@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Urbanist:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+@import "./content/tokens.css";
+@import "./layout/tokens.css";
+@import "./layout/themes/graphite.css";
+@import "./layout/themes/ocean.css";
+@import "./layout/themes/ember.css";
+@import "./layout/themes/aurora.css";
+@import "./layout/themes/canopy.css";
+@import "./layout/themes/dune.css";
+@import "./layout/themes/cosmos.css";
+@import "./layout/shell.css";
+@import "./layout/navigation.css";
+@import "./layout/appearance.css";
+@import "./layout/dashboard-home.css";
+@import "./layout/analytics.css";
+@import "./layout/primevue.css";
+
+html,
+body,
+#app {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-weight: 400;
+  background: var(--layout-page-bg);
+  color: var(--layout-text-color);
+  font-family: var(--layout-font-family);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--layout-accent) 82%, var(--layout-accent-strong) 18%) transparent;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--layout-accent) 82%, var(--layout-accent-strong) 18%) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.4rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--layout-accent), var(--layout-accent-strong));
+  border-radius: 999px;
+  border: 0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--layout-accent) 88%, white),
+    color-mix(in srgb, var(--layout-accent-strong) 90%, black)
+  );
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

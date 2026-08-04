@@ -6,15 +6,19 @@
         :count-label="`${paymentMethodsStore.items.length} mode(s)`"
         create-label="Nouveau mode"
         show-create
+        :reloading="paymentMethodsStore.loading"
         @create="dialog.openCreate()"
+        @reload="paymentMethodsStore.fetchAll"
       />
     </template>
     <template #content>
       <AppTableState
         :loading="paymentMethodsStore.loading"
+        :error="paymentMethodsStore.error"
         :is-empty="!paymentMethodsStore.loading && paymentMethodsStore.items.length === 0"
         empty-title="Aucun mode de paiement"
         empty-text="Configurez les modes disponibles pour les encaissements."
+        @retry="paymentMethodsStore.fetchAll"
       >
         <DataTable
           :value="paymentMethodsStore.items"

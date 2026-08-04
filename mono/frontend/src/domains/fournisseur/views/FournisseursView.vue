@@ -10,16 +10,20 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher un fournisseur..."
           show-search
+          :reloading="fournisseursStore.loading"
           @update:search-term="searchTerm = $event"
           @create="dialog.openCreate()"
+          @reload="load"
         />
       </template>
       <template #content>
         <AppTableState
           :loading="fournisseursStore.loading"
+          :error="fournisseursStore.error"
           :is-empty="!fournisseursStore.loading && filteredItems.length === 0"
           empty-title="Aucun fournisseur"
           empty-text="Créez un fournisseur pour gérer vos achats et dettes."
+          @retry="load"
         >
           <DataTable
             :value="filteredItems"
@@ -247,12 +251,14 @@ const confirmDelete = (fournisseur) => {
   })
 }
 
-onMounted(async () => {
+const load = async () => {
   try {
     await fournisseursStore.fetchAll()
   } catch (error) {
     showError(error?.message || 'Impossible de charger les fournisseurs.')
   }
-})
+}
+
+onMounted(load)
 </script>
 

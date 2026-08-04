@@ -1,0 +1,7 @@
+services:
+    App\Tests\Support\StubControlPlaneClient:
+        public: true
+
+    App\Onboarding\Application\Service\ControlPlaneGatewayInterface:
+        alias: App\Tests\Support\StubControlPlaneClient
+        public: true

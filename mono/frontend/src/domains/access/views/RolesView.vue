@@ -9,12 +9,20 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
+          :reloading="loading"
           @update:search-term="searchTerm = $event"
           @create="openCreate"
+          @reload="load"
         />
       </template>
       <template #content>
-        <AppTableState :loading="loading" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucun rôle">
+        <AppTableState
+          :loading="loading"
+          :error="error"
+          :is-empty="!loading && filteredItems.length === 0"
+          empty-title="Aucun rôle"
+          @retry="load"
+        >
           <DataTable
             :value="filteredItems"
             data-key="id"
@@ -99,6 +107,7 @@ const { hasPermission } = usePermissions()
 const items = ref([])
 const permissions = ref([])
 const loading = ref(false)
+const error = ref(null)
 const submitting = ref(false)
 const searchTerm = ref('')
 const dialogVisible = ref(false)
@@ -120,10 +129,13 @@ const filteredItems = computed(() => {
 
 const load = async () => {
   loading.value = true
+  error.value = null
   try {
     const [roleList, permissionList] = await Promise.all([accessService.listRoles(), accessService.listPermissions()])
     items.value = roleList
     permissions.value = permissionList
+  } catch (err) {
+    error.value = err?.message || 'Impossible de charger les rôles.'
   } finally {
     loading.value = false
   }

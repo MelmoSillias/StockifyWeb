@@ -1,0 +1,184 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+    upload-dir: 'public/uploads'
+    integration_webhook_enabled_default: false
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/**/Domain/Entity/'
+            - '../src/**/Domain/Enum/'
+            - '../src/**/Domain/Exception/'
+            - '../src/**/Domain/Event/'
+            - '../src/**/Domain/ValueObject/'
+            - '../src/**/Domain/Trait/'
+            - '../src/**/Application/**/Command/*Command.php'
+            - '../src/**/Application/**/Query/*Query.php'
+            - '../src/**/Application/**/Dto/'
+
+    # DIP — repository interfaces bound to Doctrine implementations
+    App\Catalog\Domain\Repository\ProductRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductRepository
+
+    App\Catalog\Domain\Repository\ProductCategoryRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductCategoryRepository
+
+    App\Catalog\Domain\Repository\ProductVariantRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineProductVariantRepository
+
+    App\Catalog\Domain\Repository\UnitOfMeasureRepositoryInterface:
+        alias: App\Catalog\Infrastructure\Persistence\Doctrine\DoctrineUnitOfMeasureRepository
+
+    App\IdentityAccess\Domain\Repository\UserRepositoryInterface:
+        alias: App\IdentityAccess\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
+
+    App\IdentityAccess\Domain\Repository\RefreshTokenRepositoryInterface:
+        alias: App\IdentityAccess\Infrastructure\Persistence\Doctrine\DoctrineRefreshTokenRepository
+
+    App\Inventory\Domain\Repository\StockLotRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockLotRepository
+
+    App\Inventory\Domain\Repository\StockMovementRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockMovementRepository
+
+    App\Inventory\Domain\Repository\StockPolicyRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockPolicyRepository
+
+    App\Inventory\Domain\Repository\StockLotAllocationRepositoryInterface:
+        alias: App\Inventory\Infrastructure\Persistence\Doctrine\DoctrineStockLotAllocationRepository
+
+    App\SharedKernel\Application\Event\DomainEventDispatcherInterface:
+        alias: App\SharedKernel\Infrastructure\Event\SymfonyDomainEventDispatcher
+
+    App\Client\Domain\Repository\ClientRepositoryInterface:
+        alias: App\Client\Infrastructure\Persistence\Doctrine\DoctrineClientRepository
+
+    App\Commerce\Domain\Repository\VenteRepositoryInterface:
+        alias: App\Commerce\Infrastructure\Persistence\Doctrine\DoctrineVenteRepository
+
+    App\Commerce\Domain\Repository\CommandeRepositoryInterface:
+        alias: App\Commerce\Infrastructure\Persistence\Doctrine\DoctrineCommandeRepository
+
+    App\Facturation\Domain\Repository\FactureRepositoryInterface:
+        alias: App\Facturation\Infrastructure\Persistence\Doctrine\DoctrineFactureRepository
+
+    App\Facturation\Domain\Repository\AvoirRepositoryInterface:
+        alias: App\Facturation\Infrastructure\Persistence\Doctrine\DoctrineAvoirRepository
+
+    App\Paiement\Domain\Repository\PaiementRepositoryInterface:
+        alias: App\Paiement\Infrastructure\Persistence\Doctrine\DoctrinePaiementRepository
+
+    App\Livraison\Domain\Repository\BonDeLivraisonRepositoryInterface:
+        alias: App\Livraison\Infrastructure\Persistence\Doctrine\DoctrineBonDeLivraisonRepository
+
+    App\Finance\Domain\Repository\CompteRepositoryInterface:
+        alias: App\Finance\Infrastructure\Persistence\Doctrine\DoctrineCompteRepository
+
+    App\Finance\Domain\Repository\ModeDePaiementRepositoryInterface:
+        alias: App\Finance\Infrastructure\Persistence\Doctrine\DoctrineModeDePaiementRepository
+
+    App\Finance\Domain\Repository\TransactionRepositoryInterface:
+        alias: App\Finance\Infrastructure\Persistence\Doctrine\DoctrineTransactionRepository
+
+    App\Fournisseur\Domain\Repository\FournisseurRepositoryInterface:
+        alias: App\Fournisseur\Infrastructure\Persistence\Doctrine\DoctrineFournisseurRepository
+
+    App\Fournisseur\Domain\Repository\DetteFournisseurRepositoryInterface:
+        alias: App\Fournisseur\Infrastructure\Persistence\Doctrine\DoctrineDetteFournisseurRepository
+
+    App\Fournisseur\Domain\Repository\PaiementFournisseurRepositoryInterface:
+        alias: App\Fournisseur\Infrastructure\Persistence\Doctrine\DoctrinePaiementFournisseurRepository
+
+    App\Fournisseur\Domain\Repository\CommandeFournisseurRepositoryInterface:
+        alias: App\Fournisseur\Infrastructure\Persistence\Doctrine\DoctrineCommandeFournisseurRepository
+
+    App\AccessAudit\Domain\Repository\PermissionRepositoryInterface:
+        alias: App\AccessAudit\Infrastructure\Persistence\Doctrine\DoctrinePermissionRepository
+
+    App\AccessAudit\Domain\Repository\RoleRepositoryInterface:
+        alias: App\AccessAudit\Infrastructure\Persistence\Doctrine\DoctrineRoleRepository
+
+    App\AccessAudit\Domain\Repository\UserRoleRepositoryInterface:
+        alias: App\AccessAudit\Infrastructure\Persistence\Doctrine\DoctrineUserRoleRepository
+
+    App\AccessAudit\Domain\Repository\UserPermissionRepositoryInterface:
+        alias: App\AccessAudit\Infrastructure\Persistence\Doctrine\DoctrineUserPermissionRepository
+
+    App\AccessAudit\Domain\Repository\AuditLogRepositoryInterface:
+        alias: App\AccessAudit\Infrastructure\Persistence\Doctrine\DoctrineAuditLogRepository
+
+    App\Impression\Domain\Repository\PrintSettingsRepositoryInterface:
+        alias: App\Impression\Infrastructure\Persistence\Doctrine\DoctrinePrintSettingsRepository
+
+    App\Shop\Domain\Repository\ShopRepositoryInterface:
+        alias: App\Shop\Infrastructure\Persistence\Doctrine\DoctrineShopRepository
+
+    App\Integration\Domain\Repository\TenantAccountRepositoryInterface:
+        alias: App\Integration\Infrastructure\Persistence\Doctrine\DoctrineTenantAccountRepository
+
+    App\Integration\Domain\Repository\IntegrationRequestLogRepositoryInterface:
+        alias: App\Integration\Infrastructure\Persistence\Doctrine\DoctrineIntegrationRequestLogRepository
+
+    App\Integration\Security\IntegrationJwtValidator:
+        arguments:
+            $publicKeyPath: '%kernel.project_dir%/config/jwt/integration_public.pem'
+            $enabled: '%env(bool:INTEGRATION_ENABLED)%'
+
+    App\Integration\Application\Service\UsageWebhookDispatcher:
+        arguments:
+            $controlPlaneBaseUrl: '%env(default::CONTROL_PLANE_BASE_URL)%'
+            $webhookSecret: '%env(default::INTEGRATION_WEBHOOK_SECRET)%'
+            $enabled: '%env(default:integration_webhook_enabled_default:bool:INTEGRATION_WEBHOOK_ENABLED)%'
+
+    App\Onboarding\Application\Service\ControlPlaneClient:
+        arguments:
+            $controlPlaneBaseUrl: '%env(default::CONTROL_PLANE_BASE_URL)%'
+
+    App\Onboarding\Application\Service\ControlPlaneGatewayInterface:
+        alias: App\Onboarding\Application\Service\ControlPlaneClient
+
+    App\Impression\Application\Renderer\DocumentRendererInterface:
+        alias: App\Impression\Infrastructure\Renderer\TwigDocumentRenderer
+
+    App\Impression\Application\Resolver\DocumentDataResolverRegistry:
+        arguments:
+            $resolvers: !tagged_iterator impression.document_data_resolver
+
+    App\Impression\Application\Resolver\TableDocumentDataResolver:
+        arguments:
+            $providers: !tagged_iterator impression.table_data_provider
+        tags: ['impression.document_data_resolver']
+
+    App\Impression\Infrastructure\Exporter\DocumentExporterRegistry:
+        arguments:
+            $exporters:
+                - '@App\Impression\Infrastructure\Exporter\HtmlExporter'
+                - '@App\Impression\Infrastructure\Exporter\DompdfExporter'
+                - '@App\Impression\Infrastructure\Exporter\PhpSpreadsheetExporter'
+                - '@App\Impression\Infrastructure\Exporter\PhpWordExporter'
+
+    App\Impression\Application\Resolver\FactureDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+    App\Impression\Application\Resolver\PaiementDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+    App\Impression\Application\Resolver\VenteTicketDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+    App\Impression\Application\Resolver\AvoirDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+    App\Impression\Application\Resolver\BonLivraisonDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+    App\Impression\Application\Resolver\TransactionDocumentDataResolver:
+        tags: ['impression.document_data_resolver']
+
+    App\Impression\Application\Resolver\Table\GenericTableDataProvider:
+        tags: ['impression.table_data_provider']
+
+    App\AccessAudit\Application\Service\AuditLoggerService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'

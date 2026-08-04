@@ -1,0 +1,22 @@
+{
+  "id": "default",
+  "displayName": "Boutique Demo",
+  "appTitle": "Stockify - Boutique Demo",
+  "brandName": "Stockify",
+  "brandSubtitle": "Gestion catalogue et stock",
+  "shopPhone": "+223 XX XX XX XX",
+  "viteApiPrefix": "http://localhost:8001/api",
+  "printProfile": {
+    "name": "Boutique Demo",
+    "addressLines": [
+      "Bamako, Mali"
+    ],
+    "phones": [
+      "+223 XX XX XX XX"
+    ],
+    "email": "contact@stockify.local"
+  },
+  "brandingAssets": {
+    "logo": "logo.svg"
+  }
+}

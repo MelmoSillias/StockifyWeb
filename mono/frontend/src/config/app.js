@@ -88,7 +88,7 @@ export const appConfig = {
       {
         key: 'commerce',
         label: 'Commerce',
-        icon: 'pi pi-shopping-bag',
+        icon: 'pi pi-cart-arrow-down',
         items: [
           {
             key: 'commerce-cart',
@@ -105,6 +105,14 @@ export const appConfig = {
             routeName: 'commerce-orders',
             section: 'Commerce',
             requiredPermission: 'commerce.commandes.view'
+          },
+          {
+            key: 'commerce-quotes',
+            label: 'Devis',
+            icon: 'pi pi-file-edit',
+            routeName: 'commerce-quotes',
+            section: 'Commerce',
+            requiredPermission: 'commerce.devis.view'
           },
           {
             key: 'commerce-sales',
@@ -135,7 +143,7 @@ export const appConfig = {
       {
         key: 'finance',
         label: 'Finances',
-        icon: 'pi pi-chart-line',
+        icon: 'pi pi-wallet',
         routeName: 'finance',
         requiredPermission: 'finance.view'
       },
