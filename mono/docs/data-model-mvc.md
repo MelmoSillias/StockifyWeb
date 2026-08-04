@@ -1,5 +1,7 @@
 # Architecture de données — Stockify MVC
 
+> Document **legacy** (app MVC). Pour le modèle mono actuel, voir [new-data-model.md](new-data-model.md). Certaines entités MVC n'ont pas encore été portées dans mono (caisse, fournisseurs).
+
 Documentation du modèle de données Doctrine (`mvc/src/Entity/`).  
 **11 entités**, **6 domaines métier**, base relationnelle Symfony/Doctrine ORM.
 

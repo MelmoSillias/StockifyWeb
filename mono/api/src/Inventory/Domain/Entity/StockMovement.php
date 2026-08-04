@@ -97,6 +97,16 @@ class StockMovement
         return $this->quantity;
     }
 
+    public function getSourceRef(): ?string
+    {
+        return $this->sourceRef;
+    }
+
+    public function setSourceRef(?string $sourceRef): void
+    {
+        $this->sourceRef = $sourceRef;
+    }
+
     public function getOccurredAt(): \DateTimeImmutable
     {
         return $this->occurredAt;

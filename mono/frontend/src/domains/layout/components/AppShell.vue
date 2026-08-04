@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -7,7 +7,7 @@ import Breadcrumb from 'primevue/breadcrumb'
 import { useToast } from 'primevue/usetoast'
 
 import AppSidebar from '@/domains/layout/components/AppSidebar.vue'
-import AppThemePanel from '@/domains/layout/components/AppThemePanel.vue'
+import AppTopbarQuickPanel from '@/domains/layout/components/AppTopbarQuickPanel.vue'
 import AppTopbar from '@/domains/layout/components/AppTopbar.vue'
 import { useLayout } from '@/domains/layout/composables/useLayout'
 import { useLayoutTheme } from '@/domains/layout/composables/useLayoutTheme'
@@ -33,10 +33,10 @@ const {
   sidebarMode,
   sidebarCollapsed,
   mobileSidebarOpen,
-  preferencesOpen,
+  quickPanelOpen,
   handlePrimaryNavigation,
   setMobileSidebarOpen,
-  setPreferencesOpen,
+  setQuickPanelOpen,
   setDarkMode,
   darkMode
 } = useLayout()
@@ -68,9 +68,9 @@ const pageTransition = computed(() => {
   return motionPreset.value === 'calm' ? 'page-fade' : 'page-slide'
 })
 
-const preferencesVisible = computed({
-  get: () => preferencesOpen.value,
-  set: (value) => setPreferencesOpen(value)
+const quickPanelVisible = computed({
+  get: () => quickPanelOpen.value,
+  set: (value) => setQuickPanelOpen(value)
 })
 
 const toggleDarkMode = () => {
@@ -91,6 +91,12 @@ const logout = async () => {
   })
   await router.push({ name: 'login' })
 }
+
+onMounted(() => {
+  if (authEnabled && authStore.isAuthenticated) {
+    authStore.fetchCurrentUser().catch(() => {})
+  }
+})
 </script>
 
 <template>
@@ -121,7 +127,6 @@ const logout = async () => {
         :dark-mode="darkMode"
         :show-profile-actions="authEnabled"
         @toggle-navigation="handlePrimaryNavigation"
-        @open-preferences="setPreferencesOpen(true)"
         @toggle-dark-mode="toggleDarkMode"
         @logout="logout"
       />
@@ -144,6 +149,6 @@ const logout = async () => {
       </div>
     </div>
 
-    <AppThemePanel v-model="preferencesVisible" />
+    <AppTopbarQuickPanel v-model="quickPanelVisible" />
   </div>
 </template>

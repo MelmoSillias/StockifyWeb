@@ -1,8 +1,8 @@
 <template>
-  <Toolbar class="entity-toolbar">
-    <template #start>
+  <Toolbar class="entity-toolbar" :class="{ 'entity-toolbar--actions-only': actionsOnly }">
+    <template v-if="!actionsOnly" #start>
       <div class="entity-toolbar__search-group">
-        <IconField class="entity-toolbar__search-field">
+        <IconField v-if="showSearch" class="entity-toolbar__search-field">
           <InputIcon class="pi pi-search" />
           <InputText
             :model-value="searchTerm"
@@ -39,7 +39,7 @@
 
     <template #end>
       <div class="entity-toolbar__actions">
-        <Tag :value="countLabel" icon="pi pi-chart-bar" severity="contrast" rounded />
+        <Tag v-if="showCount" :value="countLabel" icon="pi pi-chart-bar" severity="contrast" rounded />
         <Button v-if="showCreate" :label="createLabel" icon="pi pi-plus-circle" @click="$emit('create')" />
       </div>
     </template>
@@ -47,6 +47,8 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import IconField from 'primevue/iconfield'
@@ -55,7 +57,7 @@ import InputText from 'primevue/inputtext'
 import Tag from 'primevue/tag'
 import Toolbar from 'primevue/toolbar'
 
-defineProps({
+const props = defineProps({
   searchTerm: {
     type: String,
     default: ''
@@ -87,15 +89,29 @@ defineProps({
   showCreate: {
     type: Boolean,
     default: true
+  },
+  showSearch: {
+    type: Boolean,
+    default: true
+  },
+  showCount: {
+    type: Boolean,
+    default: true
   }
 })
 
 defineEmits(['create', 'update:searchTerm', 'update:startDate', 'update:endDate'])
+
+const actionsOnly = computed(() => !props.showSearch && !props.showDateFilters)
 </script>
 
 <style scoped>
 .entity-toolbar {
   border-radius: 1rem;
+}
+
+.entity-toolbar--actions-only :deep(.p-toolbar) {
+  justify-content: flex-end;
 }
 
 .entity-toolbar__search-group,

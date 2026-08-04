@@ -5,6 +5,7 @@ namespace App\Catalog\Application\Query\ListVariantsCatalog;
 use App\Catalog\Application\Dto\VariantCatalogItemDto;
 use App\Catalog\Domain\Entity\ProductVariant;
 use App\Catalog\Domain\Repository\ProductVariantRepositoryInterface;
+use App\Inventory\Application\Service\StockAvailabilityService;
 use App\Inventory\Domain\Repository\StockLotRepositoryInterface;
 
 final class ListVariantsCatalogHandler
@@ -12,6 +13,7 @@ final class ListVariantsCatalogHandler
     public function __construct(
         private readonly ProductVariantRepositoryInterface $variantRepository,
         private readonly StockLotRepositoryInterface $stockLotRepository,
+        private readonly StockAvailabilityService $stockAvailabilityService,
     ) {
     }
 
@@ -19,15 +21,16 @@ final class ListVariantsCatalogHandler
     public function handle(ListVariantsCatalogQuery $query): array
     {
         $variants = $this->variantRepository->findAllWithCatalogRelations();
-        $availableByVariant = $this->stockLotRepository->sumAvailableStockByVariant();
+        $sellableByVariant = $this->stockAvailabilityService->getSellableQuantitiesByVariant();
+        $averageCostByVariant = $this->stockLotRepository->averageUnitCostByVariant();
 
         return array_map(
-            function (ProductVariant $variant) use ($availableByVariant): array {
+            function (ProductVariant $variant) use ($sellableByVariant, $averageCostByVariant): array {
                 $variantId = (string) $variant->getId();
                 $product = $variant->getProduct();
                 $category = $product->getCategory();
                 $unit = $variant->getUnitOfMeasure();
-                $available = $availableByVariant[$variantId] ?? '0.000';
+                $available = $sellableByVariant[$variantId] ?? '0.000';
                 $threshold = $variant->getAlertThreshold();
                 $isLowStock = null !== $threshold && '' !== $threshold
                     && bccomp($available, $threshold, 3) < 0;
@@ -47,6 +50,8 @@ final class ListVariantsCatalogHandler
                     saleMode: $variant->getSaleMode()->value,
                     available: $available,
                     isLowStock: $isLowStock,
+                    defaultPrice: $variant->getDefaultPrice(),
+                    averageCost: $averageCostByVariant[$variantId] ?? null,
                 ))->toArray();
             },
             $variants,

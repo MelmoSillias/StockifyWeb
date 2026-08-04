@@ -11,6 +11,7 @@ import App from '@/App.vue'
 import { applyApiClientConfig } from '@/lib/axios'
 import { setAppRouter } from '@/lib/routerContext'
 import router from '@/router'
+import { canDirective } from '@/domains/auth/directives/can'
 import { useAuthStore } from '@/domains/auth/stores/auth'
 
 import '@/assets/main.css'
@@ -36,6 +37,7 @@ app.use(PrimeVue, {
 app.use(ConfirmationService)
 app.use(ToastService)
 app.directive('tooltip', Tooltip)
+app.directive('can', canDirective)
 
 setAppRouter(router)
 

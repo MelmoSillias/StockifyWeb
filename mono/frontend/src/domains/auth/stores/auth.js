@@ -16,28 +16,64 @@ const parseStoredUser = (value) => {
   }
 }
 
+const parseStoredPermissions = (value) => {
+  if (!value) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 const createInitialState = () => ({
   accessToken: localStorage.getItem(storage.authTokenKey) || null,
-  user: parseStoredUser(localStorage.getItem(storage.authUserKey))
+  user: parseStoredUser(localStorage.getItem(storage.authUserKey)),
+  permissions: parseStoredPermissions(localStorage.getItem(storage.authPermissionsKey))
 })
 
 const normalizeMePayload = (payload) => {
   if (!payload || typeof payload !== 'object') {
-    return null
+    return { user: null, permissions: [] }
   }
 
   if (payload.user && typeof payload.user === 'object') {
-    return payload.user
+    return {
+      user: payload.user,
+      permissions: Array.isArray(payload.permissions) ? payload.permissions : []
+    }
   }
 
-  return payload
+  return {
+    user: payload,
+    permissions: Array.isArray(payload.permissions) ? payload.permissions : []
+  }
 }
 
 export const useAuthStore = defineStore('auth', {
   state: () => createInitialState(),
 
   getters: {
-    isAuthenticated: (state) => !!state.accessToken
+    isAuthenticated: (state) => !!state.accessToken,
+
+    hasPermission: (state) => (permission) => {
+      if (!permission) {
+        return true
+      }
+
+      return state.permissions.includes(permission)
+    },
+
+    hasAnyPermission: (state) => (...permissions) => {
+      if (!permissions.length) {
+        return true
+      }
+
+      return permissions.some((permission) => state.permissions.includes(permission))
+    }
   },
 
   actions: {
@@ -63,9 +99,16 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem(storage.authUserKey)
     },
 
+    setPermissions(permissions) {
+      this.permissions = Array.isArray(permissions) ? permissions : []
+      localStorage.setItem(storage.authPermissionsKey, JSON.stringify(this.permissions))
+    },
+
     clearSession() {
       this.setAccessToken(null)
       this.setUser(null)
+      this.setPermissions([])
+      localStorage.removeItem(storage.authPermissionsKey)
     },
 
     async login(credentials) {
@@ -87,8 +130,9 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchCurrentUser() {
       const payload = await authService.me()
-      const user = normalizeMePayload(payload)
+      const { user, permissions } = normalizeMePayload(payload)
       this.setUser(user)
+      this.setPermissions(permissions)
       return user
     },
 
@@ -100,6 +144,7 @@ export const useAuthStore = defineStore('auth', {
 
       if (!this.accessToken) {
         this.setUser(null)
+        this.setPermissions([])
         return null
       }
 

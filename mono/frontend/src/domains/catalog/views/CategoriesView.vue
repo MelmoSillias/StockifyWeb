@@ -1,23 +1,18 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
-      <div>
-        <p class="dashboard-eyebrow">Catalogue</p>
-        <h1 class="dashboard-title">Catégories</h1>
-        <p class="dashboard-description">Structurez votre catalogue par familles de produits.</p>
-      </div>
-    </div>
-
-    <AppEntityToolbar
-      :search-term="searchTerm"
-      search-placeholder="Rechercher une catégorie..."
-      create-label="Nouvelle catégorie"
-      :count-label="`${categoriesStore.items.length} catégorie(s)`"
-      @update:search-term="searchTerm = $event"
-      @create="dialog.openCreate()"
-    />
-
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Catégories"
+          :count-label="`${categoriesStore.items.length} catégorie(s)`"
+          create-label="Nouvelle catégorie"
+          :search-term="searchTerm"
+          search-placeholder="Rechercher une catégorie..."
+          show-search
+          @update:search-term="searchTerm = $event"
+          @create="dialog.openCreate()"
+        />
+      </template>
       <template #content>
         <AppTableState
           :loading="categoriesStore.loading || productsStore.loading"
@@ -30,14 +25,14 @@
             :value="categoryTree"
             data-key="key"
             striped-rows
-            responsive-layout="scroll"
+            :responsive-layout="tableLayout"
           >
             <Column field="name" header="Nom" expander>
               <template #body="{ node }">
                 {{ node.data.name }}
               </template>
             </Column>
-            <Column header="Nb produits" style="width: 120px">
+            <Column v-if="!isMobile" header="Nb produits" style="width: 120px">
               <template #body="{ node }">
                 <Tag
                   :value="String(node.data.product_count ?? productCount(node.data.id))"
@@ -46,36 +41,17 @@
                 />
               </template>
             </Column>
-            <Column header="Statut" style="width: 120px">
+            <Column v-if="!isMobile" header="Statut" style="width: 120px">
               <template #body="{ node }">
                 {{ node.data.status }}
               </template>
             </Column>
-            <Column header="Actions" style="width: 210px">
+            <Column header="Actions" style="width: 90px">
               <template #body="{ node }">
-                <div class="actions-cell">
-                  <Button
-                    icon="pi pi-eye"
-                    v-tooltip.top="'Voir les produits'"
-                    text
-                    rounded
-                    @click="openProductsDialog(node.data)"
-                  />
-                  <Button
-                    icon="pi pi-pencil"
-                    text
-                    rounded
-                    @click="dialog.openEdit(normalizeForEdit(node.data))"
-                  />
-                  <Button
-                    icon="pi pi-trash"
-                    text
-                    rounded
-                    severity="danger"
-                    :loading="categoriesStore.isDeleting(node.data.id)"
-                    @click="confirmDelete(node.data)"
-                  />
-                </div>
+                <AppTableActionsMenu
+                  :actions="categoryRowActions(node.data)"
+                  aria-label="Actions catégorie"
+                />
               </template>
             </Column>
           </TreeTable>
@@ -142,8 +118,10 @@ import Tag from 'primevue/tag'
 import TreeTable from 'primevue/treetable'
 
 import AppCrudDialog from '@/domains/shared/components/AppCrudDialog.vue'
-import AppEntityToolbar from '@/domains/shared/components/AppEntityToolbar.vue'
+import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu.vue'
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { useCrudDialog } from '@/domains/shared/composables/useCrudDialog'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
 import { useCategoriesStore } from '@/domains/catalog/stores/categories'
@@ -153,6 +131,8 @@ import { filterCategoryTree } from '@/domains/catalog/utils/buildCategoryTree'
 const router = useRouter()
 const categoriesStore = useCategoriesStore()
 const productsStore = useProductsStore()
+const { isMobile } = useBreakpoint()
+const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
 const { showSuccess, showError, confirmRemoval } = useEntityActions()
 const searchTerm = ref('')
 const productsDialogVisible = ref(false)
@@ -281,6 +261,26 @@ const confirmDelete = (category) => {
   })
 }
 
+const categoryRowActions = (category) => [
+  {
+    label: 'Voir les produits',
+    icon: 'pi pi-eye',
+    command: () => openProductsDialog(category)
+  },
+  {
+    label: 'Modifier',
+    icon: 'pi pi-pencil',
+    command: () => dialog.openEdit(normalizeForEdit(category))
+  },
+  {
+    label: 'Supprimer',
+    icon: 'pi pi-trash',
+    severity: 'danger',
+    loading: categoriesStore.isDeleting(category.id),
+    command: () => confirmDelete(category)
+  }
+]
+
 onMounted(async () => {
   try {
     await Promise.all([categoriesStore.fetchAll(), productsStore.fetchAll()])
@@ -290,10 +290,3 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-.actions-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-</style>

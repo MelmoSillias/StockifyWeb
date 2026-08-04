@@ -38,6 +38,7 @@ final class StockMovementService
         ?string $reference = null,
         ?string $supplierRef = null,
         ?\DateTimeImmutable $expiryDate = null,
+        ?Uuid $fournisseurId = null,
     ): StockLot {
         $lot = new StockLot(
             $variant,
@@ -46,6 +47,7 @@ final class StockMovementService
             $reference,
             $supplierRef,
             $expiryDate,
+            $fournisseurId,
         );
 
         $movement = new StockMovement(
@@ -73,6 +75,7 @@ final class StockMovementService
         MovementType $type = MovementType::Adjustment,
         ?string $reason = null,
         ?array $manualAllocations = null,
+        ?string $sourceRef = null,
     ): StockMovement {
         $available = $this->stockLotRepository->sumAvailableStock($variant);
         if (bccomp($available, $quantity, 3) < 0) {
@@ -91,6 +94,7 @@ final class StockMovementService
             $reason,
             $this->currentUser(),
         );
+        $movement->setSourceRef($sourceRef);
 
         if (null !== $manualAllocations && [] !== $manualAllocations) {
             $this->allocateManual($movement, $manualAllocations, $quantity);
@@ -145,6 +149,44 @@ final class StockMovementService
     public function getAvailableStock(ProductVariant $variant): string
     {
         return $this->stockLotRepository->sumAvailableStock($variant);
+    }
+
+    /**
+     * Compensating restock used when a previously decremented operation is
+     * reversed (e.g. an order cancellation). The quantity is returned to the
+     * most recent lot, or a new zero-cost lot if none remains.
+     */
+    public function restock(
+        ProductVariant $variant,
+        string $quantity,
+        ?string $reason = null,
+        ?string $sourceRef = null,
+    ): StockMovement {
+        $lots = $this->stockLotRepository->findByVariantOrderedByReceivedAt($variant);
+        $lot = $lots[0] ?? null;
+
+        if (null === $lot) {
+            $lot = new StockLot($variant, '0', '0.0000', 'Restock');
+            $this->stockLotRepository->save($lot, false);
+        }
+
+        $lot->increase($quantity);
+
+        $movement = new StockMovement(
+            $variant,
+            MovementType::Adjustment,
+            MovementDirection::In,
+            $quantity,
+            $lot->getUnitCost(),
+            $reason ?? 'Compensating restock',
+            $this->currentUser(),
+        );
+        $movement->setSourceRef($sourceRef);
+
+        $this->stockLotRepository->save($lot, false);
+        $this->stockMovementRepository->save($movement);
+
+        return $movement;
     }
 
     private function adjustLotIn(

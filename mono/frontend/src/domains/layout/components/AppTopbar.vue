@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import Avatar from 'primevue/avatar'
@@ -7,8 +8,12 @@ import Button from 'primevue/button'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
+import Menu from 'primevue/menu'
 import Popover from 'primevue/popover'
 
+import AppTopbarCartStatus from '@/domains/layout/components/AppTopbarCartStatus.vue'
+import AppTopbarDateClock from '@/domains/layout/components/AppTopbarDateClock.vue'
+import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { useLayoutStore } from '@/domains/layout/stores/layout'
 
 const props = defineProps({
@@ -50,12 +55,15 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['toggle-navigation', 'open-preferences', 'toggle-dark-mode', 'logout'])
+const emit = defineEmits(['toggle-navigation', 'toggle-dark-mode', 'logout'])
 
+const router = useRouter()
 const layoutStore = useLayoutStore()
 const { topbarLogoVisibility, topbarProfilePosition, topbarSearchPosition } = storeToRefs(layoutStore)
+const { isMobile, isCompact } = useBreakpoint()
 
 const profileMenu = ref()
+const mobileActionsMenu = ref()
 
 const userInitials = computed(() => {
   return props.displayName
@@ -72,6 +80,43 @@ const profileAtEnd = computed(() => topbarProfilePosition.value === 'end')
 const showSearch = computed(() => topbarSearchPosition.value !== 'hidden')
 const searchAtCenter = computed(() => topbarSearchPosition.value === 'center')
 
+const statusVariant = computed(() => (isMobile.value ? 'icon' : 'chip'))
+const statusCompact = computed(() => isCompact.value && !isMobile.value)
+
+const openQuickPanel = () => {
+  layoutStore.setQuickPanelOpen(true)
+}
+
+const toggleMobileActionsMenu = (event) => {
+  mobileActionsMenu.value.toggle(event)
+}
+
+const mobileActionItems = computed(() => {
+  const items = [
+    {
+      label: 'Calendrier',
+      icon: 'pi pi-calendar',
+      command: () => openQuickPanel()
+    }
+  ]
+
+  if (showProfile.value) {
+    items.push({
+      label: 'Mon profil',
+      icon: 'pi pi-user',
+      command: () => router.push({ name: 'profile' })
+    })
+    items.push({
+      label: 'Déconnexion',
+      icon: 'pi pi-sign-out',
+      class: 'app-topbar-mobile-menu__logout',
+      command: () => emit('logout')
+    })
+  }
+
+  return items
+})
+
 const toggleProfileMenu = (event) => {
   profileMenu.value.toggle(event)
 }
@@ -79,6 +124,11 @@ const toggleProfileMenu = (event) => {
 const handleLogout = () => {
   profileMenu.value.hide()
   emit('logout')
+}
+
+const openProfile = () => {
+  profileMenu.value.hide()
+  router.push({ name: 'profile' })
 }
 </script>
 
@@ -115,7 +165,7 @@ const handleLogout = () => {
       </div>
 
         <!-- Profile at Start -->
-        <div v-if="showProfile && !profileAtEnd" class="app-topbar__profile app-topbar__profile--start">
+        <div v-if="showProfile && !profileAtEnd && !isMobile" class="app-topbar__profile app-topbar__profile--start">
           <Avatar
             :image="user?.avatar"
             :label="userInitials"
@@ -139,6 +189,31 @@ const handleLogout = () => {
       </div>
 
       <div class="app-topbar__actions">
+        <div class="app-topbar__status">
+          <AppTopbarCartStatus
+            :variant="statusVariant"
+            :compact="statusCompact"
+          />
+          <AppTopbarDateClock
+            v-if="!isMobile"
+            :variant="statusVariant"
+            :compact="statusCompact"
+            @open-panel="openQuickPanel"
+          />
+          <Button
+            v-if="isMobile"
+            icon="pi pi-ellipsis-v"
+            severity="secondary"
+            rounded
+            text
+            class="app-topbar__mobile-menu-toggle"
+            aria-label="Plus d'options"
+            aria-haspopup="true"
+            aria-controls="app-topbar-mobile-menu"
+            @click="toggleMobileActionsMenu"
+          />
+        </div>
+
         <Button
           :icon="isDarkModeActive ? 'pi pi-sun' : 'pi pi-moon'"
           severity="secondary"
@@ -147,17 +222,9 @@ const handleLogout = () => {
           :aria-label="`Mode ${darkMode}`"
           @click="$emit('toggle-dark-mode')"
         />
-        <Button
-          icon="pi pi-sparkles"
-          severity="secondary"
-          rounded
-          text
-          aria-label="Ouvrir les preferences"
-          @click="$emit('open-preferences')"
-        />
 
         <!-- Profile at End -->
-        <div v-if="showProfile && profileAtEnd" class="app-topbar__profile app-topbar__profile--end">
+        <div v-if="showProfile && profileAtEnd && !isMobile" class="app-topbar__profile app-topbar__profile--end">
           <Avatar
             :image="user?.avatar"
             :label="userInitials"
@@ -173,8 +240,24 @@ const handleLogout = () => {
       </div>
     </header>
 
-    <Popover v-if="showProfile" ref="profileMenu" class="app-profile-menu">
+    <Menu
+      v-if="isMobile"
+      id="app-topbar-mobile-menu"
+      ref="mobileActionsMenu"
+      :model="mobileActionItems"
+      popup
+      class="app-topbar-mobile-menu"
+    />
+
+    <Popover v-if="showProfile && !isMobile" ref="profileMenu" class="app-profile-menu">
       <div class="app-profile-menu__content">
+        <Button
+          label="Mon profil"
+          icon="pi pi-user"
+          text
+          fluid
+          @click="openProfile"
+        />
         <Button
           label="Déconnexion"
           icon="pi pi-sign-out"

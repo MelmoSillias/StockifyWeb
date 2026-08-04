@@ -18,6 +18,8 @@ final readonly class VariantCatalogItemDto
         public string $saleMode,
         public string $available,
         public bool $isLowStock,
+        public string $defaultPrice,
+        public ?string $averageCost,
     ) {
     }
 
@@ -38,6 +40,8 @@ final readonly class VariantCatalogItemDto
             'sale_mode' => $this->saleMode,
             'available' => $this->available,
             'is_low_stock' => $this->isLowStock,
+            'default_price' => $this->defaultPrice,
+            'average_cost' => $this->averageCost,
         ];
     }
 }

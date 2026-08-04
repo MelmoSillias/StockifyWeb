@@ -1,0 +1,14 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }} — {{ data.document_number }}</div>
+    <div class="doc-meta">Date : {{ data.paid_at }}</div>
+    <div class="doc-meta">Montant : <strong>{{ data.amount }}</strong></div>
+    <div class="doc-meta">Mode : {{ data.method_label }}</div>
+    {% if data.context_label %}
+        <div class="doc-meta">{{ data.context_label }} : {{ data.context_reference|default('—') }}</div>
+    {% endif %}
+    {% if data.is_cancelled %}
+        <p class="cancelled">Paiement annulé</p>
+    {% endif %}
+{% endblock %}

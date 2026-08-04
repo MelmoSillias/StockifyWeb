@@ -1,47 +1,38 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
+    <AppFiltersCard>
       <div>
-        <p class="dashboard-eyebrow">Stock</p>
-        <h1 class="dashboard-title">Lots</h1>
-        <p class="dashboard-description">Réceptions et stock disponible par variante.</p>
+        <label class="filter-label" for="variant-select">Variante</label>
+        <Select
+          id="variant-select"
+          v-model="selectedVariantId"
+          :options="variantOptions"
+          option-label="label"
+          option-value="value"
+          placeholder="Sélectionner une variante"
+          filter
+          fluid
+          :loading="variantsLoading"
+          @update:model-value="loadLots"
+        />
       </div>
-    </div>
-
-    <Card class="dashboard-panel filter-card">
-      <template #content>
-        <div class="filter-grid">
-          <div>
-            <label class="filter-label" for="variant-select">Variante</label>
-            <Select
-              id="variant-select"
-              v-model="selectedVariantId"
-              :options="variantOptions"
-              option-label="label"
-              option-value="value"
-              placeholder="Sélectionner une variante"
-              filter
-              fluid
-              :loading="variantsLoading"
-              @update:model-value="loadLots"
-            />
-          </div>
-          <div v-if="inventoryStore.stock" class="stock-summary">
-            <p class="filter-label">Stock disponible</p>
-            <p class="stock-summary__value">{{ formatCompactNumber(inventoryStore.stock.available, '0') }}</p>
-          </div>
-        </div>
-      </template>
-    </Card>
-
-    <AppEntityToolbar
-      create-label="Réception lot"
-      :count-label="`${inventoryStore.lots.length} lot(s)`"
-      :show-create="Boolean(selectedVariantId)"
-      @create="receiveDialog.openCreate()"
-    />
+      <div v-if="inventoryStore.stock" class="stock-summary">
+        <p class="filter-label">Stock disponible</p>
+        <p class="stock-summary__value">{{ formatCompactNumber(inventoryStore.stock.available, '0') }}</p>
+      </div>
+    </AppFiltersCard>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Lots"
+          :count-label="`${inventoryStore.lots.length} lot(s)`"
+          create-label="Réception lot"
+          :show-create="Boolean(selectedVariantId)"
+          :show-search="false"
+          @create="receiveDialog.openCreate()"
+        />
+      </template>
       <template #content>
         <AppTableState
           :loading="inventoryStore.loading"
@@ -95,17 +86,19 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import Card from 'primevue/card'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import Select from 'primevue/select'
 
+import AppFiltersCard from '@/domains/shared/components/AppFiltersCard.vue'
 import AppCrudDialog from '@/domains/shared/components/AppCrudDialog.vue'
-import AppEntityToolbar from '@/domains/shared/components/AppEntityToolbar.vue'
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useVariantOptions } from '@/domains/catalog/composables/useVariantOptions'
+import { useFournisseurOptions } from '@/domains/fournisseur/composables/useFournisseurOptions'
 import { useCrudDialog } from '@/domains/shared/composables/useCrudDialog'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
@@ -113,6 +106,7 @@ import { useInventoryStore } from '@/domains/inventory/stores/inventory'
 
 const inventoryStore = useInventoryStore()
 const { options: variantOptions, loading: variantsLoading, load: loadVariantOptions } = useVariantOptions()
+const { options: fournisseurOptions, load: loadFournisseurOptions } = useFournisseurOptions()
 const { showSuccess, showError } = useEntityActions()
 const { formatCompactNumber } = useDisplayFormatters()
 
@@ -122,19 +116,28 @@ const createReceiveForm = () => ({
   quantity: '',
   unit_cost: '',
   reference: '',
-  supplier_ref: '',
+  fournisseur_id: null,
   expiry_date: null
 })
 
 const receiveDialog = useCrudDialog(createReceiveForm)
 
-const receiveFields = [
+const receiveFields = computed(() => [
   { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
   { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
   { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
-  { name: 'supplier_ref', label: 'Réf. fournisseur', type: 'text', placeholder: 'Optionnel', icon: 'pi pi-truck' },
+  {
+    name: 'fournisseur_id',
+    label: 'Fournisseur',
+    type: 'select',
+    options: fournisseurOptions.value,
+    optionLabel: 'label',
+    optionValue: 'value',
+    placeholder: 'Optionnel',
+    icon: 'pi pi-truck'
+  },
   { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
-]
+])
 
 const loadLots = async (variantId) => {
   if (!variantId) {
@@ -168,7 +171,7 @@ const receiveLot = async () => {
 
 onMounted(async () => {
   try {
-    await loadVariantOptions()
+    await Promise.all([loadVariantOptions(), loadFournisseurOptions()])
     if (variantOptions.value.length) {
       selectedVariantId.value = variantOptions.value[0].value
       await loadLots(selectedVariantId.value)
@@ -180,24 +183,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.filter-card {
-  margin-bottom: 1rem;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
-  align-items: end;
-}
-
-.filter-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--p-text-muted-color);
-  font-size: 0.9rem;
-}
-
 .stock-summary__value {
   margin: 0;
   font-size: 1.5rem;

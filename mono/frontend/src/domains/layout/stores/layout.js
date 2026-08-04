@@ -17,6 +17,7 @@ const createInitialState = () => {
     sidebarMode: appShellDefaults.navigation.sidebarMode,
     sidebarCollapsed: appShellDefaults.navigation.sidebarCollapsed,
     mobileSidebarOpen: false,
+    quickPanelOpen: false,
     preferencesOpen: false,
     expandedMenuKeys: {},
     themeName: appShellDefaults.appearance.themeName,
@@ -107,6 +108,10 @@ export const useLayoutStore = defineStore('layout', {
 
     setMobileSidebarOpen(value) {
       this.mobileSidebarOpen = value
+    },
+
+    setQuickPanelOpen(value) {
+      this.quickPanelOpen = value
     },
 
     setPreferencesOpen(value) {

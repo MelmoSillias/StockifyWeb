@@ -637,8 +637,8 @@ defineExpose({
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--pv-accent-soft) 80%, white);
+  color: var(--pv-accent-strong);
   flex: 0 0 auto;
 }
 
@@ -651,12 +651,12 @@ defineExpose({
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--p-text-color);
+  color: var(--pv-accent-strong);
 }
 
 .create-product-dialog__subtitle {
   margin: 0;
-  color: var(--p-text-muted-color);
+  color: var(--pv-text-muted);
 }
 
 .tab-label {

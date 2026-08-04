@@ -1,0 +1,22 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }} — {{ data.document_number }}</div>
+    <div class="doc-meta">Date : {{ data.issued_at }}</div>
+    {% if data.facture_numero %}<div class="doc-meta">Facture d'origine : {{ data.facture_numero }}</div>{% endif %}
+
+    <table class="doc-table">
+        <thead><tr><th>Désignation</th><th class="text-right">Qté</th><th class="text-right">P.U.</th><th class="text-right">Total</th></tr></thead>
+        <tbody>
+            {% for line in data.lines %}
+                <tr>
+                    <td>{{ line.label }}</td>
+                    <td class="text-right">{{ line.quantity }}</td>
+                    <td class="text-right">{{ line.unit_price }}</td>
+                    <td class="text-right">{{ line.line_total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="doc-total">Total : {{ data.total_amount }}</div>
+{% endblock %}

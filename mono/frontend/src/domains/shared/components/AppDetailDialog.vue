@@ -102,8 +102,8 @@ defineEmits(['update:visible'])
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--pv-accent-soft) 72%, transparent);
-  color: var(--pv-accent);
+  background: color-mix(in srgb, var(--pv-accent-soft) 80%, white);
+  color: var(--pv-accent-strong);
 }
 
 .detail-dialog__copy {
@@ -117,7 +117,7 @@ defineEmits(['update:visible'])
 }
 
 .detail-dialog__title {
-  color: var(--pv-text);
+  color: var(--pv-accent-strong);
   font-size: 1.05rem;
   font-weight: 700;
 }

@@ -1,0 +1,30 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }}</div>
+    {% if data.filters_summary %}
+        <div class="doc-meta">{{ data.filters_summary }}</div>
+    {% endif %}
+    <div class="doc-meta">Généré le {{ "now"|date('d/m/Y H:i') }} · {{ data.rows|length }} ligne(s)</div>
+
+    <table class="doc-table">
+        <thead>
+            <tr>
+                {% for col in data.columns %}
+                    <th>{{ col.label }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data.rows %}
+                <tr>
+                    {% for col in data.columns %}
+                        <td>{{ row[col.key]|default('') }}</td>
+                    {% endfor %}
+                </tr>
+            {% else %}
+                <tr><td colspan="{{ data.columns|length }}">Aucune donnée</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

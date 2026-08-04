@@ -24,14 +24,14 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/categories', name: 'api_categories_list', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.categories.view')]
     public function list(): JsonResponse
     {
         return $this->json($this->listCategoriesCatalogHandler->handle(new ListCategoriesCatalogQuery()));
     }
 
     #[Route('/categories', name: 'api_categories_create', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.categories.manage')]
     public function create(Request $request): JsonResponse
     {
         $data = $request->toArray();
@@ -51,7 +51,7 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/categories/{id}', name: 'api_categories_update', methods: ['PUT'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.categories.manage')]
     public function update(string $id, Request $request): JsonResponse
     {
         $category = $this->getCategory($id);
@@ -65,7 +65,7 @@ final class CategoryController extends AbstractController
     }
 
     #[Route('/categories/{id}', name: 'api_categories_delete', methods: ['DELETE'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.categories.manage')]
     public function delete(string $id): JsonResponse
     {
         $category = $this->getCategory($id);

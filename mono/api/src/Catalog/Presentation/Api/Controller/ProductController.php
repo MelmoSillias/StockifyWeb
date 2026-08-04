@@ -33,14 +33,14 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/products', name: 'api_products_list', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.view')]
     public function list(): JsonResponse
     {
         return $this->json($this->listProductsCatalogHandler->handle(new ListProductsCatalogQuery()));
     }
 
     #[Route('/products', name: 'api_products_create', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.create')]
     public function create(Request $request): JsonResponse
     {
         $data = $request->toArray();
@@ -81,14 +81,14 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/products/{id}', name: 'api_products_show', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.view')]
     public function show(string $id): JsonResponse
     {
         return $this->json($this->serializer->serialize($this->getProduct($id)));
     }
 
     #[Route('/products/{id}', name: 'api_products_update', methods: ['PUT'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.update')]
     public function update(string $id, Request $request): JsonResponse
     {
         $data = $request->toArray();
@@ -108,7 +108,7 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/products/{id}', name: 'api_products_delete', methods: ['DELETE'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.delete')]
     public function delete(string $id): JsonResponse
     {
         $product = $this->getProduct($id);

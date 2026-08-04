@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Fournisseur\Domain\Entity;
+
+use App\SharedKernel\Domain\Trait\UuidEntityTrait;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'commande_fournisseur_lines')]
+class CommandeFournisseurLine
+{
+    use UuidEntityTrait;
+
+    #[ORM\ManyToOne(targetEntity: CommandeFournisseur::class, inversedBy: 'lines')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private CommandeFournisseur $commande;
+
+    #[ORM\Column(type: 'uuid')]
+    private Uuid $variantId;
+
+    #[ORM\Column(length: 255)]
+    private string $label;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 3)]
+    private string $quantity;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
+    private string $unitCost;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 2)]
+    private string $lineTotal;
+
+    public function __construct(
+        CommandeFournisseur $commande,
+        Uuid $variantId,
+        string $label,
+        string $quantity,
+        string $unitCost,
+    ) {
+        $this->initializeUuid();
+        $this->commande = $commande;
+        $this->variantId = $variantId;
+        $this->label = $label;
+        $this->quantity = $quantity;
+        $this->unitCost = $unitCost;
+        $this->lineTotal = bcmul($quantity, $unitCost, 2);
+    }
+
+    public function getVariantId(): Uuid
+    {
+        return $this->variantId;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getQuantity(): string
+    {
+        return $this->quantity;
+    }
+
+    public function getUnitCost(): string
+    {
+        return $this->unitCost;
+    }
+
+    public function getLineTotal(): string
+    {
+        return $this->lineTotal;
+    }
+}

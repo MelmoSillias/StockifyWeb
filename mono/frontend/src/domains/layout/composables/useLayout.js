@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { appNavigation, appShellBrand, appShellDefaults } from '@/domains/layout/config/appLayout'
 import { useLayoutStore } from '@/domains/layout/stores/layout'
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 
 const normalizeMenuItems = (items, router, route) => {
   return items.map((item) => {
@@ -52,11 +53,15 @@ export function useLayout() {
   const route = useRoute()
   const router = useRouter()
   const layoutStore = useLayoutStore()
+  const { filterNavigationItems } = usePermissions()
+
+  const filteredNavigation = computed(() => filterNavigationItems(appNavigation))
 
   const {
     sidebarMode,
     sidebarCollapsed,
     mobileSidebarOpen,
+    quickPanelOpen,
     preferencesOpen,
     expandedMenuKeys,
     themeName,
@@ -69,17 +74,29 @@ export function useLayout() {
     motionPreset
   } = storeToRefs(layoutStore)
 
-  const menuModel = computed(() => normalizeMenuItems(appNavigation, router, route))
+  const menuModel = computed(() => normalizeMenuItems(filteredNavigation.value, router, route))
   const pageTitle = computed(() => route.meta.title || 'Application')
   const pageSection = computed(() => route.meta.section || appShellBrand.shortName)
   const homeBreadcrumb = computed(() => ({ icon: 'pi pi-home', route: { name: 'home' } }))
   const breadcrumbs = computed(() => {
-    return route.matched
-      .filter((record) => record.meta?.title)
-      .map((record) => ({
-        label: record.meta.title,
-        route: record.name ? { name: record.name } : undefined
-      }))
+    const title = route.meta?.title
+    if (!title) {
+      return []
+    }
+
+    const section = route.meta?.section
+    const crumbs = []
+
+    if (section && section !== title) {
+      crumbs.push({ label: section })
+    }
+
+    crumbs.push({
+      label: title,
+      route: route.name ? { name: route.name } : undefined
+    })
+
+    return crumbs
   })
 
   const shellConfig = computed(() => ({
@@ -103,7 +120,7 @@ export function useLayout() {
         return
       }
 
-      const keys = findAncestorKeys(appNavigation, routeName)
+      const keys = findAncestorKeys(filteredNavigation.value, routeName)
 
       if (keys.length) {
         layoutStore.mergeExpandedMenuKeys(toExpandedKeyMap(keys))
@@ -125,6 +142,7 @@ export function useLayout() {
     sidebarMode,
     sidebarCollapsed,
     mobileSidebarOpen,
+    quickPanelOpen,
     preferencesOpen,
     expandedMenuKeys,
     themeName,
@@ -137,6 +155,7 @@ export function useLayout() {
     motionPreset,
     handlePrimaryNavigation,
     setMobileSidebarOpen: layoutStore.setMobileSidebarOpen,
+    setQuickPanelOpen: layoutStore.setQuickPanelOpen,
     setPreferencesOpen: layoutStore.setPreferencesOpen,
     setExpandedMenuKeys: layoutStore.setExpandedMenuKeys,
     setSidebarMode: layoutStore.setSidebarMode,

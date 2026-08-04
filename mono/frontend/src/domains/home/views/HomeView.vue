@@ -1,150 +1,162 @@
 <template>
-  <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
-      <div>
-        <p class="dashboard-eyebrow">{{ shopConfig.brandName }}</p>
-        <h1 class="dashboard-title">{{ shopConfig.displayName }}</h1>
-        <p class="dashboard-description">
-          {{ shopConfig.brandSubtitle }}
-        </p>
+  <section class="dashboard-page dashboard-home">
+    <DashboardPeriodFilter
+      :preset="preset"
+      :date-range="dateRange"
+      :presets="presets"
+      @update:preset="setPreset"
+      @update:date-range="updateDateRange"
+    />
+
+    <DashboardQuickActions :visible-actions="visibleQuickActions" />
+
+    <div v-if="isEmpty && !dashboardStore.isLoading" class="dashboard-home__empty">
+      <span class="dashboard-feed-empty__icon">
+        <i class="pi pi-inbox"></i>
+      </span>
+      <p>Aucun indicateur disponible pour votre profil.</p>
+    </div>
+
+    <template v-else>
+      <DashboardKpiSkeleton
+        v-if="showKpiGrid && dashboardStore.summaryLoading && !dashboardStore.summary"
+      />
+      <DashboardKpiGrid
+        v-else-if="showKpiGrid"
+        :summary="dashboardStore.summary"
+        :visible-kpis="visibleKpis"
+        :grid-class="kpiGridClass"
+      />
+
+      <div
+        v-if="showInsights"
+        class="dashboard-home__insights"
+        :class="insightsLayoutClass"
+      >
+        <DashboardSectionSkeleton
+          v-if="showCarousel && dashboardStore.feedLoading && !dashboardStore.feed"
+          :lines="6"
+        />
+        <DashboardCarousel
+          v-else-if="showCarousel"
+          :feed="dashboardStore.feed"
+          :visible-slides="visibleSlides"
+        />
+
+        <DashboardSectionSkeleton
+          v-if="showSalesChart && dashboardStore.salesTrendLoading && !dashboardStore.salesTrend"
+          :lines="8"
+        />
+        <DashboardSalesChart
+          v-else-if="showSalesChart"
+          :sales-trend="dashboardStore.salesTrend"
+        />
       </div>
-    </div>
 
-    <div class="dashboard-kpis">
-      <Card v-for="item in starterCards" :key="item.title" class="dashboard-kpi-card">
-        <template #content>
-          <div class="dashboard-kpi-card__icon" :class="item.iconClass">
-            <i :class="item.icon"></i>
-          </div>
-          <p class="dashboard-kpi-card__label">{{ item.title }}</p>
-          <p class="dashboard-kpi-card__value">{{ item.value }}</p>
-          <p class="dashboard-kpi-card__hint">{{ item.hint }}</p>
-        </template>
-      </Card>
-    </div>
+      <DashboardFinancePanel
+        v-if="showFinancePanel"
+        :finance-summary="dashboardStore.financeSummary"
+        :visible-widgets="visibleFinanceWidgets"
+      />
 
-    <div class="dashboard-grid">
-      <Card class="dashboard-panel">
-        <template #title>Premiers pas</template>
-        <template #content>
-          <ul class="dashboard-feature-list">
-            <li v-for="step in nextSteps" :key="step.title" class="dashboard-feature-list__item">
-              <div>
-                <p class="dashboard-feature-list__title">{{ step.title }}</p>
-                <p class="dashboard-feature-list__text">{{ step.text }}</p>
-              </div>
-              <Button
-                v-if="step.routeName"
-                :label="step.action"
-                icon="pi pi-arrow-right"
-                icon-pos="right"
-                text
-                @click="router.push({ name: step.routeName })"
-              />
-            </li>
-          </ul>
-        </template>
-      </Card>
+      <DashboardTableSkeleton
+        v-if="showPendingDeliveries && dashboardStore.pendingDeliveriesLoading && !dashboardStore.pendingDeliveries"
+        :rows="6"
+      />
+      <DashboardPendingDeliveries
+        v-else-if="showPendingDeliveries"
+        :pending-deliveries="dashboardStore.pendingDeliveries"
+      />
 
-      <Card class="dashboard-panel">
-        <template #title>Raccourcis</template>
-        <template #content>
-          <ul class="dashboard-feature-list">
-            <li v-for="link in quickLinks" :key="link.title" class="dashboard-feature-list__item">
-              <div>
-                <p class="dashboard-feature-list__title">{{ link.title }}</p>
-                <p class="dashboard-feature-list__text">{{ link.text }}</p>
-              </div>
-              <Button
-                :label="link.action"
-                icon="pi pi-arrow-right"
-                icon-pos="right"
-                text
-                @click="router.push({ name: link.routeName })"
-              />
-            </li>
-          </ul>
-        </template>
-      </Card>
-    </div>
+      <DashboardTableSkeleton
+        v-if="showPendingSupplierOrders && dashboardStore.pendingSupplierOrdersLoading && !dashboardStore.pendingSupplierOrders"
+        :rows="6"
+      />
+      <DashboardPendingSupplierOrders
+        v-else-if="showPendingSupplierOrders"
+        :pending-supplier-orders="dashboardStore.pendingSupplierOrders"
+      />
+
+      <DashboardTableSkeleton
+        v-if="showRecentAudit && dashboardStore.recentAuditLoading && !dashboardStore.recentAudit"
+        :rows="5"
+      />
+      <DashboardRecentAudit
+        v-else-if="showRecentAudit"
+        :recent-audit="dashboardStore.recentAudit"
+      />
+    </template>
   </section>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue'
 
-import Button from 'primevue/button'
-import Card from 'primevue/card'
+import DashboardCarousel from '@/domains/home/components/DashboardCarousel.vue'
+import DashboardFinancePanel from '@/domains/home/components/DashboardFinancePanel.vue'
+import DashboardKpiGrid from '@/domains/home/components/DashboardKpiGrid.vue'
+import DashboardKpiSkeleton from '@/domains/home/components/DashboardKpiSkeleton.vue'
+import DashboardPendingDeliveries from '@/domains/home/components/DashboardPendingDeliveries.vue'
+import DashboardPendingSupplierOrders from '@/domains/home/components/DashboardPendingSupplierOrders.vue'
+import DashboardPeriodFilter from '@/domains/home/components/DashboardPeriodFilter.vue'
+import DashboardQuickActions from '@/domains/home/components/DashboardQuickActions.vue'
+import DashboardRecentAudit from '@/domains/home/components/DashboardRecentAudit.vue'
+import DashboardSalesChart from '@/domains/home/components/DashboardSalesChart.vue'
+import DashboardSectionSkeleton from '@/domains/home/components/DashboardSectionSkeleton.vue'
+import DashboardTableSkeleton from '@/domains/home/components/DashboardTableSkeleton.vue'
+import { useDashboardPeriod } from '@/domains/home/composables/useDashboardPeriod'
+import { useDashboardWidgets } from '@/domains/home/composables/useDashboardWidgets'
+import { useDashboardStore } from '@/domains/home/stores/dashboard'
 
-import { appConfig } from '@/config/app'
-import shopConfig from '@/shopConfig'
+const dashboardStore = useDashboardStore()
+const { preset, dateRange, from, to, setPreset, presets } = useDashboardPeriod('7days')
 
-const router = useRouter()
+const {
+  visibleKpis,
+  visibleSlides,
+  visibleQuickActions,
+  visibleFinanceWidgets,
+  showKpiGrid,
+  showCarousel,
+  showSalesChart,
+  showPendingDeliveries,
+  showPendingSupplierOrders,
+  showRecentAudit,
+  showFinancePanel,
+  showInsights,
+  insightsLayoutClass,
+  kpiGridClass,
+  isEmpty,
+  fetchOptions
+} = useDashboardWidgets()
 
-const starterCards = computed(() => [
-  {
-    title: 'Magasin',
-    value: shopConfig.displayName,
-    hint: shopConfig.id,
-    icon: 'pi pi-shop',
-    iconClass: 'dashboard-kpi-card__icon--secondary'
-  },
-  {
-    title: 'Contact',
-    value: shopConfig.shopPhone || '—',
-    hint: shopConfig.printProfile?.email || 'Coordonnées magasin',
-    icon: 'pi pi-phone',
-    iconClass: 'dashboard-kpi-card__icon--tertiary'
-  },
-  {
-    title: 'Auth',
-    value: appConfig.auth.enabled ? 'Activee' : 'Desactivee',
-    hint: 'Session active',
-    icon: 'pi pi-lock',
-    iconClass: ''
+const updateDateRange = (value) => {
+  dateRange.value = value
+}
+
+const refreshPeriodData = () => {
+  if (!from.value || !to.value) {
+    return
   }
-])
 
-const nextSteps = [
-  {
-    title: 'Catégories',
-    text: 'Structurez votre catalogue par familles.',
-    action: 'Ouvrir',
-    routeName: 'catalog-categories'
-  },
-  {
-    title: 'Produits',
-    text: 'Créez produits, variantes et gérez le stock.',
-    action: 'Ouvrir',
-    routeName: 'catalog-products'
-  },
-  {
-    title: 'Mouvements',
-    text: 'Consultez l’historique des entrées et sorties.',
-    action: 'Voir',
-    routeName: 'inventory-movements'
-  }
-]
+  dashboardStore.refreshPeriodData(from.value, to.value, fetchOptions.value)
+}
 
-const quickLinks = [
-  {
-    title: 'Produits',
-    text: 'Parcourir et gérer le catalogue.',
-    action: 'Ouvrir',
-    routeName: 'catalog-products'
-  },
-  {
-    title: 'Catégories',
-    text: 'Familles de produits du magasin.',
-    action: 'Ouvrir',
-    routeName: 'catalog-categories'
-  },
-  {
-    title: 'Mouvements',
-    text: 'Historique des entrées et sorties.',
-    action: 'Ouvrir',
-    routeName: 'inventory-movements'
-  }
-]
+const refreshStaticData = () => {
+  dashboardStore.refreshStaticData(fetchOptions.value)
+}
+
+watch([from, to], () => {
+  refreshPeriodData()
+}, { immediate: false })
+
+watch(fetchOptions, () => {
+  refreshPeriodData()
+  refreshStaticData()
+}, { deep: true })
+
+onMounted(async () => {
+  await refreshStaticData()
+  await refreshPeriodData()
+})
 </script>

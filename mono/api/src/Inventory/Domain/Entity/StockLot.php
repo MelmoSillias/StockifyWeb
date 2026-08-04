@@ -8,6 +8,7 @@ use App\SharedKernel\Domain\Trait\TimestampableTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DoctrineStockLotRepository::class)]
 #[ORM\Table(name: 'stock_lots')]
@@ -38,6 +39,9 @@ class StockLot
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $supplierRef = null;
 
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $fournisseurId = null;
+
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $expiryDate = null;
 
@@ -48,6 +52,7 @@ class StockLot
         ?string $reference = null,
         ?string $supplierRef = null,
         ?\DateTimeImmutable $expiryDate = null,
+        ?Uuid $fournisseurId = null,
     ) {
         $this->initializeUuid();
         $this->initializeTimestamps();
@@ -57,6 +62,7 @@ class StockLot
         $this->unitCost = $unitCost;
         $this->reference = $reference;
         $this->supplierRef = $supplierRef;
+        $this->fournisseurId = $fournisseurId;
         $this->expiryDate = $expiryDate;
         $this->receivedAt = new \DateTimeImmutable();
     }
@@ -99,6 +105,11 @@ class StockLot
     public function getSupplierRef(): ?string
     {
         return $this->supplierRef;
+    }
+
+    public function getFournisseurId(): ?Uuid
+    {
+        return $this->fournisseurId;
     }
 
     public function consume(string $quantity): void

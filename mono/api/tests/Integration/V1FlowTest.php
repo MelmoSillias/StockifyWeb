@@ -2,35 +2,19 @@
 
 namespace App\Tests\Integration;
 
-use App\Catalog\Domain\Entity\UnitOfMeasure;
-use App\Catalog\Domain\Repository\UnitOfMeasureRepositoryInterface;
-use Doctrine\ORM\Tools\SchemaTool;
+use App\Tests\ApiTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class V1FlowTest extends WebTestCase
+final class V1FlowTest extends ApiTestCase
 {
     private static bool $schemaInitialized = false;
 
     public function testFullMonoFlowCatalogFifo(): void
     {
-        $this->initializeSchema();
+        $this->initializeTestSchema();
 
         $client = static::createClient();
-        $client->request('POST', '/api/register', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
-            'email' => 'test@stockify.local',
-            'username' => 'testuser',
-            'password' => 'password123',
-            'first_name' => 'Test',
-            'last_name' => 'User',
-        ]));
-        $this->assertResponseStatusCodeSame(201);
-        $auth = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('access_token', $auth);
-
-        $headers = [
-            'HTTP_AUTHORIZATION' => 'Bearer ' . $auth['access_token'],
-            'CONTENT_TYPE' => 'application/json',
-        ];
+        $headers = $this->authenticateAdmin($client);
 
         $client->request('GET', '/api/units-of-measure');
         $this->assertResponseIsSuccessful();
@@ -91,30 +75,5 @@ final class V1FlowTest extends WebTestCase
         $client->request('GET', "/api/variants/{$variantId}/stock", [], [], $headers);
         $stockAfter = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(120, (float) $stockAfter['available']);
-    }
-
-    private function initializeSchema(): void
-    {
-        if (self::$schemaInitialized) {
-            return;
-        }
-
-        if (is_file(__DIR__ . '/../../var/test.db')) {
-            unlink(__DIR__ . '/../../var/test.db');
-        }
-
-        self::bootKernel();
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $tool = new SchemaTool($em);
-        $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
-
-        /** @var UnitOfMeasureRepositoryInterface $unitRepo */
-        $unitRepo = static::getContainer()->get(UnitOfMeasureRepositoryInterface::class);
-        foreach ([['piece', 'Pièce', 0], ['kg', 'Kilogramme', 3], ['liter', 'Litre', 3], ['carton', 'Carton', 0]] as [$code, $label, $decimals]) {
-            $unitRepo->save(new UnitOfMeasure($code, $label, $decimals));
-        }
-
-        self::$schemaInitialized = true;
-        self::ensureKernelShutdown();
     }
 }

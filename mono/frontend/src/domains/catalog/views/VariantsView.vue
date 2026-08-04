@@ -1,41 +1,34 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
-      <div>
-        <p class="dashboard-eyebrow">Catalogue</p>
-        <h1 class="dashboard-title">Variantes</h1>
-        <p class="dashboard-description">Formats de vente, prix et seuils d'alerte.</p>
-      </div>
-    </div>
-
-    <Card class="dashboard-panel filter-card">
-      <template #content>
-        <label class="filter-label" for="product-select">Produit</label>
-        <Select
-          id="product-select"
-          v-model="selectedProductId"
-          :options="productOptions"
-          option-label="label"
-          option-value="value"
-          placeholder="Sélectionner un produit"
-          filter
-          fluid
-          @update:model-value="loadVariants"
-        />
-      </template>
-    </Card>
-
-    <AppEntityToolbar
-      :search-term="searchTerm"
-      search-placeholder="Rechercher une variante..."
-      create-label="Nouvelle variante"
-      :count-label="`${filteredVariants.length} variante(s)`"
-      :show-create="Boolean(selectedProductId)"
-      @update:search-term="searchTerm = $event"
-      @create="dialog.openCreate()"
-    />
+    <AppFiltersCard>
+      <label class="filter-label" for="product-select">Produit</label>
+      <Select
+        id="product-select"
+        v-model="selectedProductId"
+        :options="productOptions"
+        option-label="label"
+        option-value="value"
+        placeholder="Sélectionner un produit"
+        filter
+        fluid
+        @update:model-value="loadVariants"
+      />
+    </AppFiltersCard>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Variantes"
+          :count-label="`${filteredVariants.length} variante(s)`"
+          create-label="Nouvelle variante"
+          :show-create="Boolean(selectedProductId)"
+          :search-term="searchTerm"
+          search-placeholder="Rechercher une variante..."
+          show-search
+          @update:search-term="searchTerm = $event"
+          @create="dialog.openCreate()"
+        />
+      </template>
       <template #content>
         <AppTableState
           :loading="variantsStore.loading"
@@ -48,38 +41,31 @@
             :value="filteredVariants"
             data-key="id"
             striped-rows
-            responsive-layout="scroll"
+            :responsive-layout="tableLayout"
           >
-            <Column field="sku" header="SKU" />
+            <Column v-if="!isMobile" field="sku" header="SKU" />
             <Column header="Unité">
               <template #body="{ data }">
                 {{ unitLabel(data.unit_of_measure_id) }}
               </template>
             </Column>
-            <Column field="sale_mode" header="Mode vente" />
+            <Column v-if="!isMobile" field="sale_mode" header="Mode vente" />
             <Column header="Prix">
               <template #body="{ data }">
                 {{ formatCompactNumber(data.default_price) }}
               </template>
             </Column>
-            <Column header="Seuil alerte">
+            <Column v-if="!isMobile" header="Seuil alerte">
               <template #body="{ data }">
                 {{ formatCompactNumber(data.alert_threshold) }}
               </template>
             </Column>
-            <Column header="Actions" style="width: 170px">
+            <Column header="Actions" style="width: 90px">
               <template #body="{ data }">
-                <div class="actions-cell">
-                  <Button icon="pi pi-pencil" text rounded @click="dialog.openEdit(normalizeForEdit(data))" />
-                  <Button
-                    icon="pi pi-trash"
-                    text
-                    rounded
-                    severity="danger"
-                    :loading="variantsStore.isDeleting(data.id)"
-                    @click="confirmDelete(data)"
-                  />
-                </div>
+                <AppTableActionsMenu
+                  :actions="variantRowActions(data)"
+                  aria-label="Actions variante"
+                />
               </template>
             </Column>
           </DataTable>
@@ -111,9 +97,12 @@ import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import Select from 'primevue/select'
 
+import AppFiltersCard from '@/domains/shared/components/AppFiltersCard.vue'
 import AppCrudDialog from '@/domains/shared/components/AppCrudDialog.vue'
-import AppEntityToolbar from '@/domains/shared/components/AppEntityToolbar.vue'
+import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu.vue'
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { useCrudDialog } from '@/domains/shared/composables/useCrudDialog'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
@@ -124,6 +113,8 @@ import { useVariantsStore } from '@/domains/catalog/stores/variants'
 const productsStore = useProductsStore()
 const unitsStore = useUnitsStore()
 const variantsStore = useVariantsStore()
+const { isMobile } = useBreakpoint()
+const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
 const { showSuccess, showError, confirmRemoval } = useEntityActions()
 const { formatCompactNumber } = useDisplayFormatters()
 
@@ -238,6 +229,21 @@ const confirmDelete = (variant) => {
   })
 }
 
+const variantRowActions = (variant) => [
+  {
+    label: 'Modifier',
+    icon: 'pi pi-pencil',
+    command: () => dialog.openEdit(normalizeForEdit(variant))
+  },
+  {
+    label: 'Supprimer',
+    icon: 'pi pi-trash',
+    severity: 'danger',
+    loading: variantsStore.isDeleting(variant.id),
+    command: () => confirmDelete(variant)
+  }
+]
+
 onMounted(async () => {
   try {
     await Promise.all([productsStore.fetchAll(), unitsStore.fetchAll()])
@@ -250,22 +256,3 @@ onMounted(async () => {
   }
 })
 </script>
-
-<style scoped>
-.filter-card {
-  margin-bottom: 1rem;
-}
-
-.filter-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--p-text-muted-color);
-  font-size: 0.9rem;
-}
-
-.actions-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-</style>

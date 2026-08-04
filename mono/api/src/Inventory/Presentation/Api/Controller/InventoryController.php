@@ -36,7 +36,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/stock-policy', name: 'api_stock_policy_show', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.stock.view')]
     public function showPolicy(string $id): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -49,7 +49,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/stock-policy', name: 'api_stock_policy_update', methods: ['PUT'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.policy.manage')]
     public function updatePolicy(string $id, Request $request): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -70,7 +70,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/lots', name: 'api_lots_create', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.lots.create')]
     public function receiveLot(string $id, Request $request): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -80,6 +80,7 @@ final class InventoryController extends AbstractController
         }
 
         $expiry = !empty($data['expiry_date']) ? new \DateTimeImmutable($data['expiry_date']) : null;
+        $fournisseurId = !empty($data['fournisseur_id']) ? Uuid::fromString((string) $data['fournisseur_id']) : null;
         $lot = $this->stockMovementService->receiveLot(
             $variant,
             (string) $data['quantity'],
@@ -87,13 +88,14 @@ final class InventoryController extends AbstractController
             $data['reference'] ?? null,
             $data['supplier_ref'] ?? null,
             $expiry,
+            $fournisseurId,
         );
 
         return $this->json($this->serializeLot($lot), Response::HTTP_CREATED);
     }
 
     #[Route('/variants/{id}/lots', name: 'api_lots_list', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.stock.view')]
     public function listLots(string $id): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -103,7 +105,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/stock', name: 'api_stock_show', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.stock.view')]
     public function showStock(string $id): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -115,7 +117,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/stock-out', name: 'api_stock_out', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.stock_out')]
     public function stockOut(string $id, Request $request): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -144,7 +146,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/variants/{id}/adjustments', name: 'api_adjustments', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.adjustments')]
     public function adjust(string $id, Request $request): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -175,7 +177,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/stock-movements', name: 'api_stock_movements', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.movements.view')]
     public function listMovements(Request $request): JsonResponse
     {
         $variantId = $request->query->get('variant_id');
@@ -189,7 +191,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/stock-alerts', name: 'api_stock_alerts', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('inventory.alerts.view')]
     public function stockAlerts(): JsonResponse
     {
         $alerts = $this->stockAlertsHandler->handle(new GetStockAlertsQuery());
@@ -220,6 +222,7 @@ final class InventoryController extends AbstractController
             'received_at' => $lot->getReceivedAt()->format(\DateTimeInterface::ATOM),
             'expiry_date' => $lot->getExpiryDate()?->format('Y-m-d'),
             'supplier_ref' => $lot->getSupplierRef(),
+            'fournisseur_id' => $lot->getFournisseurId() ? (string) $lot->getFournisseurId() : null,
         ];
     }
 

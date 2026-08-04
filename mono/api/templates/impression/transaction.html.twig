@@ -1,0 +1,11 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }}</div>
+    <div class="doc-meta">Compte : {{ data.compte_name }}</div>
+    <div class="doc-meta">Date : {{ data.occurred_at }}</div>
+    <div class="doc-meta">Type : {{ data.type }} · Montant : <strong>{{ data.amount }}</strong></div>
+    <div class="doc-meta">Libellé : {{ data.label }}</div>
+    {% if data.description %}<div class="doc-meta">{{ data.description }}</div>{% endif %}
+    {% if data.is_cancelled %}<p class="cancelled">Transaction annulée</p>{% endif %}
+{% endblock %}

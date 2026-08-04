@@ -10,17 +10,21 @@
         "doctrine/doctrine-bundle": "^2.18.3",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6.7",
+        "dompdf/dompdf": "^3.1",
         "lexik/jwt-authentication-bundle": "^3.2",
         "nelmio/cors-bundle": "^2.6.1",
+        "phpoffice/phpspreadsheet": "^5.9",
+        "phpoffice/phpword": "^1.4",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2.11",
         "symfony/framework-bundle": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/security-bundle": "7.4.*",
+        "symfony/twig-bundle": "7.4.*",
         "symfony/uid": "7.4.*",
         "symfony/validator": "7.4.*",
-        "symfony/yaml": "7.4.*",
-        "symfony/flex": "^2.11"
+        "symfony/yaml": "7.4.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3",

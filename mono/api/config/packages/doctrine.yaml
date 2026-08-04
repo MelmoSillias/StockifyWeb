@@ -29,6 +29,60 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Inventory/Domain/Entity'
                 prefix: 'App\Inventory\Domain\Entity'
                 alias: Inventory
+            Client:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Client/Domain/Entity'
+                prefix: 'App\Client\Domain\Entity'
+                alias: Client
+            Commerce:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Commerce/Domain/Entity'
+                prefix: 'App\Commerce\Domain\Entity'
+                alias: Commerce
+            Facturation:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Facturation/Domain/Entity'
+                prefix: 'App\Facturation\Domain\Entity'
+                alias: Facturation
+            Paiement:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Paiement/Domain/Entity'
+                prefix: 'App\Paiement\Domain\Entity'
+                alias: Paiement
+            Livraison:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Livraison/Domain/Entity'
+                prefix: 'App\Livraison\Domain\Entity'
+                alias: Livraison
+            Finance:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Finance/Domain/Entity'
+                prefix: 'App\Finance\Domain\Entity'
+                alias: Finance
+            Fournisseur:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Fournisseur/Domain/Entity'
+                prefix: 'App\Fournisseur\Domain\Entity'
+                alias: Fournisseur
+            AccessAudit:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/AccessAudit/Domain/Entity'
+                prefix: 'App\AccessAudit\Domain\Entity'
+                alias: AccessAudit
+            Impression:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Impression/Domain/Entity'
+                prefix: 'App\Impression\Domain\Entity'
+                alias: Impression
         controller_resolver:
             auto_mapping: false
 

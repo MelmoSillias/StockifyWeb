@@ -1,14 +1,14 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
-      <div>
-        <p class="dashboard-eyebrow">Stock</p>
-        <h1 class="dashboard-title">Alertes</h1>
-        <p class="dashboard-description">Produits en stock faible.</p>
-      </div>
-    </div>
-
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Alertes"
+          :count-label="`${inventoryStore.alerts.length} alerte(s)`"
+          :show-create="false"
+          :show-search="false"
+        />
+      </template>
       <template #content>
         <AppTableState
           :loading="inventoryStore.loading"
@@ -48,6 +48,7 @@ import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import Tag from 'primevue/tag'
 
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'

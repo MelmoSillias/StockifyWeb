@@ -101,6 +101,29 @@ class DoctrineStockLotRepository extends ServiceEntityRepository implements Stoc
         return $map;
     }
 
+    public function averageUnitCostByVariant(): array
+    {
+        /** @var list<array{variantId: mixed, weightedCost: mixed, remaining: mixed}> $rows */
+        $rows = $this->createQueryBuilder('l')
+            ->select('v.id AS variantId, SUM(l.quantityRemaining * l.unitCost) AS weightedCost, SUM(l.quantityRemaining) AS remaining')
+            ->innerJoin('l.variant', 'v')
+            ->andWhere('l.quantityRemaining > 0')
+            ->groupBy('v.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $remaining = (float) ($row['remaining'] ?? 0);
+            if ($remaining <= 0) {
+                continue;
+            }
+            $map[(string) $row['variantId']] = number_format((float) ($row['weightedCost'] ?? 0) / $remaining, 4, '.', '');
+        }
+
+        return $map;
+    }
+
     public function save(StockLot $lot, bool $flush = true): void
     {
         $this->getEntityManager()->persist($lot);

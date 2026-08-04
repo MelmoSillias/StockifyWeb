@@ -67,11 +67,49 @@ export const useEntityActions = () => {
     })
   }
 
+  const confirmPopup = ({ event, message, header, acceptLabel = 'Confirmer', onAccept }) => {
+    if (!confirm) {
+      const accepted = typeof window !== 'undefined'
+        ? window.confirm([header || 'Confirmation', message].filter(Boolean).join('\n\n'))
+        : true
+
+      if (!accepted) {
+        return
+      }
+
+      Promise.resolve(onAccept()).catch((error) => {
+        showError(error?.message || 'L\'operation a echoue.')
+      })
+
+      return
+    }
+
+    confirm.require({
+      target: event?.currentTarget,
+      message,
+      header: header || 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      rejectProps: {
+        label: 'Annuler',
+        severity: 'secondary',
+        outlined: true
+      },
+      acceptProps: {
+        label: acceptLabel,
+        severity: 'danger'
+      },
+      accept: async () => {
+        await onAccept()
+      }
+    })
+  }
+
   return {
     showToast,
     showSuccess,
     showError,
     showInfo,
-    confirmRemoval
+    confirmRemoval,
+    confirmPopup
   }
 }

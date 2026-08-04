@@ -1,23 +1,8 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
+    <AppFiltersCard>
       <div>
-        <p class="dashboard-eyebrow">Catalogue</p>
-        <h1 class="dashboard-title">Produits</h1>
-        <p class="dashboard-description">Produits, variantes (formats de vente) et stock.</p>
-      </div>
-      <Button
-        label="Nouveau produit"
-        icon="pi pi-plus-circle"
-        @click="openCreateProduct()"
-      />
-    </div>
-
-    <Card class="dashboard-panel filter-card">
-      <template #content>
-        <div class="filter-grid">
-          <div>
-            <label class="filter-label" for="product-search">Recherche</label>
+        <label class="filter-label" for="product-search">Recherche</label>
             <IconField>
               <InputIcon class="pi pi-search" />
               <InputText
@@ -45,18 +30,30 @@
           <div class="filter-toggle">
             <label class="filter-label" for="low-stock-filter">Stock faible</label>
             <div class="filter-toggle__row">
-              <ToggleSwitch id="low-stock-filter" v-model="lowStockOnly" />
+              <ToggleSwitch
+                id="low-stock-filter"
+                v-model="lowStockOnly"
+                v-tooltip.top="'Afficher uniquement les produits en alerte'"
+              />
               <span class="filter-toggle__hint">Afficher uniquement les produits en alerte</span>
             </div>
           </div>
-          <div class="filter-count">
-            <Tag :value="`${filteredProducts.length} produit(s)`" icon="pi pi-chart-bar" severity="contrast" rounded />
-          </div>
-        </div>
-      </template>
-    </Card>
+    </AppFiltersCard>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Produits"
+          :count-label="`${filteredProducts.length} produit(s)`"
+          create-label="Nouveau produit"
+          hide-create-on-mobile
+          @create="openCreateProduct()"
+        >
+          <template #actions>
+            <AppTablePrintExportBar table-type="products" />
+          </template>
+        </AppTablePanelHeader>
+      </template>
       <template #content>
         <AppTableState
           :loading="productsStore.loading"
@@ -70,7 +67,7 @@
             :value="filteredProducts"
             data-key="id"
             striped-rows
-            responsive-layout="scroll"
+            :responsive-layout="tableLayout"
             :row-class="productRowClass"
             paginator
             :rows="rows"
@@ -92,31 +89,27 @@
                 </div>
               </template>
             </Column>
-            <Column field="reference" header="Référence" />
-            <Column header="Catégorie">
+            <Column v-if="!isMobile" field="reference" header="Référence">
               <template #body="{ data }">
-                {{ data.category_name || '—' }}
+                <small>{{ '#' + data.reference || '—' }}</small>
               </template>
             </Column>
-            <Column header="Variantes" style="width: 110px">
+            <Column v-if="!isMobile" header="Catégorie">
+              <template #body="{ data }">
+                <Tag :value="data.category_name || '—'" severity="secondary" rounded />
+              </template>
+            </Column>
+            <Column v-if="!isMobile" header="Variantes" style="width: 110px">
               <template #body="{ data }">
                 <Tag :value="String(data.variant_count ?? data.variants?.length ?? 0)" severity="secondary" rounded />
               </template>
             </Column>
-            <Column field="status" header="Statut" />
             <Column header="Actions" style="width: 140px">
               <template #body="{ data }">
-                <div class="actions-cell">
-                  <Button icon="pi pi-pencil" text rounded @click="openEditProduct(data)" />
-                  <Button
-                    icon="pi pi-trash"
-                    text
-                    rounded
-                    severity="danger"
-                    :loading="productsStore.isDeleting(data.id)"
-                    @click="confirmDeleteProduct(data)"
-                  />
-                </div>
+                <AppTableActionsMenu
+                  :actions="productRowActions(data)"
+                  aria-label="Actions produit"
+                />
               </template>
             </Column>
             <template #expansion="{ data }">
@@ -141,8 +134,7 @@
     <Teleport to="body">
       <Button
         class="products-fab"
-        icon="pi pi-plus"
-        rounded
+        icon="pi pi-plus" 
         aria-label="Nouveau produit"
         v-tooltip.left="'Nouveau produit'"
         @click="openCreateProduct()"
@@ -255,7 +247,11 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import ProductVariantsPanel from '@/domains/catalog/components/ProductVariantsPanel.vue'
 import CreateProductDialog from '@/domains/catalog/components/CreateProductDialog.vue'
 import VariantStockDialog from '@/domains/catalog/components/VariantStockDialog.vue'
+import AppFiltersCard from '@/domains/shared/components/AppFiltersCard.vue'
 import AppCrudDialog from '@/domains/shared/components/AppCrudDialog.vue'
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
+import AppTablePrintExportBar from '@/domains/impression/components/AppTablePrintExportBar.vue'
+import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useCrudDialog } from '@/domains/shared/composables/useCrudDialog'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
@@ -265,9 +261,11 @@ import { useProductsStore } from '@/domains/catalog/stores/products'
 import { useUnitsStore } from '@/domains/catalog/stores/units'
 import { useVariantsStore } from '@/domains/catalog/stores/variants'
 import { useInventoryStore } from '@/domains/inventory/stores/inventory'
+import { useFournisseurOptions } from '@/domains/fournisseur/composables/useFournisseurOptions'
 import { inventoryService } from '@/domains/inventory/services/inventoryService'
 import { variantsService } from '@/domains/catalog/services/variantsService'
 import { useLayoutStore } from '@/domains/layout/stores/layout'
+import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import {
   buildVariantSku,
   saleModeOptions
@@ -281,8 +279,11 @@ const categoriesStore = useCategoriesStore()
 const unitsStore = useUnitsStore()
 const variantsStore = useVariantsStore()
 const inventoryStore = useInventoryStore()
+const { options: fournisseurOptions, load: loadFournisseurOptions } = useFournisseurOptions()
 const layoutStore = useLayoutStore()
 const { motionPreset } = storeToRefs(layoutStore)
+const { isMobile } = useBreakpoint()
+const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
 const { showSuccess, showError, confirmRemoval } = useEntityActions()
 const { formatCompactNumber } = useDisplayFormatters()
 
@@ -333,7 +334,7 @@ const receiveDialog = useCrudDialog(() => ({
   quantity: '',
   unit_cost: '',
   reference: '',
-  supplier_ref: '',
+  fournisseur_id: null,
   expiry_date: null
 }))
 const stockOutDialog = useCrudDialog(() => ({
@@ -420,13 +421,22 @@ const variantFormFields = computed(() => {
   ]
 })
 
-const receiveFields = [
+const receiveFields = computed(() => [
   { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
   { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
   { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
-  { name: 'supplier_ref', label: 'Réf. fournisseur', type: 'text', placeholder: 'Optionnel', icon: 'pi pi-truck' },
+  {
+    name: 'fournisseur_id',
+    label: 'Fournisseur',
+    type: 'select',
+    options: fournisseurOptions.value,
+    optionLabel: 'label',
+    optionValue: 'value',
+    placeholder: 'Optionnel',
+    icon: 'pi pi-truck'
+  },
   { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
-]
+])
 
 const stockOutFields = [
   { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 5', icon: 'pi pi-box' },
@@ -659,6 +669,21 @@ const saveProduct = async () => {
   }
 }
 
+const productRowActions = (product) => [
+  {
+    label: 'Modifier',
+    icon: 'pi pi-pencil',
+    command: () => openEditProduct(product)
+  },
+  {
+    label: 'Supprimer',
+    icon: 'pi pi-trash',
+    severity: 'danger',
+    loading: productsStore.isDeleting(product.id),
+    command: () => confirmDeleteProduct(product)
+  }
+]
+
 const confirmDeleteProduct = (product) => {
   confirmRemoval({
     header: 'Supprimer ce produit ?',
@@ -876,7 +901,8 @@ onMounted(async () => {
     await Promise.all([
       categoriesStore.fetchAll(),
       productsStore.fetchAll(),
-      unitsStore.fetchAll()
+      unitsStore.fetchAll(),
+      loadFournisseurOptions()
     ])
   } catch (error) {
     showError(error?.message || 'Impossible de charger les produits.')
@@ -889,24 +915,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.filter-card {
-  margin-bottom: 0;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1.2fr 1.4fr auto;
-  gap: 1rem;
-  align-items: end;
-}
-
-.filter-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-}
-
 .filter-toggle__row {
   display: flex;
   align-items: center;
@@ -943,6 +951,16 @@ onBeforeUnmount(() => {
   .products-fab {
     right: max(1rem, env(safe-area-inset-right, 0px));
     bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .dashboard-page {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 479px) {
+  .filter-toggle__hint {
+    display: none;
   }
 }
 

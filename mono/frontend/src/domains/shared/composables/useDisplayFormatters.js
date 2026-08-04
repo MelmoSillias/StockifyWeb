@@ -1,3 +1,17 @@
+const decimalFormatter = new Intl.NumberFormat('fr-FR', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 20
+})
+
+const normalizeNumericValue = (value) => {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
 export const useDisplayFormatters = () => {
   const dateTimeFormatter = new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'medium',
@@ -44,24 +58,46 @@ export const useDisplayFormatters = () => {
     return items.map((item) => item?.[key]).filter(Boolean).join(', ')
   }
 
-  const formatCompactNumber = (value, empty = '—') => {
-    if (value === null || value === undefined || value === '') {
-      return empty
+  const formatDecimal = (value, empty = '—') => {
+    const numericValue = normalizeNumericValue(value)
+    if (numericValue === null) {
+      return typeof value === 'string' && value !== '' ? value : empty
     }
 
-    const numericValue = Number(value)
-    if (!Number.isFinite(numericValue)) {
-      return String(value)
+    return decimalFormatter.format(numericValue)
+  }
+
+  const formatCompactNumber = (value, empty = '—') => formatDecimal(value, empty)
+
+  const formatMoney = (value) => {
+    const numericValue = normalizeNumericValue(value) ?? 0
+    return `${decimalFormatter.format(numericValue)} XOF`
+  }
+
+  const formatBuyerLabel = (acheteur) => {
+    if (!acheteur) {
+      return '—'
     }
 
-    return String(numericValue)
+    if (acheteur.client_name) {
+      return acheteur.client_name
+    }
+
+    if (acheteur.anonymous_info) {
+      return acheteur.anonymous_info
+    }
+
+    return '—'
   }
 
   return {
     formatDateTime,
     formatDate,
     formatDuration,
+    formatDecimal,
     formatCompactNumber,
+    formatMoney,
+    formatBuyerLabel,
     joinLabels
   }
 }

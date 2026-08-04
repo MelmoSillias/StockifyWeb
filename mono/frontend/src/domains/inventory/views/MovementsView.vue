@@ -1,18 +1,8 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
+    <AppFiltersCard>
       <div>
-        <p class="dashboard-eyebrow">Catalogue</p>
-        <h1 class="dashboard-title">Mouvements</h1>
-        <p class="dashboard-description">Historique des entrées et sorties de stock.</p>
-      </div>
-    </div>
-
-    <Card class="dashboard-panel filter-card">
-      <template #content>
-        <div class="filter-grid">
-          <div>
-            <label class="filter-label" for="category-filter">Catégorie</label>
+        <label class="filter-label" for="category-filter">Catégorie</label>
             <Select
               id="category-filter"
               v-model="filters.categoryId"
@@ -67,17 +57,23 @@
               hide-on-range-selection
               placeholder="Choisir une période"
             />
-          </div>
-        </div>
-      </template>
-    </Card>
+      </div>
+    </AppFiltersCard>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <AppTablePanelHeader
+          title="Mouvements"
+          :count-label="`${filteredMovements.length} mouvement(s)`"
+          :show-create="false"
+          :show-search="false"
+        >
+          <template #actions>
+            <AppTablePrintExportBar table-type="movements" />
+          </template>
+        </AppTablePanelHeader>
+      </template>
       <template #content>
-        <div class="movements-toolbar">
-          <Tag :value="`${filteredMovements.length} mouvement(s)`" icon="pi pi-history" severity="contrast" rounded />
-        </div>
-
         <AppTableState
           :loading="inventoryStore.loading || variantsLoading"
           :is-empty="!inventoryStore.loading && filteredMovements.length === 0"
@@ -156,6 +152,9 @@ import DatePicker from 'primevue/datepicker'
 import Select from 'primevue/select'
 import Tag from 'primevue/tag'
 
+import AppFiltersCard from '@/domains/shared/components/AppFiltersCard.vue'
+import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
+import AppTablePrintExportBar from '@/domains/impression/components/AppTablePrintExportBar.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useVariantOptions } from '@/domains/catalog/composables/useVariantOptions'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
@@ -380,30 +379,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.filter-card {
-  margin-bottom: 0;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.85rem;
-  align-items: end;
-}
-
-.filter-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-}
-
-.movements-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.75rem;
-}
-
 .direction-cell {
   display: inline-flex;
   align-items: center;

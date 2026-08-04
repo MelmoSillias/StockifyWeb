@@ -5,6 +5,7 @@ const serializeLot = (lot) => ({
   unit_cost: Number(lot.unit_cost) === 0 ? '0.00' : String(lot.unit_cost),
   reference: emptyToNull(lot.reference),
   supplier_ref: emptyToNull(lot.supplier_ref),
+  fournisseur_id: emptyToNull(lot.fournisseur_id),
   expiry_date: lot.expiry_date
     ? new Date(lot.expiry_date).toISOString().slice(0, 10)
     : null

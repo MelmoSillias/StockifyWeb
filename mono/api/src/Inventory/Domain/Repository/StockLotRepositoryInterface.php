@@ -33,5 +33,12 @@ interface StockLotRepositoryInterface
      */
     public function countLotsByVariant(): array;
 
+    /**
+     * Weighted average unit cost of remaining stock, keyed by variant UUID string.
+     *
+     * @return array<string, string>
+     */
+    public function averageUnitCostByVariant(): array;
+
     public function save(StockLot $lot, bool $flush = true): void;
 }

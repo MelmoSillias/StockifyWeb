@@ -17,7 +17,13 @@
       empty-title="Aucune variante"
       empty-text="Ajoutez un format de vente (ex. 1L, 5L) pour ce produit."
     >
-      <DataTable :value="variants" data-key="id" size="small" striped-rows responsive-layout="scroll">
+      <DataTable
+        :value="variants"
+        data-key="id"
+        size="small"
+        striped-rows
+        :responsive-layout="tableLayout"
+      >
         <Column header="Format">
           <template #body="{ data }">
             <div class="variant-name-cell">
@@ -30,74 +36,29 @@
             </div>
           </template>
         </Column>
-        <Column header="Prix">
+        <Column v-if="!isMobile" header="Prix">
           <template #body="{ data }">
-            {{ formatCompactNumber(data.default_price) }}
+            <span class="variant-price-cell font-bold">
+              {{ formatMoney(data.default_price) }}
+            </span>
           </template>
         </Column>
-        <Column field="alert_threshold" header="Seuil">
+        <Column v-if="!isMobile" field="alert_threshold" header="Seuil">
           <template #body="{ data }">
             {{ formatCompactNumber(data.alert_threshold) }}
           </template>
         </Column>
         <Column header="Stock">
           <template #body="{ data }">
-            {{ formatCompactNumber(data.available) }}
+            <Tag :value="formatCompactNumber(data.available)" icon="pi pi-inbox" :severity="Number(data.available) <= Number(data.alert_threshold) ? 'danger' : 'success'" rounded />
           </template>
         </Column>
         <Column header="Actions" style="width: 280px">
           <template #body="{ data }">
-            <div class="actions-cell">
-              <Button
-                icon="pi pi-eye"
-                v-tooltip.top="'Voir le stock'"
-                text
-                rounded
-                size="small"
-                @click="$emit('view-stock', data)"
-              />
-              <Button
-                icon="pi pi-inbox"
-                v-tooltip.top="'Réception'"
-                text
-                rounded
-                size="small"
-                @click="$emit('receive', data)"
-              />
-              <Button
-                icon="pi pi-arrow-down"
-                v-tooltip.top="'Sortie'"
-                text
-                rounded
-                size="small"
-                @click="$emit('stock-out', data)"
-              />
-              <Button
-                icon="pi pi-sliders-h"
-                v-tooltip.top="'Ajustement'"
-                text
-                rounded
-                size="small"
-                @click="$emit('adjust', data)"
-              />
-              <Button
-                icon="pi pi-pencil"
-                v-tooltip.top="'Modifier'"
-                text
-                rounded
-                size="small"
-                @click="$emit('edit-variant', data)"
-              />
-              <Button
-                icon="pi pi-trash"
-                v-tooltip.top="'Supprimer'"
-                text
-                rounded
-                size="small"
-                severity="danger"
-                @click="$emit('delete-variant', data)"
-              />
-            </div>
+            <AppTableActionsMenu
+              :actions="variantRowActions(data)"
+              aria-label="Actions variante"
+            />
           </template>
         </Column>
       </DataTable>
@@ -106,11 +67,16 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 import Button from 'primevue/button'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
+import Tag from 'primevue/tag'
 
+import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
 import { variantDisplayLabel } from '@/domains/catalog/utils/variantLabel'
 
@@ -121,7 +87,7 @@ defineProps({
   loading: { type: Boolean, default: false }
 })
 
-defineEmits([
+const emit = defineEmits([
   'add-variant',
   'view-stock',
   'receive',
@@ -131,7 +97,9 @@ defineEmits([
   'delete-variant'
 ])
 
-const { formatCompactNumber } = useDisplayFormatters()
+const { isMobile } = useBreakpoint()
+const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
+const { formatCompactNumber, formatMoney } = useDisplayFormatters()
 
 const labelFor = (variant) => {
   if (variant.unit_label) {
@@ -139,6 +107,35 @@ const labelFor = (variant) => {
   }
   return variantDisplayLabel(variant, [])
 }
+
+const variantRowActions = (variant) => [
+  {
+    label: 'Voir le stock',
+    icon: 'pi pi-eye',
+    command: () => emit('view-stock', variant)
+  },
+  {
+    label: 'Réception',
+    icon: 'pi pi-inbox',
+    command: () => emit('receive', variant)
+  },
+  {
+    label: 'Ajustement',
+    icon: 'pi pi-sliders-h',
+    command: () => emit('adjust', variant)
+  },
+  {
+    label: 'Modifier',
+    icon: 'pi pi-pencil',
+    command: () => emit('edit-variant', variant)
+  },
+  {
+    label: 'Supprimer',
+    icon: 'pi pi-trash',
+    severity: 'danger',
+    command: () => emit('delete-variant', variant)
+  }
+]
 </script>
 
 <style scoped>
@@ -152,6 +149,7 @@ const labelFor = (variant) => {
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .product-variants-panel__title {
@@ -171,10 +169,10 @@ const labelFor = (variant) => {
   font-size: 0.95rem;
 }
 
-.actions-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.1rem;
-  flex-wrap: wrap;
+@media (max-width: 767px) {
+  .product-variants-panel__header .p-button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

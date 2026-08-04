@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import Avatar from 'primevue/avatar'
@@ -55,6 +55,7 @@ const props = defineProps({
 const emit = defineEmits(['close-mobile-sidebar', 'toggle-sidebar', 'logout'])
 
 const route = useRoute()
+const router = useRouter()
 const layoutStore = useLayoutStore()
 const { sidebarLogoPosition, sidebarProfilePosition, sidebarSearchPosition } = storeToRefs(layoutStore)
 
@@ -159,6 +160,11 @@ const handleSearchClick = () => {
 const handleLogout = () => {
   profileMenu.value.hide()
   emit('logout')
+}
+
+const openProfile = () => {
+  profileMenu.value.hide()
+  router.push({ name: 'profile' })
 }
 </script>
 
@@ -359,6 +365,13 @@ const handleLogout = () => {
 
     <Popover v-if="showProfile" ref="profileMenu" class="app-profile-menu">
       <div class="app-profile-menu__content">
+        <Button
+          label="Mon profil"
+          icon="pi pi-user"
+          text
+          fluid
+          @click="openProfile"
+        />
         <Button
           label="Déconnexion"
           icon="pi pi-sign-out"

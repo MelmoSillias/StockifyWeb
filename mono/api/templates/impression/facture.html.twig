@@ -1,0 +1,47 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }} — {{ data.document_number }}</div>
+    <div class="doc-meta">Date : {{ data.issued_at }} · Source : {{ data.source_reference|default('—') }}</div>
+    <div class="doc-meta">Acheteur : {{ data.buyer_name }}</div>
+    {% if data.is_creance %}
+        <div class="doc-meta">Créance{% if data.credit_closed_at %} · Soldée le {{ data.credit_closed_at }}{% endif %}</div>
+    {% endif %}
+
+    <table class="doc-table">
+        <thead>
+            <tr>
+                <th>Désignation</th>
+                <th class="text-right">Qté</th>
+                <th class="text-right">P.U.</th>
+                <th class="text-right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in data.lines %}
+                <tr>
+                    <td>{{ line.label }}</td>
+                    <td class="text-right">{{ line.quantity }}</td>
+                    <td class="text-right">{{ line.unit_price }}</td>
+                    <td class="text-right">{{ line.line_total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="doc-total">Total : {{ data.total_amount }}</div>
+
+    {% if data.paiements|length > 0 %}
+        <div style="margin-top:16px;">
+            <strong>Paiements reçus</strong>
+            <table class="doc-table">
+                <thead><tr><th>Réf.</th><th>Date</th><th class="text-right">Montant</th></tr></thead>
+                <tbody>
+                    {% for p in data.paiements %}
+                        <tr><td>{{ p.reference }}</td><td>{{ p.paid_at }}</td><td class="text-right">{{ p.amount }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

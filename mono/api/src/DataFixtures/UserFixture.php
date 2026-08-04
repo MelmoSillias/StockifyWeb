@@ -2,16 +2,24 @@
 
 namespace App\DataFixtures;
 
+use App\AccessAudit\Domain\Entity\Role;
+use App\AccessAudit\Domain\Entity\UserRole;
 use App\IdentityAccess\Domain\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-final class UserFixture extends Fixture
+final class UserFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
+    }
+
+    public function getDependencies(): array
+    {
+        return [RolePermissionFixture::class];
     }
 
     public function load(ObjectManager $manager): void
@@ -25,7 +33,7 @@ final class UserFixture extends Fixture
         );
         $owner->setPasswordHash($this->passwordHasher->hashPassword($owner, '123'));
         $owner->activate();
-        $owner->setRoles(['ROLE_USER']);
+        $owner->syncSymfonyRoles(['admin']);
 
         $managerUser = new User(
             'manager@stockify.local',
@@ -36,10 +44,17 @@ final class UserFixture extends Fixture
         );
         $managerUser->setPasswordHash($this->passwordHasher->hashPassword($managerUser, '123'));
         $managerUser->activate();
-        $managerUser->setRoles(['ROLE_USER']);
+        $managerUser->syncSymfonyRoles(['gerant']);
 
         $manager->persist($owner);
         $manager->persist($managerUser);
+        $manager->flush();
+
+        $adminRole = $this->getReference('role.admin', Role::class);
+        $gerantRole = $this->getReference('role.gerant', Role::class);
+
+        $manager->persist(new UserRole($owner, $adminRole));
+        $manager->persist(new UserRole($managerUser, $gerantRole));
         $manager->flush();
 
         $this->addReference(FixtureReferences::OWNER_USER, $owner);

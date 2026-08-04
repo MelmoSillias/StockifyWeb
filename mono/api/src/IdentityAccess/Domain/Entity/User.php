@@ -2,10 +2,15 @@
 
 namespace App\IdentityAccess\Domain\Entity;
 
+use App\AccessAudit\Domain\Entity\UserPermission;
+use App\AccessAudit\Domain\Entity\UserRole;
+use App\AccessAudit\Domain\PermissionCatalog;
 use App\IdentityAccess\Domain\Enum\UserStatus;
 use App\IdentityAccess\Infrastructure\Persistence\Doctrine\DoctrineUserRepository;
 use App\SharedKernel\Domain\Trait\TimestampableTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -47,6 +52,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
+    /** @var Collection<int, UserRole> */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserRole::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $userRoles;
+
+    /** @var Collection<int, UserPermission> */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserPermission::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $userPermissions;
+
     public function __construct(
         string $email,
         string $username,
@@ -61,11 +74,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->passwordHash = $passwordHash;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+        $this->userRoles = new ArrayCollection();
+        $this->userPermissions = new ArrayCollection();
     }
 
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = strtolower($email);
+        $this->touch();
     }
 
     public function getUserIdentifier(): string
@@ -76,6 +97,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUsername(): string
     {
         return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = strtolower($username);
+        $this->touch();
     }
 
     public function getRoles(): array
@@ -111,9 +138,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->firstName;
     }
 
+    public function setFirstName(string $firstName): void
+    {
+        $this->firstName = $firstName;
+        $this->touch();
+    }
+
     public function getLastName(): string
     {
         return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): void
+    {
+        $this->lastName = $lastName;
+        $this->touch();
     }
 
     public function getStatus(): UserStatus
@@ -146,5 +185,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+    }
+
+    /** @return Collection<int, UserRole> */
+    public function getUserRoles(): Collection
+    {
+        return $this->userRoles;
+    }
+
+    /** @return Collection<int, UserPermission> */
+    public function getUserPermissions(): Collection
+    {
+        return $this->userPermissions;
+    }
+
+    public function suspend(): void
+    {
+        $this->status = UserStatus::Suspended;
+        $this->touch();
+    }
+
+    /**
+     * @param list<string> $roleCodes
+     */
+    public function syncSymfonyRoles(array $roleCodes): void
+    {
+        $symfonyRoles = array_map(
+            static fn (string $code): string => PermissionCatalog::symfonyRole($code),
+            $roleCodes,
+        );
+        $this->roles = array_values(array_unique($symfonyRoles));
+        $this->touch();
     }
 }

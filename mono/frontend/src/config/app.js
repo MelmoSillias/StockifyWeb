@@ -37,35 +37,168 @@ export const appConfig = {
         key: 'home',
         label: 'Dashboard',
         icon: 'pi pi-home',
-        routeName: 'home'
+        routeName: 'home',
+        requiredPermission: 'dashboard.view'
+      },
+      {
+        key: 'analytics',
+        label: 'Analytics',
+        icon: 'pi pi-chart-bar',
+        routeName: 'analytics',
+        requiredPermission: 'analytics.view'
+      },
+      {
+        key: 'clients',
+        label: 'Clientèle',
+        icon: 'pi pi-users',
+        routeName: 'clients',
+        requiredPermission: 'client.clients.view'
       },
       {
         key: 'catalog',
         label: 'Catalogue',
-        icon: 'pi pi-book',
+        icon: 'pi pi-inbox',
         items: [
           {
             key: 'catalog-products',
             label: 'Produits',
             icon: 'pi pi-tag',
             routeName: 'catalog-products',
-            section: 'Catalogue'
+            section: 'Catalogue',
+            requiredPermission: 'catalog.products.view'
           },
           {
             key: 'catalog-categories',
             label: 'Catégories',
             icon: 'pi pi-sitemap',
             routeName: 'catalog-categories',
-            section: 'Catalogue'
+            section: 'Catalogue',
+            requiredPermission: 'catalog.categories.view'
           },
           {
             key: 'inventory-movements',
             label: 'Mouvements',
             icon: 'pi pi-history',
             routeName: 'inventory-movements',
-            section: 'Catalogue'
+            section: 'Catalogue',
+            requiredPermission: 'inventory.movements.view'
           }
         ]
+      },
+      {
+        key: 'commerce',
+        label: 'Commerce',
+        icon: 'pi pi-shopping-bag',
+        items: [
+          {
+            key: 'commerce-cart',
+            label: 'Panier',
+            icon: 'pi pi-shopping-cart',
+            routeName: 'commerce-cart',
+            section: 'Commerce',
+            requiredPermission: 'commerce.cart.use'
+          },
+          {
+            key: 'commerce-orders',
+            label: 'Commandes',
+            icon: 'pi pi-list',
+            routeName: 'commerce-orders',
+            section: 'Commerce',
+            requiredPermission: 'commerce.commandes.view'
+          },
+          {
+            key: 'commerce-sales',
+            label: 'Ventes',
+            icon: 'pi pi-shopping-bag',
+            routeName: 'commerce-sales',
+            section: 'Commerce',
+            requiredPermission: 'commerce.ventes.view'
+          },
+          {
+            key: 'commerce-payments',
+            label: 'Paiements',
+            icon: 'pi pi-wallet',
+            routeName: 'commerce-payments',
+            section: 'Commerce',
+            requiredPermission: 'paiement.paiements.view'
+          },
+          {
+            key: 'commerce-creances',
+            label: 'Carnet de dettes',
+            icon: 'pi pi-book',
+            routeName: 'commerce-creances',
+            section: 'Commerce',
+            requiredPermission: 'client.creances.view'
+          }
+        ]
+      },
+      {
+        key: 'finance',
+        label: 'Finances',
+        icon: 'pi pi-chart-line',
+        routeName: 'finance',
+        requiredPermission: 'finance.view'
+      },
+      {
+        key: 'fournisseurs',
+        label: 'Fournisseurs',
+        icon: 'pi pi-truck',
+        items: [
+          {
+            key: 'fournisseurs-list',
+            label: 'Liste',
+            icon: 'pi pi-list',
+            routeName: 'fournisseurs',
+            section: 'Fournisseurs',
+            requiredPermission: 'fournisseur.view'
+          },
+          {
+            key: 'fournisseur-dettes',
+            label: 'Carnet de dettes',
+            icon: 'pi pi-book',
+            routeName: 'fournisseur-dettes',
+            section: 'Fournisseurs',
+            requiredPermission: 'fournisseur.dettes.view'
+          }
+        ]
+      },
+      {
+        key: 'access',
+        label: 'Accès & Audit',
+        icon: 'pi pi-shield',
+        requiredPermission: ['access.users.view', 'access.roles.view', 'access.audit.view'],
+        items: [
+          {
+            key: 'access-users',
+            label: 'Utilisateurs',
+            icon: 'pi pi-users',
+            routeName: 'access-users',
+            section: 'Accès & Audit',
+            requiredPermission: 'access.users.view'
+          },
+          {
+            key: 'access-roles',
+            label: 'Rôles',
+            icon: 'pi pi-id-card',
+            routeName: 'access-roles',
+            section: 'Accès & Audit',
+            requiredPermission: 'access.roles.view'
+          },
+          {
+            key: 'access-audit',
+            label: 'Journal d\'audit',
+            icon: 'pi pi-history',
+            routeName: 'access-audit',
+            section: 'Accès & Audit',
+            requiredPermission: 'access.audit.view'
+          }
+        ]
+      },
+      {
+        key: 'parametres',
+        label: 'Paramètres',
+        icon: 'pi pi-cog',
+        routeName: 'parametres'
       }
     ]
   },
@@ -81,7 +214,9 @@ export const appConfig = {
   storage: {
     layoutPreferencesKey: 'stockify-layout-preferences',
     authTokenKey: 'stockify-access-token',
-    authUserKey: 'stockify-auth-user'
+    authUserKey: 'stockify-auth-user',
+    authPermissionsKey: 'stockify-auth-permissions',
+    commerceCartKey: 'stockify-commerce-cart'
   },
   axios: {
     baseURL: shopConfig.viteApiPrefix || 'http://localhost:8000/api',

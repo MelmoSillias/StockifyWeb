@@ -1,0 +1,17 @@
+{% extends 'impression/_layout.html.twig' %}
+
+{% block content %}
+    <div class="doc-title">{{ data.title }} — {{ data.document_number }}</div>
+    <div class="doc-meta">Commande : {{ data.commande_reference|default('—') }}</div>
+    <div class="doc-meta">Envoyé le : {{ data.sent_at }}{% if data.delivered_at %} · Livré le {{ data.delivered_at }}{% endif %}</div>
+    <div class="doc-meta">Statut : {{ data.status }}</div>
+
+    <table class="doc-table">
+        <thead><tr><th>Désignation</th><th class="text-right">Quantité</th></tr></thead>
+        <tbody>
+            {% for line in data.lines %}
+                <tr><td>{{ line.label }}</td><td class="text-right">{{ line.quantity }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

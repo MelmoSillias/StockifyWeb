@@ -31,14 +31,14 @@ final class ProductVariantController extends AbstractController
     }
 
     #[Route('/variants', name: 'api_variants_catalog', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.view')]
     public function catalog(): JsonResponse
     {
         return $this->json($this->listVariantsCatalogHandler->handle(new ListVariantsCatalogQuery()));
     }
 
     #[Route('/products/{productId}/variants', name: 'api_variants_list', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.view')]
     public function list(string $productId): JsonResponse
     {
         $product = $this->getProduct($productId);
@@ -48,7 +48,7 @@ final class ProductVariantController extends AbstractController
     }
 
     #[Route('/products/{productId}/variants', name: 'api_variants_create', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.variants.manage')]
     public function create(string $productId, Request $request): JsonResponse
     {
         $product = $this->getProduct($productId);
@@ -78,14 +78,14 @@ final class ProductVariantController extends AbstractController
     }
 
     #[Route('/variants/{id}', name: 'api_variants_show', methods: ['GET'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.products.view')]
     public function show(string $id): JsonResponse
     {
         return $this->json($this->serializeVariant($this->getVariant($id)));
     }
 
     #[Route('/variants/{id}', name: 'api_variants_update', methods: ['PUT'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.variants.manage')]
     public function update(string $id, Request $request): JsonResponse
     {
         $variant = $this->getVariant($id);
@@ -102,7 +102,7 @@ final class ProductVariantController extends AbstractController
     }
 
     #[Route('/variants/{id}', name: 'api_variants_delete', methods: ['DELETE'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('catalog.variants.manage')]
     public function delete(string $id): JsonResponse
     {
         $variant = $this->getVariant($id);

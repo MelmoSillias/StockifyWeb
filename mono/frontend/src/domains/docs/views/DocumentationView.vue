@@ -1,15 +1,5 @@
 <template>
   <section class="dashboard-page">
-    <div class="dashboard-hero dashboard-hero--compact">
-      <div>
-        <p class="dashboard-eyebrow">SimUI</p>
-        <h1 class="dashboard-title">Documentation rapide</h1>
-        <p class="dashboard-description">
-          Guide minimal pour copier ce modele dans un nouveau projet et l'adapter a vos besoins.
-        </p>
-      </div>
-    </div>
-
     <div class="dashboard-grid">
       <Card v-for="section in sections" :key="section.title" class="dashboard-panel">
         <template #title>{{ section.title }}</template>

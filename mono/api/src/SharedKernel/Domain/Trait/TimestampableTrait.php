@@ -32,4 +32,10 @@ trait TimestampableTrait
     {
         return $this->updatedAt;
     }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $createdAt;
+    }
 }

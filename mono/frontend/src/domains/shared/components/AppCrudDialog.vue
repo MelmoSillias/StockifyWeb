@@ -78,6 +78,9 @@
             :model-value="modelValue[field.name]"
             :min="field.min"
             :max="field.max"
+            :min-fraction-digits="0"
+            :max-fraction-digits="field.maxFractionDigits ?? 20"
+            mode="decimal"
             :placeholder="field.placeholder"
             :disabled="loading"
             :invalid="hasFieldError(field.name)"
@@ -301,8 +304,8 @@ const updateFileField = (field, event) => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--pv-accent-soft) 80%, white);
+  color: var(--pv-accent-strong);
   flex: 0 0 auto;
 }
 
@@ -315,12 +318,12 @@ const updateFileField = (field, event) => {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--p-text-color);
+  color: var(--pv-accent-strong);
 }
 
 .crud-dialog__header-subtitle {
   margin: 0;
-  color: var(--p-text-muted-color);
+  color: var(--pv-text-muted);
 }
 
 .crud-dialog__grid {

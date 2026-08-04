@@ -1,25 +1,25 @@
 
 ###> symfony/framework-bundle ###
-/mvc/.env
-/mvc/.env.local
-/mvc/.env.local.php
+/.env
+/.env.local
+/.env.local.php
 /.env.*.local
-/mvc/config/secrets/prod/prod.decrypt.private.php
-/mvc/public/bundles/
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
 /var/
-/mvc/vendor/
+/vendor/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
-/mvc/phpunit.xml
-/mvc/.phpunit.result.cache
+/phpunit.xml
+/.phpunit.result.cache
 ###< phpunit/phpunit ###
 
 ###> symfony/phpunit-bridge ###
-/mvc/.phpunit.result.cache
-/mvc/phpunit.xml
+/.phpunit.result.cache
+/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
 ###> symfony/asset-mapper ###
-/mvc/assets/vendor/
+/assets/vendor/
 ###< symfony/asset-mapper ###
