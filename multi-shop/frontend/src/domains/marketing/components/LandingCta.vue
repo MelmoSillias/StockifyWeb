@@ -103,4 +103,28 @@ const { isAuthenticated, loginTo, primaryAction } = useMarketingAuth()
     width: 100%;
   }
 }
+
+@media (max-width: 400px) {
+  .landing-cta {
+    padding-block: 2.25rem;
+  }
+
+  .landing-cta__inner {
+    gap: 1.25rem;
+    padding: 1.25rem 1rem;
+    border-radius: var(--mkt-radius);
+  }
+
+  .landing-cta__copy .mkt-eyebrow {
+    margin-bottom: 0.5rem;
+  }
+
+  .landing-cta__copy .mkt-title {
+    margin-bottom: 0.65rem;
+  }
+
+  .landing-cta__actions {
+    gap: 0.55rem;
+  }
+}
 </style>

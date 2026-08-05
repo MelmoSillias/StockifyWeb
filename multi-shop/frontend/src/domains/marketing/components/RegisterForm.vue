@@ -387,6 +387,7 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   --p-form-field-color: #0f172a;
   --p-form-field-placeholder-color: #94a3b8;
   --p-form-field-icon-color: #94a3b8;
+  --p-form-field-shadow: none;
   --p-primary-color: var(--mkt-accent);
   --p-primary-contrast-color: #ffffff;
   --p-primary-hover-color: var(--mkt-accent-strong);
@@ -612,6 +613,14 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   background: #ffffff;
   color: var(--mkt-light-text);
   border-color: #cbd5e1;
+  box-shadow: none;
+}
+
+.register-form :deep(.p-inputtext:enabled:focus),
+.register-form :deep(.p-inputtext:enabled:hover),
+.register-form :deep(.p-password-input:enabled:focus),
+.register-form :deep(.p-password-input:enabled:hover) {
+  box-shadow: none;
 }
 
 .register-form :deep(.p-inputtext::placeholder),
@@ -652,45 +661,78 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
 
 @media (max-width: 400px) {
   .register-form {
-    padding: 1rem 0.85rem;
-    gap: 0.85rem;
-    border-radius: 1rem;
+    padding: 0.95rem 0.8rem;
+    gap: 0.75rem;
+    border-radius: 0.95rem;
+    box-shadow: 0 16px 40px rgba(15, 19, 31, 0.18);
   }
 
   .register-form__header h2 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
   }
 
   .register-form__header p,
   .register-form__footer {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.45;
   }
 
   .register-form__badge {
+    font-size: 0.7rem;
+    padding: 0.28rem 0.55rem;
+  }
+
+  .register-form__panel {
+    gap: 0.8rem;
+    padding-top: 0.25rem;
+  }
+
+  .register-form__field {
+    gap: 0.35rem;
+  }
+
+  .register-form__field label {
+    font-size: 0.8rem;
+  }
+
+  .register-form__error {
     font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
+  }
+
+  .register-form :deep(.p-step-number) {
+    --step-size: 1.05rem;
+    font-size: 0.62rem;
   }
 
   .register-form :deep(.p-step-active .p-step-number) {
-    --step-size: 1.75rem;
-    font-size: 0.85rem;
+    --step-size: 1.55rem;
+    font-size: 0.78rem;
   }
 
   .register-form :deep(.p-step-active .p-step-title) {
-    max-width: 5.5rem;
-    font-size: 0.85rem;
+    max-width: 5rem;
+    font-size: 0.8rem;
   }
 
   .register-form :deep(.p-steppanels) {
-    min-height: 12.5rem;
+    min-height: 11.5rem;
+  }
+
+  .register-form :deep(.p-inputtext),
+  .register-form :deep(.p-password-input) {
+    font-size: 0.88rem;
+    padding-block: 0.55rem;
   }
 
   .register-form__actions {
     justify-content: stretch;
+    gap: 0.55rem;
   }
 
   .register-form__actions :deep(.p-button) {
     flex: 1 1 auto;
+    font-size: 0.85rem;
+    padding: 0.65rem 0.85rem;
   }
 }
 

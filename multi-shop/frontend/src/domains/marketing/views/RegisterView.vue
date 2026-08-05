@@ -48,11 +48,12 @@ const { landingTo } = useMarketingAuth()
 
 .register-page__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
-  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 22rem) minmax(0, 26rem);
+  gap: clamp(1.75rem, 3vw, 3rem);
+  justify-content: center;
   align-items: start;
   width: 100%;
-  max-width: 100%;
+  max-width: 56rem;
   min-width: 0;
 }
 
@@ -75,12 +76,22 @@ const { landingTo } = useMarketingAuth()
 @media (max-width: 900px) {
   .register-page__grid {
     grid-template-columns: minmax(0, 1fr);
+    max-width: 26rem;
   }
 }
 
 @media (max-width: 400px) {
-  .register-page__hero {
-    padding-inline: 0;
+  .register-page__grid {
+    gap: 1.25rem;
+    max-width: 100%;
+  }
+
+  .register-page__intro {
+    gap: 0.85rem;
+  }
+
+  .register-page__back {
+    font-size: 0.85rem;
   }
 }
 </style>

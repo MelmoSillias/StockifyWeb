@@ -87,4 +87,31 @@ const { register } = useScrollReveal()
     grid-column: auto;
   }
 }
+
+@media (max-width: 400px) {
+  .landing-features__grid {
+    gap: 0.75rem;
+  }
+
+  .landing-features__card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .landing-features__icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 1rem;
+  }
+
+  .landing-features__card h3 {
+    font-size: 0.92rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .landing-features__card p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
 </style>

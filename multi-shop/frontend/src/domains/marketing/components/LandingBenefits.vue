@@ -92,4 +92,32 @@ const { register } = useScrollReveal()
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 400px) {
+  .landing-benefits {
+    padding-block: 2.5rem;
+  }
+
+  .landing-benefits__grid {
+    gap: 0.75rem;
+  }
+
+  .landing-benefits__card {
+    padding: 1.15rem 1rem;
+  }
+
+  .landing-benefits__card .mkt-icon-wrap {
+    margin-bottom: 0.85rem;
+  }
+
+  .landing-benefits__card h3 {
+    font-size: 0.98rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .landing-benefits__card p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
 </style>

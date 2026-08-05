@@ -147,5 +147,49 @@ const ctaLabel = (label) => (isAuthenticated.value ? 'Accéder au dashboard' : l
   .landing-showcase__grid--reversed .landing-showcase__visual {
     order: unset;
   }
+
+  .landing-showcase__phones {
+    min-height: unset;
+    height: auto;
+    justify-content: center;
+  }
+
+  .landing-showcase__phone {
+    position: relative;
+  }
+
+  .landing-showcase__phone--secondary {
+    display: none;
+  }
+
+  .landing-showcase__phone--primary {
+    left: auto;
+    bottom: auto;
+    transform: rotate(0deg) scale(0.95);
+  }
+}
+
+@media (max-width: 400px) {
+  .landing-showcase__grid {
+    gap: 1.5rem;
+  }
+
+  .landing-showcase__copy .mkt-eyebrow {
+    margin-bottom: 0.5rem;
+  }
+
+  .landing-showcase__copy .mkt-title {
+    margin-bottom: 0.65rem;
+  }
+
+  .landing-showcase__actions {
+    gap: 0.75rem;
+    margin-top: 1.15rem;
+  }
+
+  .landing-showcase__phone--primary {
+    width: min(100%, 12.5rem);
+    transform: rotate(0deg) scale(1);
+  }
 }
 </style>

@@ -82,4 +82,12 @@ onMounted(loadPlans)
 .landing-pricing__skeleton {
   border-radius: var(--mkt-radius);
 }
+
+@media (max-width: 400px) {
+  .landing-pricing__grid,
+  .landing-pricing__state {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+}
 </style>

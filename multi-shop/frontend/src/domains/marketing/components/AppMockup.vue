@@ -67,4 +67,24 @@ defineProps({
 .app-mockup--light .app-mockup__screen {
   background: #f3f5fa;
 }
+
+@media (max-width: 900px) {
+  .app-mockup--offset {
+    transform: none;
+  }
+
+  .app-mockup__screen {
+    min-height: 16rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-mockup {
+    width: min(100%, 12.5rem);
+  }
+
+  .app-mockup__screen {
+    min-height: 14.5rem;
+  }
+}
 </style>

@@ -68,4 +68,29 @@ const { register } = useScrollReveal()
   border-color: color-mix(in srgb, var(--mkt-accent) 30%, transparent);
   box-shadow: 0 4px 16px var(--mkt-accent-soft);
 }
+
+@media (max-width: 400px) {
+  .landing-trust {
+    padding-block: 1.75rem;
+  }
+
+  .landing-trust__label {
+    font-size: 0.7rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .landing-trust__logos {
+    gap: 0.5rem;
+  }
+
+  .landing-trust__pill {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.78rem;
+    gap: 0.4rem;
+  }
+
+  .landing-trust__pill i {
+    font-size: 0.75rem;
+  }
+}
 </style>

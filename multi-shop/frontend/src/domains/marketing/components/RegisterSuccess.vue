@@ -81,13 +81,6 @@ const goToLogin = () => {
   color-scheme: light;
 }
 
-@media (max-width: 400px) {
-  .register-success {
-    padding: 1rem 0.85rem;
-    border-radius: 1rem;
-  }
-}
-
 .register-success__icon {
   width: 3rem;
   height: 3rem;
@@ -126,5 +119,46 @@ const goToLogin = () => {
   justify-content: center;
   color: var(--mkt-light-muted);
   font-size: 0.92rem;
+}
+
+@media (max-width: 400px) {
+  .register-success {
+    padding: 0.95rem 0.8rem;
+    gap: 0.75rem;
+    border-radius: 0.95rem;
+  }
+
+  .register-success__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.95rem;
+  }
+
+  .register-success h2 {
+    font-size: 1.15rem;
+  }
+
+  .register-success p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .register-success__credentials {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+  }
+
+  .register-success__credentials p {
+    font-size: 0.82rem;
+  }
+
+  .register-success__back {
+    font-size: 0.82rem;
+  }
+
+  .register-success :deep(.p-button) {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.85rem;
+  }
 }
 </style>

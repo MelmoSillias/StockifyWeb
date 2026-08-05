@@ -208,16 +208,73 @@ const { isAuthenticated, primaryAction, anchorTo } = useMarketingAuth()
   }
 
   .landing-hero__phones {
-    min-height: 20rem;
+    min-height: unset;
+    height: auto;
     margin-top: 1.5rem;
+    justify-content: center;
+  }
+
+  .landing-hero__phone {
+    position: relative;
   }
 
   .landing-hero__phone--back {
-    right: 0;
+    display: none;
   }
 
   .landing-hero__phone--front {
-    left: 0;
+    left: auto;
+    bottom: auto;
+    transform: rotate(0deg) scale(0.95);
+  }
+}
+
+@media (max-width: 400px) {
+  .landing-hero__grid {
+    gap: 1.5rem;
+  }
+
+  .landing-hero__copy .mkt-tag {
+    margin-bottom: 0.85rem;
+  }
+
+  .landing-hero__copy .mkt-title {
+    margin-bottom: 0.85rem;
+  }
+
+  .landing-hero__copy .mkt-lead {
+    margin-bottom: 1.25rem;
+  }
+
+  .landing-hero__actions {
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .landing-hero__actions .mkt-btn {
+    width: 100%;
+  }
+
+  .landing-hero__stats {
+    gap: 1.15rem 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .landing-hero__stat strong {
+    font-size: 1.15rem;
+  }
+
+  .landing-hero__stat span {
+    font-size: 0.75rem;
+  }
+
+  .landing-hero__phones {
+    margin-top: 0.75rem;
+  }
+
+  .landing-hero__phone--front {
+    width: min(100%, 12.5rem);
+    transform: rotate(0deg) scale(1);
   }
 }
 </style>

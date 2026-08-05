@@ -540,4 +540,48 @@ onUnmounted(() => {
     align-items: flex-start;
   }
 }
+
+@media (max-width: 400px) {
+  .marketing-shell__nav {
+    padding-inline: 0.85rem;
+  }
+
+  .marketing-shell__nav--landing {
+    padding-block: 0.65rem;
+  }
+
+  .marketing-shell__nav--landing .marketing-shell__brand-mark--logo {
+    width: 2.85rem;
+    height: 2.85rem;
+  }
+
+  .marketing-shell__nav--landing .marketing-shell__brand-name {
+    font-size: 0.95rem;
+  }
+
+  .marketing-shell__links {
+    left: 0.75rem;
+    right: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .marketing-shell__footer {
+    padding-top: 2rem;
+  }
+
+  .marketing-shell__footer-inner {
+    padding-bottom: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .marketing-shell__footer-brand p,
+  .marketing-shell__footer-col a {
+    font-size: 0.85rem;
+  }
+
+  .marketing-shell__footer-bottom {
+    padding: 1rem 0;
+    font-size: 0.75rem;
+  }
+}
 </style>

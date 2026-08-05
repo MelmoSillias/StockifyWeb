@@ -70,6 +70,13 @@ html:has(.mkt-page) {
   margin-inline: auto;
 }
 
+@media (max-width: 1200px) {
+  .mkt-page .mkt-container,
+  .mkt-page .mkt-container--narrow {
+    width: min(100% - 4rem, 72rem);
+  }
+}
+
 .mkt-page .mkt-section {
   padding-block: clamp(4.5rem, 8vw, 7rem);
   position: relative;
@@ -349,24 +356,101 @@ html:has(.mkt-page) {
 }
 
 @media (max-width: 768px) {
-  .mkt-page .mkt-container,
-  .mkt-page .mkt-container--narrow {
-    width: min(100% - 1.25rem, 72rem);
-  }
-
   .mkt-page .mkt-section:not(.landing-hero):not(.register-page__hero) {
     padding-block: clamp(3.5rem, 7vw, 5rem);
   }
 }
 
 @media (max-width: 400px) {
+  html:has(.mkt-page) {
+    --mkt-nav-gap: 1.25rem;
+    scroll-padding-top: calc(var(--mkt-nav-height, 5rem) + 0.75rem);
+  }
+
+  .mkt-page {
+    --mkt-radius: 1rem;
+    --mkt-radius-sm: 0.75rem;
+    --mkt-space-xs: 0.4rem;
+    --mkt-space-sm: 0.6rem;
+    --mkt-space-md: 1rem;
+    --mkt-space-lg: 1.35rem;
+    --mkt-space-xl: 2rem;
+    font-size: 0.94rem;
+  }
+
   .mkt-page .mkt-container,
   .mkt-page .mkt-container--narrow {
-    width: min(100% - 0.75rem, 72rem);
+    width: min(100% - 2.5rem, 72rem);
+  }
+
+  .mkt-page .mkt-section {
+    padding-block: 2.75rem;
+  }
+
+  .mkt-page .mkt-section.landing-hero {
+    padding-top: calc(var(--mkt-nav-height) + var(--mkt-nav-gap));
+    padding-bottom: 2.75rem;
   }
 
   .mkt-page .mkt-section.register-page__hero {
-    padding-top: calc(var(--mkt-nav-height) + 1.5rem);
-    padding-bottom: 2.5rem;
+    padding-top: calc(var(--mkt-nav-height) + 1.25rem);
+    padding-bottom: 2rem;
+  }
+
+  .mkt-page .mkt-section-header {
+    margin-bottom: 1.5rem;
+    gap: 0.45rem;
+  }
+
+  .mkt-page .mkt-tag {
+    padding: 0.28rem 0.65rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+  }
+
+  .mkt-page .mkt-tag::before {
+    width: 0.32rem;
+    height: 0.32rem;
+  }
+
+  .mkt-page .mkt-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  .mkt-page .mkt-title {
+    font-size: 1.7rem;
+    line-height: 1.18;
+  }
+
+  .mkt-page .mkt-title--sm {
+    font-size: 1.4rem;
+    line-height: 1.22;
+  }
+
+  .mkt-page .mkt-lead {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    margin-top: 0.45rem;
+  }
+
+  .mkt-page .mkt-btn {
+    padding: 0.7rem 1.15rem;
+    font-size: 0.88rem;
+    gap: 0.35rem;
+  }
+
+  .mkt-page .mkt-link {
+    font-size: 0.88rem;
+  }
+
+  .mkt-page .mkt-glass {
+    border-radius: var(--mkt-radius);
+  }
+
+  .mkt-page .mkt-icon-wrap {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.05rem;
   }
 }

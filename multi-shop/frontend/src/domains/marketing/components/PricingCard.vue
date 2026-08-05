@@ -182,4 +182,42 @@ const ctaLabel = computed(() => {
   color: white;
   box-shadow: 0 10px 32px var(--mkt-accent-glow);
 }
+
+@media (max-width: 400px) {
+  .pricing-card {
+    padding: 1.25rem 1rem;
+    gap: 0.95rem;
+  }
+
+  .pricing-card__badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.65rem;
+  }
+
+  .pricing-card__name {
+    font-size: 0.7rem;
+  }
+
+  .pricing-card__price strong {
+    font-size: 1.85rem;
+  }
+
+  .pricing-card__price span {
+    font-size: 0.85rem;
+  }
+
+  .pricing-card__features {
+    gap: 0.55rem;
+  }
+
+  .pricing-card__features li {
+    font-size: 0.85rem;
+    gap: 0.45rem;
+  }
+
+  .pricing-card__cta {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
+  }
+}
 </style>
