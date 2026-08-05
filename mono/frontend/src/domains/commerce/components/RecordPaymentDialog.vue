@@ -53,8 +53,8 @@
     </div>
 
     <template #footer>
-      <Button label="Annuler" severity="secondary" text @click="$emit('update:visible', false)" />
-      <Button label="Encaisser" :loading="loading" @click="onConfirm" />
+      <Button label="Annuler" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
+      <Button label="Encaisser" :loading="loading" :disabled="loading" @click="onConfirm" />
     </template>
   </Dialog>
 </template>
@@ -118,6 +118,7 @@ watch(paymentDate, () => {
 })
 
 const onConfirm = () => {
+  if (props.loading) return
   const value = Number(amount.value || 0)
   if (value <= 0 || !methodId.value) {
     return

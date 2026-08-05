@@ -9,20 +9,14 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
-          :reloading="loading"
           @update:search-term="searchTerm = $event"
           @create="openCreate"
+          :reloading="loading"
           @reload="load"
         />
       </template>
       <template #content>
-        <AppTableState
-          :loading="loading"
-          :error="error"
-          :is-empty="!loading && filteredItems.length === 0"
-          empty-title="Aucun rôle"
-          @retry="load"
-        >
+        <AppTableState :loading="loading" :error="error" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucun rôle" @retry="load">
           <DataTable
             :value="filteredItems"
             data-key="id"
@@ -70,8 +64,8 @@
         </div>
       </div>
       <template #footer>
-        <Button label="Annuler" severity="secondary" text @click="dialogVisible = false" />
-        <Button label="Enregistrer" :loading="submitting" @click="save" />
+        <Button label="Annuler" severity="secondary" text :disabled="submitting" @click="dialogVisible = false" />
+        <Button label="Enregistrer" :loading="submitting" :disabled="submitting" @click="save" />
       </template>
     </Dialog>
   </section>
@@ -98,6 +92,7 @@ import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { accessService } from '@/domains/access/services/accessService'
+import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 const toast = useToast()
 const confirm = useConfirm()
@@ -108,7 +103,6 @@ const items = ref([])
 const permissions = ref([])
 const loading = ref(false)
 const error = ref(null)
-const submitting = ref(false)
 const searchTerm = ref('')
 const dialogVisible = ref(false)
 const dialogMode = ref('create')
@@ -165,8 +159,7 @@ const openEdit = (role) => {
   dialogVisible.value = true
 }
 
-const save = async () => {
-  submitting.value = true
+const { pending: submitting, run: save } = useAsyncAction(async () => {
   try {
     if (dialogMode.value === 'create') {
       await accessService.createRole({ ...form })
@@ -183,10 +176,10 @@ const save = async () => {
     await load()
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Erreur', detail: error.response?.data?.error || error.message, life: 4000 })
-  } finally {
-    submitting.value = false
   }
-}
+})
+
+let deletingRole = false
 
 const confirmDelete = (role) => {
   confirm.require({
@@ -195,12 +188,16 @@ const confirmDelete = (role) => {
     acceptLabel: 'Supprimer',
     rejectLabel: 'Annuler',
     accept: async () => {
+      if (deletingRole) return
+      deletingRole = true
       try {
         await accessService.deleteRole(role.id)
         toast.add({ severity: 'success', summary: 'Rôle supprimé', life: 3000 })
         await load()
       } catch (error) {
         toast.add({ severity: 'error', summary: 'Erreur', detail: error.response?.data?.error || error.message, life: 4000 })
+      } finally {
+        deletingRole = false
       }
     }
   })

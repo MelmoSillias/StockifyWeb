@@ -8,8 +8,10 @@ export const signupService = {
       accountSlug: payload.accountSlug,
       billingEmail: payload.billingEmail,
       adminEmail: payload.adminEmail ?? payload.billingEmail,
-      applicationSlug: defaultApplicationSlug
-    })
+      adminPassword: payload.adminPassword,
+      applicationSlug: defaultApplicationSlug,
+      planCode: payload.requestedPlanCode ?? undefined
+    }, { timeout: 90000 })
 
     return data
   }

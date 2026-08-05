@@ -109,7 +109,7 @@
         label="Créer la commande"
         icon="pi pi-check"
         :loading="loading"
-        :disabled="lines.length === 0"
+        :disabled="loading || lines.length === 0"
         @click="onSubmit"
       />
     </template>
@@ -195,6 +195,7 @@ const removeLine = (variantId) => {
 }
 
 const onSubmit = () => {
+  if (props.loading) return
   if (!props.fournisseurId || lines.value.length === 0) {
     return
   }

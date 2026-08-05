@@ -95,7 +95,7 @@
         label="Expédier"
         icon="pi pi-truck"
         :loading="submitting"
-        :disabled="!canSubmit"
+        :disabled="submitting || !canSubmit"
         @click="onSubmit"
       />
     </template>
@@ -178,6 +178,7 @@ const loadData = async () => {
 }
 
 const onSubmit = async () => {
+  if (submitting.value) return
   if (!props.order?.id || !canSubmit.value) {
     return
   }
@@ -203,6 +204,7 @@ const onSubmit = async () => {
 }
 
 const markDelivered = async (bon) => {
+  if (deliveringId.value) return
   deliveringId.value = bon.id
   try {
     const updated = await commerceService.delivrerBonLivraison(bon.id)

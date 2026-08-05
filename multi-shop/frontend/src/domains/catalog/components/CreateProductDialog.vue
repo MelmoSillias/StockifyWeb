@@ -574,6 +574,7 @@ const confirmClear = (event) => {
 }
 
 const confirmSubmit = (event) => {
+  if (props.loading) return
   if (!canSubmit.value) {
     showValidation.value = true
     if (!isProductValid.value) {

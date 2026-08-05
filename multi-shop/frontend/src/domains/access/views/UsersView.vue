@@ -68,8 +68,8 @@
         </div>
       </div>
       <template #footer>
-        <Button label="Annuler" severity="secondary" text @click="dialogVisible = false" />
-        <Button label="Enregistrer" :loading="submitting" @click="save" />
+        <Button label="Annuler" severity="secondary" text :disabled="submitting" @click="dialogVisible = false" />
+        <Button label="Enregistrer" :loading="submitting" :disabled="submitting" @click="save" />
       </template>
     </Dialog>
   </section>
@@ -96,6 +96,7 @@ import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { accessService } from '@/domains/access/services/accessService'
+import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 const toast = useToast()
 const { isMobile } = useBreakpoint()
@@ -105,7 +106,6 @@ const items = ref([])
 const roles = ref([])
 const loading = ref(false)
 const error = ref(null)
-const submitting = ref(false)
 const searchTerm = ref('')
 const dialogVisible = ref(false)
 const dialogMode = ref('create')
@@ -170,8 +170,7 @@ const openEdit = (user) => {
   dialogVisible.value = true
 }
 
-const save = async () => {
-  submitting.value = true
+const { pending: submitting, run: save } = useAsyncAction(async () => {
   try {
     if (dialogMode.value === 'create') {
       await accessService.createUser({ ...form })
@@ -190,10 +189,8 @@ const save = async () => {
     await load()
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Erreur', detail: error.response?.data?.error || error.message, life: 4000 })
-  } finally {
-    submitting.value = false
   }
-}
+})
 
 const suspend = async (user) => {
   try {

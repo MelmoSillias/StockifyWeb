@@ -178,12 +178,12 @@
     </div>
 
     <template #footer>
-      <Button label="Annuler" severity="secondary" text @click="$emit('update:visible', false)" />
+      <Button label="Annuler" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
       <Button
         :label="confirmLabel"
         icon="pi pi-check"
         :loading="loading"
-        :disabled="lines.length === 0 || (showDeliveryDate && !deliveryDate) || (isQuoteMode && !validUntil)"
+        :disabled="loading || lines.length === 0 || (showDeliveryDate && !deliveryDate) || (isQuoteMode && !validUntil)"
         @click="onSubmit"
       />
     </template>
@@ -311,6 +311,7 @@ const removeLine = (lineId) => {
 }
 
 const onSubmit = () => {
+  if (props.loading) return
   emit('submit', {
     operationDate: operationDate.value,
     paymentDate: paymentDate.value,

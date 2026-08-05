@@ -29,7 +29,7 @@ export const showcaseSections = [
     eyebrow: 'Inventaire',
     title: 'Gardez une longueur d’avance sur vos ruptures.',
     description: 'Suivez chaque entrée et sortie, recevez des alertes de seuil et anticipez vos réapprovisionnements avant qu’il ne soit trop tard.',
-    cta: 'Essayer StockifyWeb',
+    cta: 'Essayer LafiaSugu',
     mockup: {
       theme: 'light',
       title: 'Stock en direct',

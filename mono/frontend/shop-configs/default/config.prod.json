@@ -1,8 +1,8 @@
 {
   "id": "default",
   "displayName": "Boutique Demo",
-  "appTitle": "Stockify - Boutique Demo",
-  "brandName": "Stockify",
+  "appTitle": "LafiaSugu - Boutique Demo",
+  "brandName": "LafiaSugu",
   "brandSubtitle": "Gestion catalogue et stock",
   "shopPhone": "+223 XX XX XX XX",
   "viteApiPrefix": "https://api.example.com/api",
@@ -17,6 +17,6 @@
     "email": "contact@stockify.local"
   },
   "brandingAssets": {
-    "logo": "logo.svg"
+    "logo": "logo.png"
   }
 }

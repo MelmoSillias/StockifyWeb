@@ -36,7 +36,7 @@
         label="Enregistrer"
         icon="pi pi-check"
         :loading="loading"
-        :disabled="!canSubmit"
+        :disabled="loading || !canSubmit"
         @click="onSubmit"
       />
     </template>
@@ -65,6 +65,7 @@ const totalAmount = ref(null)
 const canSubmit = computed(() => Boolean(props.fournisseurId) && Number(totalAmount.value) > 0)
 
 const onSubmit = () => {
+  if (props.loading) return
   if (!canSubmit.value) {
     return
   }

@@ -12,18 +12,18 @@
           <span class="mkt-title-accent"> en toute sérénité.</span>
         </h1>
         <p class="mkt-lead">
-          StockifyWeb centralise catalogue, inventaire, ventes et finances dans une
+          LafiaSugu centralise catalogue, inventaire, ventes et finances dans une
           expérience soignée — pensée pour les commerces qui veulent grandir sans
           multiplier les outils.
         </p>
         <div class="landing-hero__actions">
-          <RouterLink :to="{ name: 'register' }" class="mkt-btn mkt-btn--primary">
-            Essayer maintenant
+          <RouterLink :to="primaryAction.to" class="mkt-btn mkt-btn--primary">
+            {{ isAuthenticated ? 'Accéder au dashboard' : 'Essayer maintenant' }}
             <i class="pi pi-arrow-right"></i>
           </RouterLink>
-          <a href="#tarifs" class="mkt-btn mkt-btn--ghost-light">
+          <RouterLink :to="anchorTo('tarifs')" class="mkt-btn mkt-btn--ghost-light">
             Voir les tarifs
-          </a>
+          </RouterLink>
         </div>
         <div class="landing-hero__stats">
           <div v-for="stat in heroStats" :key="stat.label" class="landing-hero__stat">
@@ -64,14 +64,14 @@ import AppMockup from '@/domains/marketing/components/AppMockup.vue'
 import MockupDashboard from '@/domains/marketing/components/MockupDashboard.vue'
 import { heroStats } from '@/domains/marketing/config/marketingContent'
 import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
 
 const { register } = useScrollReveal()
+const { isAuthenticated, primaryAction, anchorTo } = useMarketingAuth()
 </script>
 
 <style scoped>
 .landing-hero {
-  padding-top: clamp(7rem, 12vw, 9.5rem);
-  padding-bottom: clamp(4.5rem, 8vw, 6.5rem);
   overflow: hidden;
 }
 
@@ -87,7 +87,7 @@ const { register } = useScrollReveal()
   height: 32rem;
   top: -8rem;
   right: -6rem;
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--mkt-accent-soft);
 }
 
 .landing-hero__glow--2 {
@@ -95,7 +95,7 @@ const { register } = useScrollReveal()
   height: 24rem;
   bottom: -4rem;
   left: -4rem;
-  background: rgba(99, 102, 241, 0.1);
+  background: color-mix(in srgb, var(--mkt-accent-band) 15%, transparent);
 }
 
 .landing-hero__grid {
@@ -178,7 +178,7 @@ const { register } = useScrollReveal()
 .landing-hero__phone :deep(.app-mockup__frame) {
   box-shadow:
     var(--mkt-shadow-phone),
-    0 0 60px rgba(16, 185, 129, 0.12);
+    0 0 60px var(--mkt-accent-soft);
 }
 
 .landing-hero__phone--back {

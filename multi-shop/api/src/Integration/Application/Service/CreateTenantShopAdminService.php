@@ -24,9 +24,9 @@ final class CreateTenantShopAdminService
     }
 
     /**
-     * @return array{user: User, temporary_password: string}
+     * @return array{user: User, temporary_password: string|null, user_provided_password: bool}
      */
-    public function create(Shop $shop, Uuid $tenantAccountId, string $adminEmail, string $accountName): array
+    public function create(Shop $shop, Uuid $tenantAccountId, string $adminEmail, string $accountName, ?string $password = null): array
     {
         $email = strtolower(trim($adminEmail));
         if ('' === $email) {
@@ -38,13 +38,24 @@ final class CreateTenantShopAdminService
         }
 
         $username = $this->resolveUsername($email, $shop->getSlug());
-        $temporaryPassword = $this->passwordGenerator->generate()->plainValue();
+        $userProvidedPassword = null !== $password && '' !== trim($password);
+        if ($userProvidedPassword) {
+            $plainPassword = trim($password);
+            if (strlen($plainPassword) < 8) {
+                throw new \InvalidArgumentException('Admin password must be at least 8 characters.');
+            }
+        } else {
+            $plainPassword = $this->passwordGenerator->generate()->plainValue();
+        }
+
         $nameParts = $this->splitAccountName($accountName);
 
         $user = new User($email, $username, 'placeholder', $nameParts['first'], $nameParts['last']);
-        $user->setPasswordHash($this->passwordHasher->hashPassword($user, $temporaryPassword));
+        $user->setPasswordHash($this->passwordHasher->hashPassword($user, $plainPassword));
         $user->activate();
-        $user->requirePasswordChange();
+        if (!$userProvidedPassword) {
+            $user->requirePasswordChange();
+        }
         $user->assignToShop($shop->getId());
         $user->assignToTenantAccount($tenantAccountId);
 
@@ -62,7 +73,8 @@ final class CreateTenantShopAdminService
 
         return [
             'user' => $user,
-            'temporary_password' => $temporaryPassword,
+            'temporary_password' => $userProvidedPassword ? null : $plainPassword,
+            'user_provided_password' => $userProvidedPassword,
         ];
     }
 

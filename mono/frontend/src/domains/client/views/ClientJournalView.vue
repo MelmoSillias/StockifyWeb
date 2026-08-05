@@ -7,16 +7,6 @@
         text
         @click="router.push({ name: 'clients' })"
       />
-      <Button
-        icon="pi pi-refresh"
-        text
-        rounded
-        severity="secondary"
-        :loading="clientsStore.detailLoading"
-        aria-label="Actualiser"
-        v-tooltip.top="'Actualiser'"
-        @click="loadClient()"
-      />
       <div v-if="client" class="client-journal__title-block">
         <h1 class="client-journal__title">{{ client.name }}</h1>
         <div class="client-journal__meta">
@@ -27,14 +17,28 @@
     </div>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <div class="client-journal__actions">
+          <Button
+            icon="pi pi-refresh"
+            text
+            rounded
+            severity="secondary"
+            :loading="clientsStore.detailLoading"
+            aria-label="Actualiser"
+            v-tooltip.top="'Actualiser'"
+            @click="load()"
+          />
+        </div>
+      </template>
       <template #content>
         <AppTableState
           :loading="clientsStore.detailLoading && !client"
-          :error="!client ? loadError : null"
+          :error="loadError"
           :is-empty="!clientsStore.detailLoading && !client && Boolean(loadError)"
           empty-title="Client introuvable"
           :empty-text="loadError || 'Ce client n\'existe pas ou a été supprimé.'"
-          @retry="loadClient()"
+          @retry="load()"
         >
           <Tabs v-if="client" v-model:value="activeTab" @update:value="onTabChange">
             <TabList>
@@ -83,11 +87,9 @@
               <TabPanel value="ventes">
                 <AppTableState
                   :loading="tabLoading.ventes"
-                  :error="tabErrors.ventes"
                   :is-empty="!tabLoading.ventes && tabData.ventes.length === 0"
                   empty-title="Aucune vente"
                   empty-text="Ce client n'a pas encore de vente enregistrée."
-                  @retry="loadTab('ventes', { force: true })"
                 >
                   <DataTable
                     :value="tabData.ventes"
@@ -128,11 +130,9 @@
               <TabPanel value="commandes">
                 <AppTableState
                   :loading="tabLoading.commandes"
-                  :error="tabErrors.commandes"
                   :is-empty="!tabLoading.commandes && tabData.commandes.length === 0"
                   empty-title="Aucune commande"
                   empty-text="Ce client n'a pas encore de commande enregistrée."
-                  @retry="loadTab('commandes', { force: true })"
                 >
                   <DataTable
                     :value="tabData.commandes"
@@ -168,11 +168,9 @@
               <TabPanel value="factures">
                 <AppTableState
                   :loading="tabLoading.factures"
-                  :error="tabErrors.factures"
                   :is-empty="!tabLoading.factures && tabData.factures.length === 0"
                   empty-title="Aucune facture"
                   empty-text="Ce client n'a pas encore de facture."
-                  @retry="loadTab('factures', { force: true })"
                 >
                   <DataTable
                     :value="tabData.factures"
@@ -217,23 +215,19 @@
                 <CreancesTable
                   :items="tabData.creances"
                   :loading="tabLoading.creances"
-                  :error="tabErrors.creances"
                   :show-client-column="false"
                   :payment-loading-id="paymentLoadingId"
                   empty-text="Ce client n'a pas encore de créance enregistrée."
                   @pay="openCreancePayment"
-                  @retry="loadTab('creances', { force: true })"
                 />
               </TabPanel>
 
               <TabPanel value="paiements">
                 <AppTableState
                   :loading="tabLoading.paiements"
-                  :error="tabErrors.paiements"
                   :is-empty="!tabLoading.paiements && tabData.paiements.length === 0"
                   empty-title="Aucun paiement"
                   empty-text="Ce client n'a pas encore de paiement enregistré."
-                  @retry="loadTab('paiements', { force: true })"
                 >
                   <DataTable
                     :value="tabData.paiements"
@@ -364,14 +358,6 @@ const tabLoading = reactive({
   paiements: false
 })
 
-const tabErrors = reactive({
-  ventes: null,
-  commandes: null,
-  factures: null,
-  creances: null,
-  paiements: null
-})
-
 const loadedTabs = ref(new Set(['info']))
 
 const clientId = computed(() => route.params.id)
@@ -428,8 +414,8 @@ const tabFetchers = {
   paiements: () => clientsService.listPaiements(clientId.value)
 }
 
-const loadTab = async (tab, { force = false } = {}) => {
-  if (tab === 'info' || (!force && loadedTabs.value.has(tab))) {
+const loadTab = async (tab) => {
+  if (tab === 'info' || loadedTabs.value.has(tab)) {
     return
   }
 
@@ -439,13 +425,11 @@ const loadTab = async (tab, { force = false } = {}) => {
   }
 
   tabLoading[tab] = true
-  tabErrors[tab] = null
   try {
     tabData[tab] = await fetcher()
     loadedTabs.value.add(tab)
   } catch (error) {
-    tabErrors[tab] = error?.message || `Impossible de charger les ${tab}.`
-    showError(tabErrors[tab])
+    showError(error?.message || `Impossible de charger les ${tab}.`)
   } finally {
     tabLoading[tab] = false
   }
@@ -508,6 +492,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await commerceService.createPaiement({
@@ -518,7 +503,8 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     })
     paymentVisible.value = false
     showSuccess('Paiement enregistré.')
-    await loadTab('creances', { force: true })
+    loadedTabs.value.delete('creances')
+    await loadTab('creances')
   } catch (error) {
     showError(error?.message || 'Le paiement a échoué.')
   } finally {
@@ -526,7 +512,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
   }
 }
 
-const loadClient = async () => {
+const load = async () => {
   loadError.value = null
   try {
     await clientsStore.fetchById(clientId.value, { force: true })
@@ -535,7 +521,7 @@ const loadClient = async () => {
   }
 }
 
-onMounted(loadClient)
+onMounted(load)
 </script>
 
 <style scoped>
@@ -575,5 +561,10 @@ onMounted(loadClient)
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
   color: var(--p-text-muted-color);
+}
+
+.client-journal__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

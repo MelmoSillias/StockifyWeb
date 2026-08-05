@@ -25,8 +25,8 @@
     </div>
 
     <template #footer>
-      <Button label="Annuler" severity="secondary" text @click="$emit('update:visible', false)" />
-      <Button label="Confirmer" icon="pi pi-check" :loading="loading" :disabled="!deliveryDate" @click="onConfirm" />
+      <Button label="Annuler" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
+      <Button label="Confirmer" icon="pi pi-check" :loading="loading" :disabled="loading || !deliveryDate" @click="onConfirm" />
     </template>
   </Dialog>
 </template>
@@ -64,6 +64,7 @@ watch(
 )
 
 const onConfirm = () => {
+  if (props.loading) return
   if (!deliveryDate.value) {
     return
   }

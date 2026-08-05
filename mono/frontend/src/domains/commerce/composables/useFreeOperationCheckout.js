@@ -76,6 +76,7 @@ export const useFreeOperationCheckout = () => {
       return false
     }
 
+    if (submitting.value) return false
     submitting.value = true
     try {
       const payload = {

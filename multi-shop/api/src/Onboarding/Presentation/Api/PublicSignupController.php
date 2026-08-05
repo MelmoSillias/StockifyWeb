@@ -44,12 +44,20 @@ final class PublicSignupController extends AbstractController
             $data['adminEmail'] = $data['billingEmail'];
         }
 
+        if (!empty($data['adminPassword']) && strlen((string) $data['adminPassword']) < 8) {
+            return $this->json(['error' => 'Admin password must be at least 8 characters.'], Response::HTTP_BAD_REQUEST);
+        }
+
         try {
             $result = $this->publicSignupService->signup($data);
 
             return $this->json($result, Response::HTTP_CREATED);
         } catch (ControlPlaneException $exception) {
             return $this->json(['error' => $exception->getMessage()], $exception->getStatusCode());
+        } catch (\InvalidArgumentException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\DomainException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         }
     }
 }

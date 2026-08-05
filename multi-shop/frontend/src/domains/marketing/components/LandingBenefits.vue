@@ -2,7 +2,7 @@
   <section id="avantages" class="landing-benefits mkt-section mkt-section--light">
     <div class="mkt-container--narrow">
       <div class="mkt-section-header mkt-section-header--center mkt-reveal" :ref="register">
-        <p class="mkt-eyebrow">Pourquoi StockifyWeb</p>
+        <p class="mkt-eyebrow">Pourquoi LafiaSugu</p>
         <h2 class="mkt-title mkt-title--sm">Trois piliers pour piloter votre activité.</h2>
       </div>
       <div class="landing-benefits__grid">

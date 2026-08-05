@@ -31,7 +31,7 @@ defineProps({
   },
   title: {
     type: String,
-    default: 'Stockify'
+    default: 'LafiaSugu'
   },
   stats: {
     type: Array,
@@ -119,13 +119,13 @@ defineProps({
   height: 5rem;
   padding: 0.45rem;
   border-radius: 0.75rem;
-  background: rgba(16, 185, 129, 0.08);
+  background: var(--mkt-accent-soft);
 }
 
 .mockup-dashboard__chart div {
   flex: 1;
   border-radius: 0.35rem 0.35rem 0.1rem 0.1rem;
-  background: linear-gradient(180deg, var(--mkt-accent), rgba(16, 185, 129, 0.4));
+  background: linear-gradient(180deg, var(--mkt-accent), color-mix(in srgb, var(--mkt-accent) 40%, transparent));
 }
 
 .mockup-dashboard__rows {

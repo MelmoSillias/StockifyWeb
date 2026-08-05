@@ -43,6 +43,8 @@
   --layout-accent: #10b981;
   --layout-accent-strong: #047857;
   --layout-accent-soft: rgba(16, 185, 129, 0.12);
+  --layout-logo-bg: #fffdfa;
+  --layout-logo-border: #f3e8dc;
   --layout-font-size-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
   --layout-font-size-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
   --layout-font-size-base: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
@@ -74,6 +76,12 @@
   --layout-accent: #f43f5e;
   --layout-accent-strong: #be123c;
   --layout-accent-soft: rgba(244, 63, 94, 0.14);
+}
+
+:root[data-layout-accent='orange'] {
+  --layout-accent: #F79E1B;
+  --layout-accent-strong: #C47A0E;
+  --layout-accent-soft: rgba(247, 158, 27, 0.16);
 }
 
 :root[data-layout-surface='slate'] {
@@ -268,7 +276,7 @@
 }
 
 /* Logo mark gradient - solid override */
-:root[data-layout-gradient='solid'] .app-sidebar__logo-mark,
-:root[data-layout-gradient='solid'] .app-topbar__brand-mark {
+:root[data-layout-gradient='solid'] .app-sidebar__logo-mark:not(.app-sidebar__logo-mark--brand),
+:root[data-layout-gradient='solid'] .app-topbar__brand-mark:not(.app-topbar__brand-mark--brand) {
   background: var(--layout-accent-strong);
 }

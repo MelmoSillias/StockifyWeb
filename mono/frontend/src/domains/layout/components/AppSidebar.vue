@@ -175,7 +175,10 @@ const openProfile = () => {
       <div class="app-sidebar__container">
         <!-- Logo Section -->
         <div v-if="logoAtTop" class="app-sidebar__logo">
-          <div class="app-sidebar__logo-mark">
+          <div
+            class="app-sidebar__logo-mark"
+            :class="{ 'app-sidebar__logo-mark--brand': brand.logoUrl }"
+          >
             <img v-if="brand.logoUrl" :src="brand.logoUrl" :alt="brand.name" class="app-sidebar__logo-image" />
             <span v-else class="app-sidebar__logo-icon">{{ brand.shortName[0] }}</span>
           </div>
@@ -258,7 +261,10 @@ const openProfile = () => {
 
         <!-- Logo Center -->
         <div v-if="!logoAtTop" class="app-sidebar__logo app-sidebar__logo--center">
-          <div class="app-sidebar__logo-mark">
+          <div
+            class="app-sidebar__logo-mark"
+            :class="{ 'app-sidebar__logo-mark--brand': brand.logoUrl }"
+          >
             <img v-if="brand.logoUrl" :src="brand.logoUrl" :alt="brand.name" class="app-sidebar__logo-image" />
             <span v-else class="app-sidebar__logo-icon">{{ brand.shortName[0] }}</span>
           </div>
@@ -286,7 +292,10 @@ const openProfile = () => {
     >
       <template #header>
         <div class="app-sidebar__logo">
-          <div class="app-sidebar__logo-mark">
+          <div
+            class="app-sidebar__logo-mark"
+            :class="{ 'app-sidebar__logo-mark--brand': brand.logoUrl }"
+          >
             <img v-if="brand.logoUrl" :src="brand.logoUrl" :alt="brand.name" class="app-sidebar__logo-image" />
             <span v-else class="app-sidebar__logo-icon">{{ brand.shortName[0] }}</span>
           </div>

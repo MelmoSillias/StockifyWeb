@@ -181,7 +181,7 @@
     <template #footer>
         <div class="flex flex-row justify-end gap-2 mt-4">
             <Button label="Annuler" icon="pi pi-times" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
-            <Button :label="submitLabel" icon="pi pi-check" :loading="loading" :disabled="loading" @click="$emit('submit')" />
+            <Button :label="submitLabel" icon="pi pi-check" :loading="loading" :disabled="loading" @click="onSubmitClick" />
         </div>
     </template>
   </Dialog>
@@ -281,6 +281,11 @@ const updateFileField = (field, event) => {
     })
   }
   reader.readAsDataURL(file)
+}
+
+function onSubmitClick() {
+  if (props.loading) return
+  emit('submit')
 }
 </script>
 

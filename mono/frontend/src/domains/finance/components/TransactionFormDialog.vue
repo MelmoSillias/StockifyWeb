@@ -61,8 +61,8 @@
     </div>
 
     <template #footer>
-      <Button label="Annuler" severity="secondary" text @click="$emit('update:visible', false)" />
-      <Button label="Enregistrer" :loading="loading" @click="submit" />
+      <Button label="Annuler" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
+      <Button label="Enregistrer" :loading="loading" :disabled="loading" @click="submit" />
     </template>
   </Dialog>
 </template>
@@ -123,6 +123,7 @@ watch(
 )
 
 const submit = () => {
+  if (props.loading) return
   if (!form.compte_id || !form.label || Number(form.amount) <= 0) {
     return
   }

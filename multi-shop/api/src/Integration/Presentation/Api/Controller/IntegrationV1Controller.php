@@ -223,11 +223,13 @@ final class IntegrationV1Controller extends AbstractController
             );
             $this->shopRepository->save($result->shop);
             $data = $this->serializeShop($result->shop);
-            if (null !== $result->adminEmail && null !== $result->temporaryPassword) {
+            if (null !== $result->adminEmail) {
                 $data['admin'] = [
                     'email' => $result->adminEmail,
-                    'temporary_password' => $result->temporaryPassword,
                 ];
+                if (null !== $result->temporaryPassword) {
+                    $data['admin']['temporary_password'] = $result->temporaryPassword;
+                }
             }
             $usage = $this->getAccountUsageHandler->handle(new GetAccountUsageQuery($externalAccountId));
             $this->usageWebhookDispatcher->dispatchUsageUpdated($externalAccountId, [

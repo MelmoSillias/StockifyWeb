@@ -4,6 +4,10 @@
     <div class="login-view__orb login-view__orb--secondary"></div>
 
     <div class="login-view__toolbar">
+      <RouterLink :to="landingTo" class="login-view__back">
+        <i class="pi pi-arrow-left"></i>
+        Retour à l'accueil
+      </RouterLink>
       <Button
         icon="pi pi-palette"
         label="Personnaliser"
@@ -15,12 +19,15 @@
 
     <div class="login-view__content">
       <section class="login-view__hero">
-        <div class="login-view__brand-mark">
+        <div
+          class="login-view__brand-mark"
+          :class="{ 'login-view__brand-mark--logo': brand.logoUrl }"
+        >
           <img v-if="brand.logoUrl" :src="brand.logoUrl" :alt="brand.name" class="login-view__brand-image" />
           <span v-else>{{ brand.shortName }}</span>
         </div>
-        <p class="login-view__eyebrow">Application métier Stockify</p>
-        <h1 class="login-view__title">{{ brand.name }}</h1>
+        <p class="login-view__eyebrow">Application métier {{ brand.name }}</p>
+        <h1 v-if="!brand.logoUrl" class="login-view__title">{{ brand.name }}</h1>
         <p class="login-view__subtitle">{{ authIntro }}</p>
       </section>
 
@@ -81,6 +88,7 @@
             type="submit"
             label="Se connecter"
             :loading="loading"
+            :disabled="loading"
             fluid
             size="large"
           />
@@ -105,6 +113,8 @@ import { useAuthStore } from '@/domains/auth/stores/auth'
 import AppThemePanel from '@/domains/layout/components/AppThemePanel.vue'
 import { appShellBrand } from '@/domains/layout/config/appLayout'
 import { clearAuthFieldError, normalizeAuthError, validateLoginCredentials } from '@/domains/auth/services/authErrors'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
+import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
@@ -116,6 +126,7 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const authStore = useAuthStore()
+const { landingTo } = useMarketingAuth()
 const brand = appShellBrand
 const preferencesVisible = ref(false)
 const authIntro = 'Gérez votre catalogue, votre stock et vos ventes au quotidien.'
@@ -153,7 +164,6 @@ watch(
 )
 
 const errors = ref({})
-const loading = ref(false)
 
 const clearFieldError = (fieldName) => {
   errors.value = clearAuthFieldError(errors.value, fieldName)
@@ -164,7 +174,7 @@ const onLoginMethodChange = () => {
   errors.value = clearAuthFieldError(errors.value, 'email')
 }
 
-const handleLogin = async () => {
+const { pending: loading, run: handleLogin } = useAsyncAction(async () => {
   errors.value = {}
 
   const validation = validateLoginCredentials(credentials.value, loginMethod.value)
@@ -177,8 +187,6 @@ const handleLogin = async () => {
     return
   }
 
-  loading.value = true
-
   try {
     await authStore.login(credentials.value)
     toast.add({
@@ -189,7 +197,6 @@ const handleLogin = async () => {
     })
 
     await router.replace(route.query.redirect || { name: 'home' })
-
   } catch (error) {
     const authError = normalizeAuthError(error, 'login')
 
@@ -201,10 +208,8 @@ const handleLogin = async () => {
     if (authError.toast) {
       toast.add(authError.toast)
     }
-  } finally {
-    loading.value = false
   }
-}
+})
 </script>
 
 <style scoped>
@@ -224,9 +229,26 @@ const handleLogin = async () => {
 
 .login-view__toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   position: relative;
   z-index: 1;
+}
+
+.login-view__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--layout-font-size-sm);
+  font-weight: 600;
+  color: var(--layout-text-muted);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.login-view__back:hover {
+  color: var(--layout-accent);
 }
 
 .login-view__content {
@@ -260,6 +282,22 @@ const handleLogin = async () => {
   font-weight: 700;
   box-shadow: var(--layout-shadow-soft);
   overflow: hidden;
+}
+
+.login-view__brand-mark--logo {
+  width: auto;
+  max-width: min(100%, 14rem);
+  height: clamp(4rem, 8vw, 5.5rem);
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.login-view__brand-mark--logo .login-view__brand-image {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  padding: 0;
 }
 
 .login-view__brand-image {

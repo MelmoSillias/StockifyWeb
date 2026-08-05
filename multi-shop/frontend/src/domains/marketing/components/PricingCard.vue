@@ -22,11 +22,11 @@
     </ul>
 
     <RouterLink
-      :to="{ name: 'register', query: { plan: plan.code } }"
+      :to="ctaTo"
       class="pricing-card__cta"
       :class="{ 'pricing-card__cta--primary': featured }"
     >
-      {{ featured ? 'Commencer gratuitement' : 'Choisir ce plan' }}
+      {{ ctaLabel }}
     </RouterLink>
   </article>
 </template>
@@ -34,6 +34,9 @@
 <script setup>
 import { computed } from 'vue'
 import { featureLabels } from '@/domains/marketing/config/marketingContent'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
+
+const { isAuthenticated, signupTo } = useMarketingAuth()
 
 const props = defineProps({
   plan: {
@@ -67,6 +70,16 @@ const maxShops = computed(() => props.plan.quotas?.max_shops ?? null)
 const featureItems = computed(() => (
   (props.plan.features ?? []).map((feature) => featureLabels[feature.code] ?? feature.name)
 ))
+
+const ctaTo = signupTo({ plan: props.plan.code })
+
+const ctaLabel = computed(() => {
+  if (isAuthenticated.value) {
+    return 'Accéder au dashboard'
+  }
+
+  return props.featured ? 'Commencer gratuitement' : 'Choisir ce plan'
+})
 </script>
 
 <style scoped>
@@ -90,9 +103,9 @@ const featureItems = computed(() => (
 }
 
 .pricing-card--featured {
-  border-color: rgba(16, 185, 129, 0.4);
-  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, white 45%);
-  box-shadow: 0 20px 56px rgba(16, 185, 129, 0.18);
+  border-color: color-mix(in srgb, var(--mkt-accent) 40%, transparent);
+  background: linear-gradient(180deg, var(--mkt-accent-soft) 0%, white 45%);
+  box-shadow: 0 20px 56px var(--mkt-accent-glow);
 }
 
 .pricing-card__badge {
@@ -167,6 +180,6 @@ const featureItems = computed(() => (
   background: var(--mkt-accent);
   border-color: transparent;
   color: white;
-  box-shadow: 0 10px 32px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 10px 32px var(--mkt-accent-glow);
 }
 </style>

@@ -134,7 +134,7 @@ const resetCart = () => {
 
     <template v-else>
       <ul class="app-topbar-cart-panel__lines">
-        <li v-for="line in cart.lines" :key="line.variantId" class="app-topbar-cart-panel__line">
+        <li v-for="line in cart.lines" :key="line.lineId" class="app-topbar-cart-panel__line">
           <div class="app-topbar-cart-panel__line-row">
             <div class="app-topbar-cart-panel__line-info">
               <span class="app-topbar-cart-panel__line-label" :title="line.label">{{ line.label }}</span>
@@ -152,7 +152,7 @@ const resetCart = () => {
                 size="small"
                 class="app-topbar-cart-panel__line-remove"
                 :disabled="cart.isCheckedOut"
-                @click="cart.removeLine(line.variantId)"
+                @click="cart.removeLine(line.lineId)"
               />
             </div>
           </div>
@@ -283,7 +283,7 @@ const resetCart = () => {
 
         <template v-else>
           <ul class="app-topbar-cart-panel__lines">
-            <li v-for="line in cart.lines" :key="line.variantId" class="app-topbar-cart-panel__line">
+            <li v-for="line in cart.lines" :key="line.lineId" class="app-topbar-cart-panel__line">
               <div class="app-topbar-cart-panel__line-row">
                 <div class="app-topbar-cart-panel__line-info">
                   <span class="app-topbar-cart-panel__line-label" :title="line.label">{{ line.label }}</span>
@@ -301,7 +301,7 @@ const resetCart = () => {
                     size="small"
                     class="app-topbar-cart-panel__line-remove"
                     :disabled="cart.isCheckedOut"
-                    @click="cart.removeLine(line.variantId)"
+                    @click="cart.removeLine(line.lineId)"
                   />
                 </div>
               </div>

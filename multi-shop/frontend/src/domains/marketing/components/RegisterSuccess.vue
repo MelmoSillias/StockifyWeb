@@ -5,12 +5,20 @@
     </div>
     <h2>Compte créé avec succès</h2>
     <p>
-      Votre espace StockifyWeb est prêt. Conservez ces identifiants pour votre première connexion.
+      Votre espace LafiaSugu est prêt.
+      <template v-if="result.shopCredentials?.passwordProvided">
+        Connectez-vous avec l’e-mail et le mot de passe que vous avez choisis.
+      </template>
+      <template v-else>
+        Conservez ces identifiants pour votre première connexion.
+      </template>
     </p>
 
     <div class="register-success__credentials">
       <p><strong>E-mail :</strong> {{ result.shopCredentials?.email }}</p>
-      <p><strong>Mot de passe temporaire :</strong> {{ result.shopCredentials?.temporaryPassword }}</p>
+      <p v-if="result.shopCredentials?.temporaryPassword">
+        <strong>Mot de passe temporaire :</strong> {{ result.shopCredentials.temporaryPassword }}
+      </p>
     </div>
 
     <Button
@@ -19,12 +27,18 @@
       size="large"
       @click="goToLogin"
     />
+
+    <RouterLink :to="landingTo" class="register-success__back mkt-link">
+      <i class="pi pi-arrow-left"></i>
+      Retour à l'accueil
+    </RouterLink>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
 
 const props = defineProps({
   result: {
@@ -34,6 +48,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { landingTo } = useMarketingAuth()
 
 const goToLogin = () => {
   router.push({
@@ -54,6 +69,7 @@ const goToLogin = () => {
   border-radius: var(--mkt-radius);
   background: white;
   box-shadow: var(--mkt-shadow);
+  color: var(--mkt-light-text);
 }
 
 .register-success__icon {
@@ -69,6 +85,7 @@ const goToLogin = () => {
 .register-success h2 {
   font-size: 1.5rem;
   font-weight: 800;
+  color: var(--mkt-light-text);
 }
 
 .register-success p {
@@ -86,6 +103,12 @@ const goToLogin = () => {
 .register-success__credentials p {
   margin: 0;
   color: var(--mkt-light-text);
+  font-size: 0.92rem;
+}
+
+.register-success__back {
+  justify-content: center;
+  color: var(--mkt-light-muted);
   font-size: 0.92rem;
 }
 </style>

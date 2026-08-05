@@ -8,6 +8,7 @@ final class PublicSignupService
 {
     public function __construct(
         private readonly ControlPlaneGatewayInterface $controlPlaneClient,
+        private readonly LocalSignupProvisioner $localSignupProvisioner,
         private readonly SignupPlanPolicy $signupPlanPolicy,
         private readonly LoggerInterface $logger,
     ) {
@@ -31,14 +32,68 @@ final class PublicSignupService
         }
 
         $adminEmail = (string) ($data['adminEmail'] ?? $data['billingEmail'] ?? '');
+        $applicationSlug = (string) ($data['applicationSlug'] ?? 'stockify');
 
-        return $this->controlPlaneClient->signup([
+        $controlPlaneResult = $this->controlPlaneClient->signup([
             'accountName' => (string) ($data['accountName'] ?? ''),
             'accountSlug' => (string) ($data['accountSlug'] ?? ''),
             'billingEmail' => (string) ($data['billingEmail'] ?? $adminEmail),
             'adminEmail' => $adminEmail,
-            'applicationSlug' => (string) ($data['applicationSlug'] ?? 'stockify'),
+            'adminPassword' => isset($data['adminPassword']) ? (string) $data['adminPassword'] : null,
+            'applicationSlug' => $applicationSlug,
             'planCode' => $resolvedPlanCode,
+            'skipRemoteIntegration' => true,
         ]);
+
+        $accountId = (string) ($controlPlaneResult['account']['id'] ?? '');
+        if ('' === $accountId) {
+            throw new ControlPlaneException('Control plane signup did not return an account id.', 502);
+        }
+
+        $entitlement = is_array($controlPlaneResult['entitlement'] ?? null) ? $controlPlaneResult['entitlement'] : [];
+
+        $localResult = $this->localSignupProvisioner->provision(
+            externalAccountId: $accountId,
+            accountName: (string) ($data['accountName'] ?? ''),
+            accountSlug: (string) ($data['accountSlug'] ?? ''),
+            adminEmail: $adminEmail,
+            adminPassword: isset($data['adminPassword']) ? (string) $data['adminPassword'] : null,
+            entitlements: [
+                'features' => is_array($entitlement['features'] ?? null) ? $entitlement['features'] : [],
+                'quotas' => is_array($entitlement['quotas'] ?? null) ? $entitlement['quotas'] : [],
+            ],
+        );
+
+        $completion = $this->controlPlaneClient->completeSignup([
+            'accountId' => $accountId,
+            'applicationSlug' => $applicationSlug,
+            'remoteTenantId' => $accountId,
+            'remoteShopIds' => [(string) $localResult->shop->getId()],
+        ]);
+
+        return [
+            'account' => $controlPlaneResult['account'],
+            'subscription' => $controlPlaneResult['subscription'],
+            'tenantBinding' => $completion['tenantBinding'] ?? null,
+            'shopCredentials' => $this->buildShopCredentials($localResult, $adminEmail),
+            'stockifyLoginUrl' => $controlPlaneResult['stockifyLoginUrl'] ?? null,
+        ];
+    }
+
+    private function buildShopCredentials(
+        \App\Integration\Application\Command\CreateTenantShop\CreateTenantShopResult $result,
+        string $adminEmail,
+    ): array {
+        $credentials = [
+            'email' => $result->adminEmail ?? $adminEmail,
+        ];
+
+        if (null !== $result->temporaryPassword && '' !== $result->temporaryPassword) {
+            $credentials['temporaryPassword'] = $result->temporaryPassword;
+        } else {
+            $credentials['passwordProvided'] = true;
+        }
+
+        return $credentials;
     }
 }

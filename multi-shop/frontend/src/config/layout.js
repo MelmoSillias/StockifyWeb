@@ -1,4 +1,5 @@
 export const themeDefaultAccents = {
+  lafiasugu: 'orange',
   graphite: 'emerald',
   ocean: 'cyan',
   ember: 'amber',
@@ -10,6 +11,7 @@ export const themeDefaultAccents = {
 
 export const layoutOptionSets = {
   themes: [
+    { label: 'LafiaSugu', value: 'lafiasugu' },
     { label: 'Graphite', value: 'graphite' },
     { label: 'Ocean', value: 'ocean' },
     { label: 'Ember', value: 'ember' },
@@ -23,6 +25,7 @@ export const layoutOptionSets = {
     { label: 'Cyan', value: 'cyan' },
     { label: 'Amber', value: 'amber' },
     { label: 'Rose', value: 'rose' },
+    { label: 'Orange', value: 'orange' },
     { label: 'Custom', value: 'custom' }
   ],
   surfaces: [
@@ -104,15 +107,15 @@ export const layoutOptionSets = {
 
 export const layoutDefaults = {
   appearance: {
-    themeName: 'graphite',
-    accentName: 'emerald',
+    themeName: 'lafiasugu',
+    accentName: 'orange',
     accentColor: null,
     surfaceName: 'slate',
-    fontName: 'space',
+    fontName: 'jakarta',
     density: 'comfortable',
     textScale: 'normal',
     radius: 'soft',
-    darkMode: 'system',
+    darkMode: 'dark',
     motionPreset: 'expressive',
     gradientMode: 'gradient'
   },

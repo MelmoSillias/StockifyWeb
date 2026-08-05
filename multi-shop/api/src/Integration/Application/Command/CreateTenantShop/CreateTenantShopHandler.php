@@ -30,6 +30,7 @@ final readonly class CreateTenantShopCommand
         public ?string $address = null,
         public ?string $phone = null,
         public ?string $adminEmail = null,
+        public ?string $adminPassword = null,
         public bool $createAdmin = true,
     ) {
     }
@@ -44,6 +45,7 @@ final readonly class CreateTenantShopCommand
             address: isset($payload['address']) ? (string) $payload['address'] : null,
             phone: isset($payload['phone']) ? (string) $payload['phone'] : null,
             adminEmail: isset($payload['admin_email']) ? (string) $payload['admin_email'] : null,
+            adminPassword: isset($payload['admin_password']) ? (string) $payload['admin_password'] : null,
             createAdmin: !array_key_exists('create_admin', $payload) || (bool) $payload['create_admin'],
         );
     }
@@ -84,6 +86,7 @@ final class CreateTenantShopHandler
                 $account->getId(),
                 $email,
                 $command->name,
+                $command->adminPassword,
             );
             $adminEmail = $admin['user']->getEmail();
             $temporaryPassword = $admin['temporary_password'];

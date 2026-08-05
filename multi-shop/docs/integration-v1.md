@@ -10,6 +10,8 @@ Implémentation côté Data Plane du contrat Control Plane ↔ Stockify.
 
 ## Authentification
 
+Architecture complète CP ↔ DP (4 canaux, flux de provisioning, webhooks) : [sim-saas-admin/docs/auth-architecture.md](../../../sim-saas-admin/docs/auth-architecture.md).
+
 - Firewall dédié (`integration` dans `security.yaml`)
 - Bearer JWT signé RS256 par le Control Plane
 - Variable d'environnement : `INTEGRATION_JWT_PUBLIC_KEY`

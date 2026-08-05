@@ -65,7 +65,7 @@ const { register } = useScrollReveal()
 }
 
 .landing-trust__pill:hover {
-  border-color: rgba(16, 185, 129, 0.3);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+  border-color: color-mix(in srgb, var(--mkt-accent) 30%, transparent);
+  box-shadow: 0 4px 16px var(--mkt-accent-soft);
 }
 </style>

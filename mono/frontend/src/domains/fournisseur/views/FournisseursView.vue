@@ -10,9 +10,9 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher un fournisseur..."
           show-search
-          :reloading="fournisseursStore.loading"
           @update:search-term="searchTerm = $event"
           @create="dialog.openCreate()"
+          :reloading="fournisseursStore.loading"
           @reload="load"
         />
       </template>
@@ -176,6 +176,7 @@ const openCreateCommande = (fournisseur) => {
 }
 
 const onCreateCommande = async (payload) => {
+  if (creatingCommande.value) return
   creatingCommande.value = true
   try {
     const commande = await achatsService.create(payload)

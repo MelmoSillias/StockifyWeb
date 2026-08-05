@@ -7,16 +7,6 @@
         text
         @click="router.push({ name: 'fournisseurs' })"
       />
-      <Button
-        icon="pi pi-refresh"
-        text
-        rounded
-        severity="secondary"
-        :loading="fournisseursStore.detailLoading"
-        aria-label="Actualiser"
-        v-tooltip.top="'Actualiser'"
-        @click="loadFournisseur()"
-      />
       <div v-if="fournisseur" class="fournisseur-journal__title-block">
         <h1 class="fournisseur-journal__title">{{ fournisseur.name }}</h1>
         <div class="fournisseur-journal__meta">
@@ -27,14 +17,28 @@
     </div>
 
     <Card class="dashboard-panel">
+      <template #title>
+        <div class="fournisseur-journal__actions">
+          <Button
+            icon="pi pi-refresh"
+            text
+            rounded
+            severity="secondary"
+            :loading="fournisseursStore.detailLoading"
+            aria-label="Actualiser"
+            v-tooltip.top="'Actualiser'"
+            @click="load()"
+          />
+        </div>
+      </template>
       <template #content>
         <AppTableState
           :loading="fournisseursStore.detailLoading && !fournisseur"
-          :error="!fournisseur ? loadError : null"
+          :error="loadError"
           :is-empty="!fournisseursStore.detailLoading && !fournisseur && Boolean(loadError)"
           empty-title="Fournisseur introuvable"
           :empty-text="loadError || 'Ce fournisseur n\'existe pas ou a été supprimé.'"
-          @retry="loadFournisseur()"
+          @retry="load()"
         >
           <Tabs v-if="fournisseur" v-model:value="activeTab" @update:value="onTabChange">
             <TabList>
@@ -85,11 +89,9 @@
 
                 <AppTableState
                   :loading="tabLoading.commandes"
-                  :error="tabErrors.commandes"
                   :is-empty="!tabLoading.commandes && tabData.commandes.length === 0"
                   empty-title="Aucune commande"
                   empty-text="Créez une commande achat pour ce fournisseur."
-                  @retry="loadTab('commandes', { force: true })"
                 >
                   <DataTable
                     :value="tabData.commandes"
@@ -140,23 +142,19 @@
                 <DettesTable
                   :items="tabData.dettes"
                   :loading="tabLoading.dettes"
-                  :error="tabErrors.dettes"
                   :show-fournisseur-column="false"
                   :payment-loading-id="paymentLoadingId"
                   empty-text="Ce fournisseur n'a pas encore de dette enregistrée."
                   @pay="openDettePayment"
-                  @retry="loadTab('dettes', { force: true })"
                 />
               </TabPanel>
 
               <TabPanel value="paiements">
                 <AppTableState
                   :loading="tabLoading.paiements"
-                  :error="tabErrors.paiements"
                   :is-empty="!tabLoading.paiements && tabData.paiements.length === 0"
                   empty-title="Aucun paiement"
                   empty-text="Ce fournisseur n'a pas encore de décaissement enregistré."
-                  @retry="loadTab('paiements', { force: true })"
                 >
                   <DataTable
                     :value="tabData.paiements"
@@ -324,12 +322,6 @@ const tabLoading = reactive({
   paiements: false
 })
 
-const tabErrors = reactive({
-  commandes: null,
-  dettes: null,
-  paiements: null
-})
-
 const loadedTabs = ref(new Set(['info']))
 
 const fournisseurId = computed(() => route.params.id)
@@ -426,13 +418,11 @@ const loadTab = async (tab, { force = false } = {}) => {
   }
 
   tabLoading[tab] = true
-  tabErrors[tab] = null
   try {
     tabData[tab] = await fetcher()
     loadedTabs.value.add(tab)
   } catch (error) {
-    tabErrors[tab] = error?.message || `Impossible de charger les ${tab}.`
-    showError(tabErrors[tab])
+    showError(error?.message || `Impossible de charger les ${tab}.`)
   } finally {
     tabLoading[tab] = false
   }
@@ -447,6 +437,7 @@ const openCreateCommande = () => {
 }
 
 const onCreateCommande = async (payload) => {
+  if (creatingCommande.value) return
   creatingCommande.value = true
   try {
     await achatsService.create(payload)
@@ -476,6 +467,7 @@ const onConfirmCommande = async ({ expectedDate }) => {
     return
   }
 
+  if (confirming.value) return
   confirming.value = true
   pendingCommandeId.value = selectedCommande.value.id
   try {
@@ -503,6 +495,7 @@ const onRecevoirConfirm = async ({ paid_amount, mode_de_paiement_id }) => {
     return
   }
 
+  if (receiving.value) return
   receiving.value = true
   receivingId.value = selectedCommande.value.id
   try {
@@ -543,6 +536,7 @@ const cancelCommande = (commande) => {
 }
 
 const onCreateDette = async (payload) => {
+  if (creatingDette.value) return
   creatingDette.value = true
   try {
     await dettesService.create(payload)
@@ -569,6 +563,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await dettesService.createPaiement({
@@ -624,7 +619,7 @@ watch(
   { immediate: true }
 )
 
-const loadFournisseur = async () => {
+const load = async () => {
   loadError.value = null
   try {
     await fournisseursStore.fetchById(fournisseurId.value, { force: true })
@@ -633,7 +628,7 @@ const loadFournisseur = async () => {
   }
 }
 
-onMounted(loadFournisseur)
+onMounted(load)
 </script>
 
 <style scoped>
@@ -679,5 +674,10 @@ onMounted(loadFournisseur)
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1rem;
+}
+
+.fournisseur-journal__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

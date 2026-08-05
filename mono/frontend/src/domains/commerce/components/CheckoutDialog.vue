@@ -109,11 +109,11 @@
     </div>
 
     <template #footer>
-      <Button label="Annuler" severity="secondary" text @click="$emit('update:visible', false)" />
+      <Button label="Annuler" severity="secondary" text :disabled="loading" @click="$emit('update:visible', false)" />
       <Button
         :label="confirmLabel || dialogConfirmLabel"
         :loading="loading"
-        :disabled="(showDeliveryDate && !deliveryDate) || (isQuoteMode && !validUntil)"
+        :disabled="loading || (showDeliveryDate && !deliveryDate) || (isQuoteMode && !validUntil)"
         @click="onConfirm"
       />
     </template>
@@ -243,6 +243,7 @@ watch(
 )
 
 const onConfirm = () => {
+  if (props.loading) return
   ensurePaymentDate()
 
   if (showDeliveryDate.value && !deliveryDate.value) {

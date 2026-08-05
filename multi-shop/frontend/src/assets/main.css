@@ -4,6 +4,7 @@
 @import "tailwindcss-primeui";
 @import "./content/tokens.css";
 @import "./layout/tokens.css";
+@import "./layout/themes/lafiasugu.css";
 @import "./layout/themes/graphite.css";
 @import "./layout/themes/ocean.css";
 @import "./layout/themes/ember.css";

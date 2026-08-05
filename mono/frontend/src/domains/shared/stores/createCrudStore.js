@@ -83,6 +83,7 @@ export const createCrudStore = (storeId, service) => defineStore(storeId, {
       }
     },
     async createItem(payload) {
+      if (this.submitting) return
       this.submitting = true
       this.error = null
 
@@ -99,6 +100,7 @@ export const createCrudStore = (storeId, service) => defineStore(storeId, {
       }
     },
     async updateItem(id, payload) {
+      if (this.submitting) return
       this.submitting = true
       this.error = null
 
@@ -115,9 +117,11 @@ export const createCrudStore = (storeId, service) => defineStore(storeId, {
       }
     },
     async saveItem(payload) {
+      if (this.submitting) return
       return payload?.id ? this.updateItem(payload.id, payload) : this.createItem(payload)
     },
     async removeItem(id) {
+      if (this.deletingIds.includes(id)) return
       this.deletingIds = [...this.deletingIds, id]
       this.error = null
 

@@ -11,12 +11,12 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { usePrintSettingsStore } from '@/domains/impression/stores/printSettings'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
+import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 const printSettingsStore = usePrintSettingsStore()
 const { hasPermission } = usePermissions()
 const { showError, showSuccess } = useEntityActions()
 
-const saving = ref(false)
 const canManage = computed(() => hasPermission('impression.settings.manage'))
 
 const pageOptions = [
@@ -82,12 +82,11 @@ onMounted(async () => {
   }
 })
 
-const save = async () => {
+const { pending: saving, run: save } = useAsyncAction(async () => {
   if (!canManage.value) {
     return
   }
 
-  saving.value = true
   try {
     const payload = {
       shop_name: form.shop_name,
@@ -110,10 +109,8 @@ const save = async () => {
     showSuccess('Réglages d\'impression enregistrés.')
   } catch (error) {
     showError(error?.response?.data?.error || error?.message || 'Enregistrement impossible.')
-  } finally {
-    saving.value = false
   }
-}
+})
 </script>
 
 <template>
@@ -191,7 +188,7 @@ const save = async () => {
     </section>
 
     <div v-if="canManage" class="print-settings-form__actions">
-      <Button type="submit" label="Enregistrer" icon="pi pi-save" :loading="saving" />
+      <Button type="submit" label="Enregistrer" icon="pi pi-save" :loading="saving" :disabled="saving" />
     </div>
   </form>
 </template>

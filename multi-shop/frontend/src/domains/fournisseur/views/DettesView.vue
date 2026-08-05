@@ -125,6 +125,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await dettesService.createPaiement({

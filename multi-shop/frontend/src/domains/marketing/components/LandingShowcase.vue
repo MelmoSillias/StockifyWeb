@@ -10,15 +10,15 @@
         <p class="mkt-lead">{{ section.description }}</p>
         <div class="landing-showcase__actions">
           <RouterLink
-            :to="{ name: 'register' }"
+            :to="ctaTo"
             :class="section.variant === 'accent' ? 'mkt-btn mkt-btn--white' : 'mkt-btn mkt-btn--primary'"
           >
-            {{ section.cta }}
+            {{ ctaLabel(section.cta) }}
           </RouterLink>
-          <a href="#tarifs" class="mkt-link">
+          <RouterLink :to="anchorTo('tarifs')" class="mkt-link">
             En savoir plus
             <i class="pi pi-arrow-right"></i>
-          </a>
+          </RouterLink>
         </div>
       </div>
 
@@ -53,6 +53,7 @@
 import AppMockup from '@/domains/marketing/components/AppMockup.vue'
 import MockupDashboard from '@/domains/marketing/components/MockupDashboard.vue'
 import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
 
 defineProps({
   section: {
@@ -62,6 +63,10 @@ defineProps({
 })
 
 const { register } = useScrollReveal()
+const { isAuthenticated, signupTo, anchorTo } = useMarketingAuth()
+
+const ctaTo = signupTo()
+const ctaLabel = (label) => (isAuthenticated.value ? 'Accéder au dashboard' : label)
 </script>
 
 <style scoped>

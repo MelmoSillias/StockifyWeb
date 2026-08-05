@@ -110,6 +110,7 @@ export const useCartCheckout = () => {
   }
 
   const onCheckoutConfirm = async ({ payment, operationDate, paymentDate, deliveryDate, confirmOrder, validUntil }) => {
+    if (submitting.value) return false
     submitting.value = true
     try {
       if (checkoutMode.value === 'quote') {

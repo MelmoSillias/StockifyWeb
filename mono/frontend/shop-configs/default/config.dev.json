@@ -1,11 +1,11 @@
 {
   "id": "default",
   "displayName": "Boutique Demo",
-  "appTitle": "Stockify - Boutique Demo",
-  "brandName": "Stockify",
+  "appTitle": "LafiaSugu - Boutique Demo",
+  "brandName": "LafiaSugu",
   "brandSubtitle": "Gestion catalogue et stock",
   "shopPhone": "+223 XX XX XX XX",
-  "viteApiPrefix": "http://localhost:8000/api",
+  "viteApiPrefix": "http://localhost:8001/api",
   "printProfile": {
     "name": "Boutique Demo",
     "addressLines": [
@@ -17,6 +17,6 @@
     "email": "contact@stockify.local"
   },
   "brandingAssets": {
-    "logo": "logo.svg"
+    "logo": "logo.png"
   }
 }

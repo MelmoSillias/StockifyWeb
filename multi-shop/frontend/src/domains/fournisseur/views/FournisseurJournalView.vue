@@ -437,6 +437,7 @@ const openCreateCommande = () => {
 }
 
 const onCreateCommande = async (payload) => {
+  if (creatingCommande.value) return
   creatingCommande.value = true
   try {
     await achatsService.create(payload)
@@ -466,6 +467,7 @@ const onConfirmCommande = async ({ expectedDate }) => {
     return
   }
 
+  if (confirming.value) return
   confirming.value = true
   pendingCommandeId.value = selectedCommande.value.id
   try {
@@ -493,6 +495,7 @@ const onRecevoirConfirm = async ({ paid_amount, mode_de_paiement_id }) => {
     return
   }
 
+  if (receiving.value) return
   receiving.value = true
   receivingId.value = selectedCommande.value.id
   try {
@@ -533,6 +536,7 @@ const cancelCommande = (commande) => {
 }
 
 const onCreateDette = async (payload) => {
+  if (creatingDette.value) return
   creatingDette.value = true
   try {
     await dettesService.create(payload)
@@ -559,6 +563,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await dettesService.createPaiement({

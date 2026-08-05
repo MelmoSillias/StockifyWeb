@@ -81,6 +81,7 @@ export const useDevisConversion = () => {
       return false
     }
 
+    if (submitting.value) return false
     submitting.value = true
     try {
       if (checkoutMode.value === 'sale') {

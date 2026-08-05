@@ -176,6 +176,7 @@ const openCreateCommande = (fournisseur) => {
 }
 
 const onCreateCommande = async (payload) => {
+  if (creatingCommande.value) return
   creatingCommande.value = true
   try {
     const commande = await achatsService.create(payload)

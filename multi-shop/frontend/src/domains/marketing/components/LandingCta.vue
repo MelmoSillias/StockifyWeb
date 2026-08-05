@@ -4,18 +4,18 @@
     <div class="mkt-container landing-cta__inner mkt-reveal" :ref="register">
       <div class="landing-cta__copy">
         <p class="mkt-eyebrow">Prêt à démarrer</p>
-        <h2 class="mkt-title mkt-title--sm">Lancez votre espace StockifyWeb aujourd'hui.</h2>
+        <h2 class="mkt-title mkt-title--sm">Lancez votre espace LafiaSugu aujourd'hui.</h2>
         <p class="mkt-lead">
           Créez votre compte en quelques minutes et recevez vos identifiants immédiatement.
           Starter gratuit pendant toute la bêta.
         </p>
       </div>
       <div class="landing-cta__actions">
-        <RouterLink :to="{ name: 'register' }" class="mkt-btn mkt-btn--primary">
-          Créer mon compte
+        <RouterLink :to="primaryAction.to" class="mkt-btn mkt-btn--primary">
+          {{ isAuthenticated ? 'Accéder au dashboard' : 'Créer mon compte' }}
           <i class="pi pi-arrow-right"></i>
         </RouterLink>
-        <RouterLink :to="{ name: 'login' }" class="mkt-btn mkt-btn--ghost-light">
+        <RouterLink v-if="!isAuthenticated" :to="loginTo" class="mkt-btn mkt-btn--ghost-light">
           J'ai déjà un compte
         </RouterLink>
       </div>
@@ -25,8 +25,10 @@
 
 <script setup>
 import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
+import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
 
 const { register } = useScrollReveal()
+const { isAuthenticated, loginTo, primaryAction } = useMarketingAuth()
 </script>
 
 <style scoped>
@@ -43,7 +45,7 @@ const { register } = useScrollReveal()
   left: 50%;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--mkt-accent-soft) 0%, transparent 70%);
   pointer-events: none;
 }
 

@@ -381,6 +381,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     const payload = {
@@ -427,6 +428,7 @@ const onConfirmDialogSubmit = async ({ deliveryDate }) => {
     return
   }
 
+  if (confirming.value) return
   confirming.value = true
   try {
     const updated = await ordersStore.confirmOrder(confirmOrderRef.value.id, {

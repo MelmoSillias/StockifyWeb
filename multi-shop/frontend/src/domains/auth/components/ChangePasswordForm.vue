@@ -6,10 +6,10 @@ import Password from 'primevue/password'
 
 import { profileService } from '@/domains/auth/services/profileService'
 import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
+import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 const { showError, showSuccess } = useEntityActions()
 
-const saving = ref(false)
 const errors = reactive({
   current_password: '',
   new_password: '',
@@ -62,12 +62,11 @@ const validate = () => {
   return valid
 }
 
-const save = async () => {
+const { pending: saving, run: save } = useAsyncAction(async () => {
   if (!validate()) {
     return
   }
 
-  saving.value = true
   try {
     await profileService.changePassword({
       current_password: form.current_password,
@@ -77,10 +76,8 @@ const save = async () => {
     resetForm()
   } catch (error) {
     showError(error?.response?.data?.error || error?.message || 'Impossible de mettre à jour le mot de passe.')
-  } finally {
-    saving.value = false
   }
-}
+})
 </script>
 
 <template>
@@ -146,6 +143,7 @@ const save = async () => {
         label="Mettre à jour le mot de passe"
         icon="pi pi-lock"
         :loading="saving"
+        :disabled="saving"
       />
     </div>
   </form>

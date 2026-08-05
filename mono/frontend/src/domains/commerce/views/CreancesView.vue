@@ -8,8 +8,8 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher client ou référence..."
           show-search
-          :reloading="loading"
           @update:search-term="searchTerm = $event"
+          :reloading="loading"
           @reload="loadItems"
         >
           <template #actions>
@@ -108,7 +108,7 @@ const loadItems = async () => {
     items.value = await creancesService.list({ status: statusFilter.value || 'open' })
   } catch (err) {
     error.value = err?.message || 'Impossible de charger les créances.'
-    showError(error.value)
+    showError(err?.message || 'Impossible de charger les créances.')
   } finally {
     loading.value = false
   }
@@ -126,6 +126,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await commerceService.createPaiement({

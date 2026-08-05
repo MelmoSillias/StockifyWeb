@@ -48,13 +48,31 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
         $this->lastSignupPayload = $payload;
 
         return [
-            'account' => ['slug' => $payload['accountSlug']],
+            'account' => [
+                'id' => '00000000-0000-4000-8000-000000000001',
+                'slug' => $payload['accountSlug'],
+            ],
             'subscription' => ['planCode' => $payload['planCode']],
+            'entitlement' => [
+                'features' => ['stockify.multi_shop'],
+                'quotas' => ['max_shops' => 1],
+            ],
             'shopCredentials' => [
                 'email' => $payload['adminEmail'],
                 'temporaryPassword' => 'Temp123!',
             ],
             'stockifyLoginUrl' => 'http://localhost:5176/login',
+        ];
+    }
+
+    public function completeSignup(array $payload): array
+    {
+        return [
+            'tenantBinding' => [
+                'accountId' => $payload['accountId'],
+                'remoteTenantId' => $payload['remoteTenantId'],
+                'remoteShopIds' => $payload['remoteShopIds'] ?? [],
+            ],
         ];
     }
 }

@@ -8,8 +8,8 @@
           :search-term="searchTerm"
           search-placeholder="Rechercher fournisseur ou référence..."
           show-search
-          :reloading="loading"
           @update:search-term="searchTerm = $event"
+          :reloading="loading"
           @reload="loadItems"
         >
           <template #actions>
@@ -107,7 +107,7 @@ const loadItems = async () => {
     items.value = await dettesService.list({ status: statusFilter.value || 'open' })
   } catch (err) {
     error.value = err?.message || 'Impossible de charger les dettes.'
-    showError(error.value)
+    showError(err?.message || 'Impossible de charger les dettes.')
   } finally {
     loading.value = false
   }
@@ -125,6 +125,7 @@ const onPaymentConfirm = async ({ amount, mode_de_paiement_id, paymentDate }) =>
     return
   }
 
+  if (paying.value) return
   paying.value = true
   try {
     await dettesService.createPaiement({
