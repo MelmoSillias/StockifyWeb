@@ -52,10 +52,8 @@ services:
     restart: unless-stopped
     depends_on:
       - api
-    environment:
-      VITE_API_PROXY_TARGET: http://api:8001
     expose:
-      - "5176"
+      - "80"
 
 volumes:
   stockify_mysql:
