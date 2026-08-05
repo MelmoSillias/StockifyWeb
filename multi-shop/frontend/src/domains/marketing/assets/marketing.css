@@ -358,3 +358,15 @@ html:has(.mkt-page) {
     padding-block: clamp(3.5rem, 7vw, 5rem);
   }
 }
+
+@media (max-width: 400px) {
+  .mkt-page .mkt-container,
+  .mkt-page .mkt-container--narrow {
+    width: min(100% - 0.75rem, 72rem);
+  }
+
+  .mkt-page .mkt-section.register-page__hero {
+    padding-top: calc(var(--mkt-nav-height) + 1.5rem);
+    padding-bottom: 2.5rem;
+  }
+}

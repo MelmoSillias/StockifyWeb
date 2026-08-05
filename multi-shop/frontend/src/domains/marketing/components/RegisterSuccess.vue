@@ -62,6 +62,14 @@ const goToLogin = () => {
 
 <style scoped>
 .register-success {
+  --p-primary-color: var(--mkt-accent);
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: var(--mkt-accent-strong);
+  --p-primary-active-color: var(--mkt-accent-strong);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
@@ -70,6 +78,14 @@ const goToLogin = () => {
   background: white;
   box-shadow: var(--mkt-shadow);
   color: var(--mkt-light-text);
+  color-scheme: light;
+}
+
+@media (max-width: 400px) {
+  .register-success {
+    padding: 1rem 0.85rem;
+    border-radius: 1rem;
+  }
 }
 
 .register-success__icon {

@@ -369,6 +369,63 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
 
 <style scoped>
 .register-form {
+  /* Force a light PrimeVue island when the app root is .app-dark */
+  --p-content-background: #ffffff;
+  --p-content-hover-background: #f1f5f9;
+  --p-content-border-color: #e2e8f0;
+  --p-content-color: #0f172a;
+  --p-text-color: #0f172a;
+  --p-text-muted-color: #64748b;
+  --p-text-hover-color: #1e293b;
+  --p-form-field-background: #ffffff;
+  --p-form-field-disabled-background: #e2e8f0;
+  --p-form-field-filled-background: #f8fafc;
+  --p-form-field-filled-hover-background: #f8fafc;
+  --p-form-field-filled-focus-background: #f8fafc;
+  --p-form-field-border-color: #cbd5e1;
+  --p-form-field-hover-border-color: #94a3b8;
+  --p-form-field-color: #0f172a;
+  --p-form-field-placeholder-color: #94a3b8;
+  --p-form-field-icon-color: #94a3b8;
+  --p-primary-color: var(--mkt-accent);
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: var(--mkt-accent-strong);
+  --p-primary-active-color: var(--mkt-accent-strong);
+  --p-surface-0: #ffffff;
+  --p-surface-50: #f8fafc;
+  --p-surface-100: #f1f5f9;
+  --p-surface-200: #e2e8f0;
+  --p-surface-300: #cbd5e1;
+  --p-surface-400: #94a3b8;
+  --p-surface-500: #64748b;
+  --p-surface-600: #475569;
+  --p-surface-700: #334155;
+  --p-surface-800: #1e293b;
+  --p-surface-900: #0f172a;
+  --p-button-secondary-background: #f1f5f9;
+  --p-button-secondary-hover-background: #e2e8f0;
+  --p-button-secondary-active-background: #cbd5e1;
+  --p-button-secondary-border-color: #e2e8f0;
+  --p-button-secondary-color: #334155;
+  --p-button-outlined-secondary-border-color: #cbd5e1;
+  --p-button-outlined-secondary-color: #334155;
+  --p-stepper-step-number-background: #ffffff;
+  --p-stepper-step-number-active-background: #ffffff;
+  --p-stepper-step-number-border-color: #cbd5e1;
+  --p-stepper-step-number-active-border-color: var(--mkt-accent);
+  --p-stepper-step-number-color: #64748b;
+  --p-stepper-step-number-active-color: var(--mkt-accent-strong);
+  --p-stepper-step-title-color: #64748b;
+  --p-stepper-step-title-active-color: var(--mkt-light-text);
+  --p-stepper-separator-background: #e2e8f0;
+  --p-stepper-separator-active-background: var(--mkt-accent);
+  --p-stepper-steppanel-background: transparent;
+  --p-stepper-steppanel-color: var(--mkt-light-text);
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
@@ -377,6 +434,7 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   background: white;
   box-shadow: var(--mkt-shadow);
   color: var(--mkt-light-text);
+  color-scheme: light;
 }
 
 .register-form__header h2 {
@@ -398,12 +456,14 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
 
 .register-form__badge {
   align-self: flex-start;
+  max-width: 100%;
   padding: 0.35rem 0.75rem;
   border-radius: var(--mkt-radius-pill);
   background: var(--mkt-accent-soft);
   color: var(--mkt-accent-strong);
   font-size: 0.82rem;
   font-weight: 700;
+  line-height: 1.35;
 }
 
 .register-form__optional {
@@ -418,15 +478,11 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   padding-top: 0.5rem;
 }
 
-.register-form :deep(.p-steppanels) {
-  overflow: hidden;
-  min-height: 14rem;
-}
-
 .register-form__field {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  min-width: 0;
 }
 
 .register-form__field label {
@@ -442,6 +498,7 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
 
 .register-form__actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.75rem;
 }
@@ -449,6 +506,121 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
 .register-form__footer a {
   color: var(--mkt-accent);
   font-weight: 700;
+}
+
+/* —— Stepper: light surface + animated header —— */
+.register-form :deep(.stepper-animated),
+.register-form :deep(.p-stepper) {
+  min-width: 0;
+  width: 100%;
+}
+
+.register-form :deep(.p-steplist) {
+  gap: 0.15rem;
+  overflow: hidden;
+}
+
+.register-form :deep(.p-step) {
+  min-width: 0;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+}
+
+.register-form :deep(.p-step-header) {
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.register-form :deep(.p-step-number) {
+  --step-size: 1.2rem;
+  flex-shrink: 0;
+  min-width: var(--step-size);
+  width: var(--step-size);
+  height: var(--step-size);
+  font-size: 0.68rem;
+  line-height: 1;
+  border-width: 1.5px;
+  transition:
+    min-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    font-size 280ms ease,
+    background-color 280ms ease,
+    border-color 280ms ease,
+    color 280ms ease,
+    box-shadow 280ms ease;
+}
+
+.register-form :deep(.p-step-active .p-step-number) {
+  --step-size: 2rem;
+  font-size: 0.92rem;
+  border-width: 2px;
+  background: var(--mkt-accent);
+  border-color: var(--mkt-accent);
+  color: #ffffff;
+  box-shadow: 0 6px 16px var(--mkt-accent-glow);
+}
+
+.register-form :deep(.p-step:has(~ .p-step-active) .p-step-number) {
+  background: var(--mkt-accent-soft);
+  border-color: var(--mkt-accent);
+  color: var(--mkt-accent-strong);
+}
+
+.register-form :deep(.p-step-title) {
+  max-width: 0;
+  opacity: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-4px);
+  transition:
+    max-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 240ms ease;
+}
+
+.register-form :deep(.p-step-active .p-step-title) {
+  max-width: 7.5rem;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  font-weight: 700;
+}
+
+.register-form :deep(.p-stepper-separator) {
+  min-width: 0.75rem;
+  align-self: center;
+}
+
+.register-form :deep(.p-steppanels) {
+  overflow: hidden;
+  min-height: 14rem;
+  padding: 0.5rem 0 0;
+  background: transparent;
+}
+
+.register-form :deep(.p-steppanel) {
+  background: transparent;
+  color: var(--mkt-light-text);
+}
+
+.register-form :deep(.p-inputtext),
+.register-form :deep(.p-password-input) {
+  background: #ffffff;
+  color: var(--mkt-light-text);
+  border-color: #cbd5e1;
+}
+
+.register-form :deep(.p-inputtext::placeholder),
+.register-form :deep(.p-password-input::placeholder) {
+  color: #94a3b8;
+}
+
+.register-form :deep(.p-password .p-password-toggle-mask-icon) {
+  color: #94a3b8;
 }
 
 .step-slide-forward-enter-active,
@@ -478,6 +650,50 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   transform: translateX(14px);
 }
 
+@media (max-width: 400px) {
+  .register-form {
+    padding: 1rem 0.85rem;
+    gap: 0.85rem;
+    border-radius: 1rem;
+  }
+
+  .register-form__header h2 {
+    font-size: 1.25rem;
+  }
+
+  .register-form__header p,
+  .register-form__footer {
+    font-size: 0.85rem;
+  }
+
+  .register-form__badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .register-form :deep(.p-step-active .p-step-number) {
+    --step-size: 1.75rem;
+    font-size: 0.85rem;
+  }
+
+  .register-form :deep(.p-step-active .p-step-title) {
+    max-width: 5.5rem;
+    font-size: 0.85rem;
+  }
+
+  .register-form :deep(.p-steppanels) {
+    min-height: 12.5rem;
+  }
+
+  .register-form__actions {
+    justify-content: stretch;
+  }
+
+  .register-form__actions :deep(.p-button) {
+    flex: 1 1 auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .step-slide-forward-enter-active,
   .step-slide-forward-leave-active,
@@ -491,6 +707,11 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   .step-slide-back-enter-from,
   .step-slide-back-leave-to {
     transform: none;
+  }
+
+  .register-form :deep(.p-step-number),
+  .register-form :deep(.p-step-title) {
+    transition: none;
   }
 }
 </style>
