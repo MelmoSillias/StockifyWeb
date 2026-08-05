@@ -24,20 +24,34 @@ final class CreateTenantShopAdminService
     }
 
     /**
-     * @return array{user: User, temporary_password: string|null, user_provided_password: bool}
+     * @return array{user: User, temporary_password: string|null, user_provided_password: bool, membership_only: bool}
      */
-    public function create(Shop $shop, Uuid $tenantAccountId, string $adminEmail, string $accountName, ?string $password = null): array
-    {
-        $email = strtolower(trim($adminEmail));
-        if ('' === $email) {
-            throw new \InvalidArgumentException('Admin email is required.');
+    public function create(
+        Shop $shop,
+        Uuid $tenantAccountId,
+        ?string $adminEmail,
+        string $accountName,
+        ?string $password = null,
+        ?string $preferredUsername = null,
+        ?string $identityId = null,
+        ?string $firstName = null,
+        ?string $lastName = null,
+        ?string $phone = null,
+    ): array {
+        $email = self::normalizeEmail($adminEmail);
+
+        if (null !== $email) {
+            $existing = $this->userRepository->findByEmail($email);
+            if (null !== $existing) {
+                return $this->attachExistingTenantUser($existing, $shop, $tenantAccountId, $identityId);
+            }
         }
 
-        if (null !== $this->userRepository->findByEmail($email)) {
-            throw new \InvalidArgumentException('Admin email already registered.');
-        }
-
-        $username = $this->resolveUsername($email, $shop->getSlug());
+        $username = $this->resolveUsername(
+            $email,
+            $preferredUsername ?? $shop->getSlug().'-admin',
+            $shop->getSlug(),
+        );
         $userProvidedPassword = null !== $password && '' !== trim($password);
         if ($userProvidedPassword) {
             $plainPassword = trim($password);
@@ -48,16 +62,26 @@ final class CreateTenantShopAdminService
             $plainPassword = $this->passwordGenerator->generate()->plainValue();
         }
 
-        $nameParts = $this->splitAccountName($accountName);
+        $resolvedFirstName = null !== $firstName && '' !== trim($firstName) ? trim($firstName) : null;
+        $resolvedLastName = null !== $lastName && '' !== trim($lastName) ? trim($lastName) : null;
+        if (null === $resolvedFirstName || null === $resolvedLastName) {
+            $nameParts = $this->splitAccountName($accountName);
+            $resolvedFirstName ??= $nameParts['first'];
+            $resolvedLastName ??= $nameParts['last'];
+        }
 
-        $user = new User($email, $username, 'placeholder', $nameParts['first'], $nameParts['last']);
+        $user = new User($email, $username, 'placeholder', $resolvedFirstName, $resolvedLastName);
         $user->setPasswordHash($this->passwordHasher->hashPassword($user, $plainPassword));
+        if (null !== $phone && '' !== trim($phone)) {
+            $user->setPhone(trim($phone));
+        }
         $user->activate();
         if (!$userProvidedPassword) {
             $user->requirePasswordChange();
         }
         $user->assignToShop($shop->getId());
         $user->assignToTenantAccount($tenantAccountId);
+        $this->applyIdentityId($user, $identityId);
 
         $role = $this->roleRepository->findByCode('gerant');
         if (null === $role) {
@@ -75,13 +99,50 @@ final class CreateTenantShopAdminService
             'user' => $user,
             'temporary_password' => $userProvidedPassword ? null : $plainPassword,
             'user_provided_password' => $userProvidedPassword,
+            'membership_only' => false,
         ];
     }
 
-    private function resolveUsername(string $email, string $shopSlug): string
+    /**
+     * @return array{user: User, temporary_password: string|null, user_provided_password: bool, membership_only: bool}
+     */
+    private function attachExistingTenantUser(User $user, Shop $shop, Uuid $tenantAccountId, ?string $identityId = null): array
     {
-        $localPart = strtolower((string) strtok($email, '@'));
-        $base = preg_replace('/[^a-z0-9._-]/', '', $localPart) ?: $shopSlug.'-admin';
+        if ($user->isPlatformOwner()) {
+            throw new \InvalidArgumentException('Platform owner cannot be assigned as shop admin.');
+        }
+
+        $existingTenantId = $user->getTenantAccountId();
+        if (null !== $existingTenantId && !$existingTenantId->equals($tenantAccountId)) {
+            throw new \InvalidArgumentException('Admin email already registered.');
+        }
+
+        if (null === $existingTenantId) {
+            $user->assignToTenantAccount($tenantAccountId);
+        }
+
+        $makePrimary = [] === $user->getShopIds();
+        $user->addShopMembership($shop->getId(), $makePrimary);
+        $this->applyIdentityId($user, $identityId);
+        $this->userRepository->save($user);
+
+        return [
+            'user' => $user,
+            'temporary_password' => null,
+            'user_provided_password' => true,
+            'membership_only' => true,
+        ];
+    }
+
+    private function resolveUsername(?string $email, string $preferredUsername, string $shopSlug): string
+    {
+        if (null !== $email) {
+            $localPart = strtolower((string) strtok($email, '@'));
+            $base = preg_replace('/[^a-z0-9._-]/', '', $localPart) ?: $shopSlug.'-admin';
+        } else {
+            $base = preg_replace('/[^a-z0-9._-]/', '', strtolower($preferredUsername)) ?: $shopSlug.'-admin';
+        }
+
         $username = $base;
         $suffix = 1;
 
@@ -107,5 +168,29 @@ final class CreateTenantShopAdminService
             'first' => $parts[0],
             'last' => $parts[1] ?? 'Admin',
         ];
+    }
+
+    private static function normalizeEmail(?string $email): ?string
+    {
+        if (null === $email) {
+            return null;
+        }
+
+        $normalized = strtolower(trim($email));
+
+        return '' === $normalized ? null : $normalized;
+    }
+
+    private function applyIdentityId(User $user, ?string $identityId): void
+    {
+        if (null === $identityId || '' === trim($identityId)) {
+            return;
+        }
+
+        if (null !== $user->getIdentityId()) {
+            return;
+        }
+
+        $user->setIdentityId(Uuid::fromString(trim($identityId)));
     }
 }

@@ -2,62 +2,57 @@
 
 namespace App\Tests\Shop;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\IdentityAccess\Domain\Entity\User;
+use App\Shop\Domain\Entity\Shop;
+use App\Tests\ApiTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 
-final class ShopIsolationTest extends WebTestCase
+final class ShopIsolationTest extends ApiTestCase
 {
     public function testOwnerRequiresShopHeaderForBusinessEndpoints(): void
     {
+        $this->initializeTestSchema();
         $client = static::createClient();
-        $token = $this->login($client, 'owner@stockify.local', 'Demo123!');
+        $this->createShopAndPromoteAdmin();
+        $headers = $this->authenticateAdmin($client);
 
-        $client->request('GET', '/api/products', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
-        ]);
+        $client->request('GET', '/api/products', [], [], $headers);
 
         self::assertResponseStatusCodeSame(400);
     }
 
     public function testOwnerCanAccessShopScopedProductsWithHeader(): void
     {
+        $this->initializeTestSchema();
         $client = static::createClient();
-        $token = $this->login($client, 'owner@stockify.local', 'Demo123!');
-        $shopId = $this->fetchDefaultShopId($client, $token);
+        $shopId = $this->createShopAndPromoteAdmin();
+        $headers = $this->authenticateAdmin($client);
+        $headers['HTTP_X-Shop-Id'] = $shopId;
 
-        $client->request('GET', '/api/products', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
-            'HTTP_X_SHOP_ID' => $shopId,
-        ]);
+        $client->request('GET', '/api/products', [], [], $headers);
 
         self::assertResponseIsSuccessful();
     }
 
-    private function login($client, string $email, string $password): string
+    private function createShopAndPromoteAdmin(): string
     {
-        $client->request(
-            'POST',
-            '/api/login_check',
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            json_encode(['identifier' => $email, 'password' => $password], JSON_THROW_ON_ERROR),
-        );
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get('doctrine')->getManager();
 
-        self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $shop = $em->getRepository(Shop::class)->findOneBy(['slug' => 'isolation-shop']);
+        if (null === $shop) {
+            $shop = new Shop('Isolation Shop', 'isolation-shop');
+            $em->persist($shop);
+        }
 
-        return $payload['token'];
-    }
+        $admin = $em->getRepository(User::class)->findOneBy(['email' => 'admin-test@stockify.local']);
+        self::assertInstanceOf(User::class, $admin);
+        if (!$admin->isPlatformOwner()) {
+            $admin->promoteToPlatformOwner();
+        }
 
-    private function fetchDefaultShopId($client, string $token): string
-    {
-        $client->request('GET', '/api/me/shops', [], [], [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
-        ]);
+        $em->flush();
 
-        self::assertResponseIsSuccessful();
-        $payload = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
-        return $payload['data'][0]['id'];
+        return (string) $shop->getId();
     }
 }

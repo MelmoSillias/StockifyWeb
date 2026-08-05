@@ -37,12 +37,28 @@ Shop(s)
 | GET | `/capabilities` | JWT — capacités supportées |
 | POST | `/accounts` | JWT — provision idempotent |
 | GET | `/accounts/{id}` | JWT — état tenant |
-| PATCH | `/accounts/{id}/entitlements` | JWT — sync entitlements |
+| PATCH | `/accounts/{id}/entitlements` | JWT — sync entitlements (push CP → DP) |
 | POST | `/accounts/{id}/suspend` | JWT — suspension |
 | POST | `/accounts/{id}/activate` | JWT — réactivation |
-| DELETE | `/accounts/{id}` | JWT — suppression (si pas de shops) |
+| DELETE | `/accounts/{id}` | JWT — `?mode=guard` (défaut, refuse si shops) ou `?mode=purge` (hard delete, flag `TENANT_PURGE_ENABLED`) |
 | GET | `/accounts/{id}/usage` | JWT — shops/users count |
-| POST | `/accounts/{id}/shops` | JWT — créer boutique |
+| POST | `/accounts/{id}/shops` | JWT — créer boutique (Idempotency-Key + reprise même slug sous le tenant) |
+| POST | `/accounts/{id}/users/invite` | JWT — invite / membership |
+
+Voir aussi [identity-v1.md](identity-v1.md) pour l'authentification globale (Gap C).
+
+## Résilience des entitlements (pull de secours)
+
+Le Control Plane pousse le snapshot via `PATCH …/entitlements`. En complément, le Data Plane tire un snapshot à jour depuis le CP quand `TenantAccount.last_synced_at` est trop ancien (`ENTITLEMENT_STALE_AFTER_SECONDS`, défaut 86400).
+
+- Déclenchement : `TenantFeatureGuard` avant quota/feature, et commande `integration:pull-stale-entitlements`
+- Endpoint CP : `POST {CONTROL_PLANE_BASE_URL}/api/integration/v1/accounts/{accountId}/entitlements/pull` (HMAC `X-Integration-Signature`)
+- Panne CP : le dernier snapshot local est conservé (fail-open sur features déjà accordées, fail-closed sur features absentes du snapshot)
+
+## Suppression
+
+- **guard** (défaut) : 204 si aucune boutique, 409 sinon.
+- **purge** : nécessite `TENANT_PURGE_ENABLED=1`. Supprime données métier, users, shops, puis `TenantAccount`. Répond **202** avec `deletion_receipt`.
 
 ## Suspension
 

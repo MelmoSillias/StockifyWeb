@@ -33,6 +33,12 @@ final class LocalSignupProvisioner
         string $adminEmail,
         ?string $adminPassword,
         array $entitlements,
+        ?string $identityId = null,
+        ?string $adminFirstName = null,
+        ?string $adminLastName = null,
+        ?string $adminPhone = null,
+        ?string $shopPhone = null,
+        ?string $shopAddress = null,
     ): CreateTenantShopResult {
         $this->provisionAccountHandler->handle(new ProvisionAccountCommand(
             externalAccountId: $externalAccountId,
@@ -44,8 +50,14 @@ final class LocalSignupProvisioner
             externalAccountId: $externalAccountId,
             name: $accountName,
             slug: $accountSlug,
+            address: $shopAddress,
+            phone: $shopPhone,
             adminEmail: $adminEmail,
             adminPassword: $adminPassword,
+            identityId: $identityId,
+            adminFirstName: $adminFirstName,
+            adminLastName: $adminLastName,
+            adminPhone: $adminPhone,
         ));
 
         $this->shopRepository->save($result->shop);

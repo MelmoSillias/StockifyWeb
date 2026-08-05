@@ -16,6 +16,7 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="KERNEL_CLASS" value="App\Kernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
+        <env name="TENANT_PURGE_ENABLED" value="0" />
     </php>
 
     <testsuites>

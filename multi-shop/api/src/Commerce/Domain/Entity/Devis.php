@@ -6,6 +6,8 @@ use App\Commerce\Domain\Enum\CommerceLineType;
 use App\Commerce\Domain\Enum\DevisStatus;
 use App\Commerce\Domain\ValueObject\Acheteur;
 use App\Commerce\Infrastructure\Persistence\Doctrine\DoctrineDevisRepository;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\TimestampableTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,10 +18,11 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DoctrineDevisRepository::class)]
 #[ORM\Table(name: 'devis')]
-class Devis
+class Devis implements ShopScopedInterface
 {
     use UuidEntityTrait;
     use TimestampableTrait;
+    use ShopScopedTrait;
 
     #[ORM\Column(length: 30, unique: true)]
     private string $reference;

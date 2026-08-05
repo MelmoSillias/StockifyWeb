@@ -61,8 +61,15 @@ final class IntegrationJwtTestHelper
         ];
     }
 
-    public static function createToken(): string
-    {
+    public const ISSUER = 'sim-saas-admin';
+    public const AUDIENCE = 'stockify';
+    public const SCOPES = 'integration:read integration:write';
+
+    public static function createToken(
+        string $issuer = self::ISSUER,
+        string $audience = self::AUDIENCE,
+        string $scopes = self::SCOPES,
+    ): string {
         $keys = self::ensureKeyPair();
         $configuration = Configuration::forAsymmetricSigner(
             new Sha256(),
@@ -72,20 +79,23 @@ final class IntegrationJwtTestHelper
 
         $now = new \DateTimeImmutable();
         $token = $configuration->builder()
+            ->issuedBy($issuer)
+            ->permittedFor($audience)
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now)
             ->expiresAt($now->modify('+1 hour'))
             ->relatedTo('integration-control-plane')
+            ->withClaim('scope', $scopes)
             ->getToken($configuration->signer(), $configuration->signingKey());
 
         return $token->toString();
     }
 
     /** @return array<string, string> */
-    public static function authHeaders(?string $idempotencyKey = null): array
+    public static function authHeaders(?string $idempotencyKey = null, ?string $token = null): array
     {
         $headers = [
-            'HTTP_AUTHORIZATION' => 'Bearer '.self::createToken(),
+            'HTTP_AUTHORIZATION' => 'Bearer '.($token ?? self::createToken()),
             'CONTENT_TYPE' => 'application/json',
         ];
 

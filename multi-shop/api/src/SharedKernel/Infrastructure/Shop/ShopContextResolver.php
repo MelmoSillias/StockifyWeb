@@ -29,11 +29,8 @@ final class ShopContextResolver
             return new ShopContext($shop->getId(), $shop->getName(), $shop->getSlug());
         }
 
-        if (null !== $user->getTenantAccountId() && null !== $shop->getTenantAccountId()
-            && $user->getTenantAccountId()->equals($shop->getTenantAccountId())) {
-            return new ShopContext($shop->getId(), $shop->getName(), $shop->getSlug());
-        }
-
+        // Access is membership-based only. tenant_account_id is used for
+        // suspension / entitlements, not for blanket shop access.
         if (!$user->belongsToShop($shopId)) {
             throw new AccessDeniedHttpException('Access denied for this shop.');
         }

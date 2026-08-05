@@ -20,5 +20,7 @@ interface UserRepositoryInterface
 
     public function findById(Uuid $id): ?User;
 
+    public function findByIdentityId(Uuid $identityId): ?User;
+
     public function save(User $user, bool $flush = true): void;
 }

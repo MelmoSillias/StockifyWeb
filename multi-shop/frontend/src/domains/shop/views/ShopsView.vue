@@ -6,6 +6,7 @@
           title="Boutiques"
           :count-label="`${items.length} boutique(s)`"
           create-label="Nouvelle boutique"
+          :show-create="canManageShops"
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
@@ -78,6 +79,7 @@ import Tag from 'primevue/tag'
 import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu.vue'
 import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { shopService } from '@/domains/shop/services/shopService'
 import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 import { useShopStore } from '@/domains/shop/stores/shop'
@@ -85,6 +87,8 @@ import { useShopStore } from '@/domains/shop/stores/shop'
 const router = useRouter()
 const toast = useToast()
 const shopStore = useShopStore()
+const { hasPermission } = usePermissions()
+const canManageShops = computed(() => hasPermission('platform.shops.manage'))
 
 const items = ref([])
 const loading = ref(false)
@@ -213,19 +217,22 @@ const rowActions = (shop) => [
   {
     label: 'Utilisateurs',
     icon: 'pi pi-users',
-    command: () => router.push({ name: 'admin-shop-users', params: { id: shop.id } })
+    command: () => router.push({ name: 'admin-shop-users', params: { id: shop.id } }),
+    visible: hasPermission('platform.shop_users.manage')
   },
   {
     label: 'Modifier',
     icon: 'pi pi-pencil',
-    command: () => openEdit(shop)
+    command: () => openEdit(shop),
+    visible: canManageShops.value
   },
   {
     label: 'Désactiver',
     icon: 'pi pi-trash',
-    command: () => remove(shop)
+    command: () => remove(shop),
+    visible: canManageShops.value
   }
-]
+].filter((action) => action.visible !== false)
 
 onMounted(load)
 </script>

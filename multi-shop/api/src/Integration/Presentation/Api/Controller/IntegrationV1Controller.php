@@ -24,9 +24,11 @@ use App\Integration\Application\Service\UsageWebhookDispatcher;
 use App\Integration\Domain\Entity\TenantAccount;
 use App\Integration\Domain\Repository\TenantAccountRepositoryInterface;
 use App\Integration\Security\IntegrationJwtValidator;
+use App\Integration\Security\IntegrationTokenClaims;
 use App\Shop\Domain\Entity\Shop;
 use App\Shop\Domain\Repository\ShopRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,12 +65,14 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/capabilities', name: 'integration_v1_capabilities', methods: ['GET'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_READ)]
     public function capabilities(): JsonResponse
     {
         return $this->json(['data' => $this->capabilitiesProvider->getCapabilities()]);
     }
 
     #[Route('/accounts', name: 'integration_v1_accounts_create', methods: ['POST'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function provisionAccount(Request $request): JsonResponse
     {
         $startedAt = microtime(true);
@@ -110,6 +114,7 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}', name: 'integration_v1_accounts_get', methods: ['GET'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_READ)]
     public function getAccount(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);
@@ -129,6 +134,7 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}/entitlements', name: 'integration_v1_accounts_entitlements', methods: ['PATCH'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function updateEntitlements(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);
@@ -151,6 +157,7 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}/suspend', name: 'integration_v1_accounts_suspend', methods: ['POST'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function suspendAccount(string $externalAccountId, Request $request): JsonResponse
     {
         return $this->mutateAccount(
@@ -161,6 +168,7 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}/activate', name: 'integration_v1_accounts_activate', methods: ['POST'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function activateAccount(string $externalAccountId, Request $request): JsonResponse
     {
         return $this->mutateAccount(
@@ -171,28 +179,44 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}', name: 'integration_v1_accounts_delete', methods: ['DELETE'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function deleteAccount(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);
+        $mode = (string) $request->query->get('mode', DeleteAccountCommand::MODE_GUARD);
         $log = $this->requestLogger->start($request->getMethod(), $request->getPathInfo(), $externalAccountId);
 
         try {
-            $this->deleteAccountHandler->handle(new DeleteAccountCommand($externalAccountId));
+            $result = $this->deleteAccountHandler->handle(new DeleteAccountCommand($externalAccountId, $mode));
+            if (Response::HTTP_ACCEPTED === $result->statusCode) {
+                $payload = ['deletion_receipt' => $result->deletionReceipt];
+                $this->requestLogger->complete($log, Response::HTTP_ACCEPTED, $payload, $this->durationMs($startedAt));
+
+                return $this->json($payload, Response::HTTP_ACCEPTED);
+            }
+
             $this->requestLogger->complete($log, Response::HTTP_NO_CONTENT, null, $this->durationMs($startedAt));
 
             return $this->json(null, Response::HTTP_NO_CONTENT);
         } catch (\InvalidArgumentException $exception) {
-            $this->requestLogger->complete($log, Response::HTTP_NOT_FOUND, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
+            $status = str_contains(strtolower($exception->getMessage()), 'not found')
+                ? Response::HTTP_NOT_FOUND
+                : Response::HTTP_BAD_REQUEST;
+            $this->requestLogger->complete($log, $status, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
 
-            return $this->json(['error' => $exception->getMessage()], Response::HTTP_NOT_FOUND);
+            return $this->json(['error' => $exception->getMessage()], $status);
         } catch (\DomainException $exception) {
-            $this->requestLogger->complete($log, Response::HTTP_CONFLICT, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
+            $status = str_contains(strtolower($exception->getMessage()), 'disabled')
+                ? Response::HTTP_FORBIDDEN
+                : Response::HTTP_CONFLICT;
+            $this->requestLogger->complete($log, $status, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
 
-            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
+            return $this->json(['error' => $exception->getMessage()], $status);
         }
     }
 
     #[Route('/accounts/{externalAccountId}/usage', name: 'integration_v1_accounts_usage', methods: ['GET'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_READ)]
     public function getUsage(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);
@@ -211,11 +235,30 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}/shops', name: 'integration_v1_accounts_shops_create', methods: ['POST'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function createShop(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);
         $payload = $this->decodePayload($request);
-        $log = $this->requestLogger->start($request->getMethod(), $request->getPathInfo(), $externalAccountId, null, $payload);
+        $idempotencyKey = $request->headers->get('Idempotency-Key');
+
+        if (null !== $idempotencyKey && '' !== trim($idempotencyKey)) {
+            $cached = $this->requestLogger->findIdempotentResponse($idempotencyKey);
+            if (null !== $cached) {
+                return $this->json(
+                    ['data' => $cached->getResponseBody()],
+                    $cached->getResponseStatus() ?? Response::HTTP_OK,
+                );
+            }
+        }
+
+        $log = $this->requestLogger->start(
+            method: $request->getMethod(),
+            path: $request->getPathInfo(),
+            externalAccountId: $externalAccountId,
+            idempotencyKey: $idempotencyKey,
+            requestSummary: $payload,
+        );
 
         try {
             $result = $this->createTenantShopHandler->handle(
@@ -223,9 +266,10 @@ final class IntegrationV1Controller extends AbstractController
             );
             $this->shopRepository->save($result->shop);
             $data = $this->serializeShop($result->shop);
-            if (null !== $result->adminEmail) {
+            if (null !== $result->adminEmail || null !== $result->adminUsername) {
                 $data['admin'] = [
                     'email' => $result->adminEmail,
+                    'username' => $result->adminUsername,
                 ];
                 if (null !== $result->temporaryPassword) {
                     $data['admin']['temporary_password'] = $result->temporaryPassword;
@@ -251,6 +295,7 @@ final class IntegrationV1Controller extends AbstractController
     }
 
     #[Route('/accounts/{externalAccountId}/users/invite', name: 'integration_v1_accounts_users_invite', methods: ['POST'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
     public function inviteUser(string $externalAccountId, Request $request): JsonResponse
     {
         $startedAt = microtime(true);

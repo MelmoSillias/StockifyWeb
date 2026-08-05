@@ -6,6 +6,8 @@ use App\Commerce\Domain\Enum\CommandeStatus;
 use App\Commerce\Domain\Enum\CommerceLineType;
 use App\Commerce\Domain\ValueObject\Acheteur;
 use App\Commerce\Infrastructure\Persistence\Doctrine\DoctrineCommandeRepository;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\TimestampableTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,10 +18,11 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DoctrineCommandeRepository::class)]
 #[ORM\Table(name: 'commandes')]
-class Commande
+class Commande implements ShopScopedInterface
 {
     use UuidEntityTrait;
     use TimestampableTrait;
+    use ShopScopedTrait;
 
     #[ORM\Column(length: 30, unique: true)]
     private string $reference;

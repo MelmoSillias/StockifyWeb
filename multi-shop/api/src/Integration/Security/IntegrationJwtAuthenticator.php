@@ -44,14 +44,18 @@ final class IntegrationJwtAuthenticator extends AbstractAuthenticator
         }
 
         try {
-            $this->jwtValidator->validate($token);
+            $claims = $this->jwtValidator->validate($token);
         } catch (\InvalidArgumentException $exception) {
             throw new CustomUserMessageAuthenticationException('Invalid integration token.');
         } catch (\RuntimeException $exception) {
             throw new CustomUserMessageAuthenticationException($exception->getMessage());
         }
 
-        return new SelfValidatingPassport(new UserBadge('integration', fn () => new IntegrationUser()));
+        $identifier = '' !== $claims->subject ? $claims->subject : 'integration-control-plane';
+
+        return new SelfValidatingPassport(
+            new UserBadge($identifier, fn () => new IntegrationUser($identifier, $claims->toRoles())),
+        );
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

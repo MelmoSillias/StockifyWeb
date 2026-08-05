@@ -9,14 +9,19 @@ import {
 } from '@/domains/home/config/dashboardWidgets'
 
 export function useDashboardWidgets() {
-  const { hasPermission } = usePermissions()
+  const { hasPermission, hasFeature } = usePermissions()
 
-  const filterByPermission = (items) => items.filter((item) => hasPermission(item.permission))
+  const canAccessWidget = (item) => (
+    hasPermission(item.permission)
+    && (!item.feature || hasFeature(item.feature))
+  )
 
-  const visibleKpis = computed(() => filterByPermission(DASHBOARD_KPI_DEFINITIONS))
-  const visibleSlides = computed(() => filterByPermission(DASHBOARD_CAROUSEL_SLIDE_DEFINITIONS))
-  const visibleQuickActions = computed(() => filterByPermission(DASHBOARD_QUICK_ACTIONS))
-  const visibleFinanceWidgets = computed(() => filterByPermission(DASHBOARD_FINANCE_WIDGETS))
+  const filterByAccess = (items) => items.filter((item) => canAccessWidget(item))
+
+  const visibleKpis = computed(() => filterByAccess(DASHBOARD_KPI_DEFINITIONS))
+  const visibleSlides = computed(() => filterByAccess(DASHBOARD_CAROUSEL_SLIDE_DEFINITIONS))
+  const visibleQuickActions = computed(() => filterByAccess(DASHBOARD_QUICK_ACTIONS))
+  const visibleFinanceWidgets = computed(() => filterByAccess(DASHBOARD_FINANCE_WIDGETS))
 
   const showKpiGrid = computed(() => visibleKpis.value.length > 0)
   const showCarousel = computed(() => visibleSlides.value.length > 0)

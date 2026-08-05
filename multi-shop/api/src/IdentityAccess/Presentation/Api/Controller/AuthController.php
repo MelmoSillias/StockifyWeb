@@ -2,6 +2,9 @@
 
 namespace App\IdentityAccess\Presentation\Api\Controller;
 
+use App\IdentityAccess\Application\Service\GlobalAuthDisabledException;
+use App\IdentityAccess\Application\Service\GlobalAuthFailedException;
+use App\IdentityAccess\Application\Service\GlobalAuthService;
 use App\IdentityAccess\Application\Service\RefreshTokenService;
 use App\IdentityAccess\Application\Service\RegisterUserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +20,7 @@ final class AuthController extends AbstractController
     public function __construct(
         private readonly RegisterUserService $registerUserService,
         private readonly RefreshTokenService $refreshTokenService,
+        private readonly GlobalAuthService $globalAuthService,
     ) {
     }
 
@@ -63,5 +67,33 @@ final class AuthController extends AbstractController
         }
 
         return $this->json($tokens);
+    }
+
+    #[Route('/auth/global', name: 'api_auth_global', methods: ['POST'])]
+    public function globalLogin(Request $request): JsonResponse
+    {
+        $data = $request->toArray();
+        $email = isset($data['email']) ? (string) $data['email'] : '';
+        $password = isset($data['password']) ? (string) $data['password'] : '';
+
+        if ('' === trim($email) || '' === $password) {
+            return $this->json(['error' => 'email and password are required.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $result = $this->globalAuthService->authenticate(
+                $email,
+                $password,
+                (string) ($data['application'] ?? 'stockify'),
+            );
+        } catch (GlobalAuthDisabledException) {
+            return $this->json(['error' => 'Global identity authentication is disabled.'], Response::HTTP_NOT_FOUND);
+        } catch (GlobalAuthFailedException $exception) {
+            $status = $exception->getCode() >= 400 ? $exception->getCode() : Response::HTTP_UNAUTHORIZED;
+
+            return $this->json(['error' => $exception->getMessage()], $status);
+        }
+
+        return $this->json($result);
     }
 }

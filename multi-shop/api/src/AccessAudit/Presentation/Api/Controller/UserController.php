@@ -52,15 +52,19 @@ final class UserController extends AbstractController
             return $this->json(['error' => 'Corps JSON invalide.'], Response::HTTP_BAD_REQUEST);
         }
 
-        foreach (['email', 'username', 'password', 'first_name', 'last_name'] as $field) {
+        foreach (['username', 'password', 'first_name', 'last_name'] as $field) {
             if (empty($data[$field])) {
                 return $this->json(['error' => sprintf('Le champ %s est requis.', $field)], Response::HTTP_BAD_REQUEST);
             }
         }
 
+        $email = isset($data['email']) && '' !== trim((string) $data['email'])
+            ? (string) $data['email']
+            : null;
+
         try {
             $user = $this->userManagementService->createUser(
-                (string) $data['email'],
+                $email,
                 (string) $data['username'],
                 (string) $data['password'],
                 (string) $data['first_name'],

@@ -11,6 +11,9 @@ interface TenantAccountRepositoryInterface
 
     public function findByExternalAccountId(string $externalAccountId): ?TenantAccount;
 
+    /** @return list<TenantAccount> */
+    public function findAllOrdered(): array;
+
     public function save(TenantAccount $account, bool $flush = true): void;
 
     public function remove(TenantAccount $account, bool $flush = true): void;

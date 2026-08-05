@@ -1,17 +1,31 @@
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import { useAuthStore } from '@/domains/auth/stores/auth'
+import { useShopStore } from '@/domains/shop/stores/shop'
 
 export function usePermissions() {
   const authStore = useAuthStore()
+  const shopStore = useShopStore()
+  const { activeShopId } = storeToRefs(shopStore)
 
   const permissions = computed(() => authStore.permissions)
+  const features = computed(() => authStore.features)
 
   const hasPermission = (permission) => authStore.hasPermission(permission)
 
   const hasAnyPermission = (...codes) => authStore.hasAnyPermission(...codes)
 
+  const hasFeature = (feature) => authStore.hasFeature(feature)
+
   const canAccessMenuItem = (item) => {
+    // Touch activeShopId so nav recomputes when the shop (and its features) changes.
+    void activeShopId.value
+
+    if (item?.requiredFeature && !authStore.hasFeature(item.requiredFeature)) {
+      return false
+    }
+
     if (!item?.requiredPermission) {
       return true
     }
@@ -42,8 +56,10 @@ export function usePermissions() {
 
   return {
     permissions,
+    features,
     hasPermission,
     hasAnyPermission,
+    hasFeature,
     canAccessMenuItem,
     filterNavigationItems
   }

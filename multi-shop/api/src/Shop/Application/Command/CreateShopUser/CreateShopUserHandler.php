@@ -5,7 +5,6 @@ namespace App\Shop\Application\Command\CreateShopUser;
 use App\AccessAudit\Application\Service\UserManagementService;
 use App\IdentityAccess\Domain\Entity\User;
 use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
-use App\Shop\Application\Service\ShopEmailGenerator;
 use App\Shop\Application\Service\ShopPasswordGenerator;
 use App\Shop\Domain\Repository\ShopRepositoryInterface;
 use App\Shop\Domain\ValueObject\ShopUsername;
@@ -16,7 +15,6 @@ final class CreateShopUserHandler
         private readonly ShopRepositoryInterface $shopRepository,
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserManagementService $userManagementService,
-        private readonly ShopEmailGenerator $emailGenerator,
         private readonly ShopPasswordGenerator $passwordGenerator,
     ) {
     }
@@ -37,15 +35,10 @@ final class CreateShopUserHandler
             throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé dans cette boutique.');
         }
 
-        $email = $this->emailGenerator->generate($username, $shop)->value();
-        if (null !== $this->userRepository->findByEmail($email)) {
-            throw new \InvalidArgumentException('Cet email est déjà utilisé.');
-        }
-
         $generatedPassword = $this->passwordGenerator->generate();
 
         $user = $this->userManagementService->createUser(
-            email: $email,
+            email: null,
             username: $username,
             password: $generatedPassword->plainValue(),
             firstName: trim($command->firstName),
@@ -54,6 +47,10 @@ final class CreateShopUserHandler
         );
 
         $user->assignToShop($shop->getId());
+        $tenantAccountId = $shop->getTenantAccountId();
+        if (null !== $tenantAccountId && null === $user->getTenantAccountId()) {
+            $user->assignToTenantAccount($tenantAccountId);
+        }
         $this->userRepository->save($user);
 
         return [

@@ -26,8 +26,8 @@ final class PublicSignupController extends AbstractController
             return $this->json(['error' => 'Invalid JSON body'], Response::HTTP_BAD_REQUEST);
         }
 
-        foreach (['accountName', 'accountSlug'] as $field) {
-            if (empty($data[$field])) {
+        foreach (['firstName', 'lastName', 'accountName', 'accountSlug'] as $field) {
+            if (empty($data[$field]) || (is_string($data[$field]) && '' === trim($data[$field]))) {
                 return $this->json(['error' => sprintf('Field "%s" is required.', $field)], Response::HTTP_BAD_REQUEST);
             }
         }

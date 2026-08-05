@@ -28,6 +28,14 @@ class DoctrineTenantAccountRepository extends ServiceEntityRepository implements
         return $this->findOneBy(['externalAccountId' => trim($externalAccountId)]);
     }
 
+    public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(TenantAccount $account, bool $flush = true): void
     {
         $this->getEntityManager()->persist($account);

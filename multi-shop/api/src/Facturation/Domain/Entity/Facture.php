@@ -4,6 +4,8 @@ namespace App\Facturation\Domain\Entity;
 
 use App\Commerce\Domain\Enum\CommerceLineType;
 use App\Facturation\Infrastructure\Persistence\Doctrine\DoctrineFactureRepository;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -17,9 +19,10 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity(repositoryClass: DoctrineFactureRepository::class)]
 #[ORM\Table(name: 'factures')]
-class Facture
+class Facture implements ShopScopedInterface
 {
     use UuidEntityTrait;
+    use ShopScopedTrait;
 
     #[ORM\Column(length: 30, unique: true)]
     private string $numero;

@@ -108,6 +108,6 @@ final class ShopContextSubscriber implements EventSubscriberInterface
 
         /** @var ShopScopeFilter $filter */
         $filter = $filters->getFilter('shop_scope');
-        $filter->setParameter('shop_id', "'".$context->getShopId()->toRfc4122()."'");
+        $filter->setParameter('shop_id', bin2hex($context->getShopId()->toBinary()));
     }
 }

@@ -36,6 +36,45 @@ final class IntegrationApiTest extends ApiTestCase
         $this->assertSame('1.0', $payload['data']['version']);
     }
 
+    public function testTokenIssuedForAnotherAudienceIsRejected(): void
+    {
+        IntegrationJwtTestHelper::ensureKeyPair();
+        $this->initializeTestSchema();
+        $client = static::createClient();
+
+        $foreignToken = IntegrationJwtTestHelper::createToken(audience: 'dentalsoft');
+        $client->request('GET', '/integration/v1/capabilities', [], [], IntegrationJwtTestHelper::authHeaders(null, $foreignToken));
+        $this->assertResponseStatusCodeSame(401);
+    }
+
+    public function testTokenFromUnknownIssuerIsRejected(): void
+    {
+        IntegrationJwtTestHelper::ensureKeyPair();
+        $this->initializeTestSchema();
+        $client = static::createClient();
+
+        $foreignToken = IntegrationJwtTestHelper::createToken(issuer: 'rogue-control-plane');
+        $client->request('GET', '/integration/v1/capabilities', [], [], IntegrationJwtTestHelper::authHeaders(null, $foreignToken));
+        $this->assertResponseStatusCodeSame(401);
+    }
+
+    public function testReadOnlyTokenCannotProvisionAccounts(): void
+    {
+        IntegrationJwtTestHelper::ensureKeyPair();
+        $this->initializeTestSchema();
+        $client = static::createClient();
+
+        $readOnly = IntegrationJwtTestHelper::createToken(scopes: 'integration:read');
+
+        $client->request('GET', '/integration/v1/capabilities', [], [], IntegrationJwtTestHelper::authHeaders(null, $readOnly));
+        $this->assertResponseIsSuccessful();
+
+        $client->request('POST', '/integration/v1/accounts', [], [], IntegrationJwtTestHelper::authHeaders(null, $readOnly), json_encode([
+            'external_account_id' => 'scope-test',
+        ]));
+        $this->assertResponseStatusCodeSame(403);
+    }
+
     public function testProvisionAccountAndLifecycle(): void
     {
         IntegrationJwtTestHelper::ensureKeyPair();
@@ -103,6 +142,40 @@ final class IntegrationApiTest extends ApiTestCase
 
         $client->request('DELETE', '/integration/v1/accounts/unknown', [], [], IntegrationJwtTestHelper::authHeaders());
         $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testCreateShopIsIdempotentByKeyAndSlug(): void
+    {
+        IntegrationJwtTestHelper::ensureKeyPair();
+        $this->initializeTestSchema();
+        $client = static::createClient();
+
+        $client->request('POST', '/integration/v1/accounts', [], [], IntegrationJwtTestHelper::authHeaders('idem-shop-account'), json_encode([
+            'external_account_id' => 'idem-shop-corp',
+            'entitlements' => ['max_shops' => 5],
+        ]));
+        $this->assertResponseStatusCodeSame(201);
+
+        $headers = IntegrationJwtTestHelper::authHeaders('idem-shop-corp-initial-shop');
+        $payload = json_encode([
+            'name' => 'Idem Shop',
+            'slug' => 'idem-shop',
+            'admin_email' => 'admin@idem-shop.test',
+        ]);
+
+        $client->request('POST', '/integration/v1/accounts/idem-shop-corp/shops', [], [], $headers, $payload);
+        $this->assertResponseStatusCodeSame(201);
+        $first = json_decode($client->getResponse()->getContent(), true);
+
+        $client->request('POST', '/integration/v1/accounts/idem-shop-corp/shops', [], [], $headers, $payload);
+        $this->assertResponseStatusCodeSame(201);
+        $cached = json_decode($client->getResponse()->getContent(), true);
+        $this->assertSame($first['data']['id'], $cached['data']['id']);
+
+        $client->request('POST', '/integration/v1/accounts/idem-shop-corp/shops', [], [], IntegrationJwtTestHelper::authHeaders(), $payload);
+        $this->assertResponseStatusCodeSame(201);
+        $bySlug = json_decode($client->getResponse()->getContent(), true);
+        $this->assertSame($first['data']['id'], $bySlug['data']['id']);
     }
 
     private function assertShopAccessBlockedWhenTenantSuspended(KernelBrowser $client, string $shopId): void

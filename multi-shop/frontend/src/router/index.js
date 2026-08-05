@@ -48,7 +48,8 @@ const routes = [
           title: 'Analytics',
           section: 'Application',
           layoutKey: 'analytics',
-          permission: 'analytics.view'
+          permission: 'analytics.view',
+          feature: 'stockify.analytics'
         }
       },
       {
@@ -217,6 +218,28 @@ const routes = [
         }
       },
       {
+        path: 'shops',
+        name: 'admin-shops',
+        component: () => import('@/domains/shop/views/ShopsView.vue'),
+        meta: {
+          title: 'Boutiques',
+          section: 'Plateforme',
+          layoutKey: 'admin-shops',
+          permission: 'platform.shops.view'
+        }
+      },
+      {
+        path: 'shops/:id/users',
+        name: 'admin-shop-users',
+        component: () => import('@/domains/shop/views/ShopUsersView.vue'),
+        meta: {
+          title: 'Utilisateurs boutique',
+          section: 'Plateforme',
+          layoutKey: 'admin-shop-users',
+          permission: 'platform.shop_users.manage'
+        }
+      },
+      {
         path: 'access/users',
         name: 'access-users',
         component: () => import('@/domains/access/views/UsersView.vue'),
@@ -313,6 +336,10 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
+    return { name: routeConfig.homeRouteName }
+  }
+
+  if (to.meta.feature && !authStore.hasFeature(to.meta.feature)) {
     return { name: routeConfig.homeRouteName }
   }
 

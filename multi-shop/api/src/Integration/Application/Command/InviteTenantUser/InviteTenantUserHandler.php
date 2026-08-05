@@ -37,8 +37,8 @@ final readonly class InviteTenantUserResult
 {
     public function __construct(
         public string $userId,
-        public string $email,
-        public string $temporaryPassword,
+        public ?string $email,
+        public ?string $temporaryPassword,
     ) {
     }
 }
@@ -54,6 +54,10 @@ final class InviteTenantUserHandler
 
     public function handle(InviteTenantUserCommand $command): InviteTenantUserResult
     {
+        if ('' === trim($command->email)) {
+            throw new \InvalidArgumentException('Email is required to invite a user.');
+        }
+
         $account = $this->requireActiveAccount($command->externalAccountId);
         $shop = $this->resolveShop($account, $command->shopId);
 
@@ -67,7 +71,7 @@ final class InviteTenantUserHandler
         return new InviteTenantUserResult(
             (string) $result['user']->getId(),
             $result['user']->getEmail(),
-            $result['temporary_password'],
+            $result['temporary_password'] ?? '',
         );
     }
 

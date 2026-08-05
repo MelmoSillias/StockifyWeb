@@ -23,10 +23,12 @@ final class ShopScopeFilter extends SQLFilter
             return '';
         }
 
-        if ('' === $shopId) {
+        if ('' === $shopId || "''" === $shopId) {
             return '';
         }
 
-        return sprintf('%s.shop_id = %s', $targetTableAlias, $shopId);
+        // shop_id is stored as BINARY(16); comparing it to a hex literal requires
+        // UNHEX, otherwise the predicate silently matches nothing.
+        return sprintf('%s.shop_id = UNHEX(%s)', $targetTableAlias, $shopId);
     }
 }

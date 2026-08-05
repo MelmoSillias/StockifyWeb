@@ -17,7 +17,7 @@ const parseStoredUser = (value) => {
   }
 }
 
-const parseStoredPermissions = (value) => {
+const parseStoredList = (value) => {
   if (!value) {
     return []
   }
@@ -33,18 +33,20 @@ const parseStoredPermissions = (value) => {
 const createInitialState = () => ({
   accessToken: localStorage.getItem(storage.authTokenKey) || null,
   user: parseStoredUser(localStorage.getItem(storage.authUserKey)),
-  permissions: parseStoredPermissions(localStorage.getItem(storage.authPermissionsKey))
+  permissions: parseStoredList(localStorage.getItem(storage.authPermissionsKey)),
+  features: parseStoredList(localStorage.getItem(storage.authFeaturesKey))
 })
 
 const normalizeMePayload = (payload) => {
   if (!payload || typeof payload !== 'object') {
-    return { user: null, permissions: [], accessibleShops: [] }
+    return { user: null, permissions: [], features: [], accessibleShops: [] }
   }
 
   if (payload.user && typeof payload.user === 'object') {
     return {
       user: payload.user,
       permissions: Array.isArray(payload.permissions) ? payload.permissions : [],
+      features: Array.isArray(payload.features) ? payload.features : [],
       accessibleShops: Array.isArray(payload.accessible_shops) ? payload.accessible_shops : []
     }
   }
@@ -52,6 +54,7 @@ const normalizeMePayload = (payload) => {
   return {
     user: payload,
     permissions: Array.isArray(payload.permissions) ? payload.permissions : [],
+    features: Array.isArray(payload.features) ? payload.features : [],
     accessibleShops: Array.isArray(payload.accessible_shops) ? payload.accessible_shops : []
   }
 }
@@ -76,6 +79,34 @@ export const useAuthStore = defineStore('auth', {
       }
 
       return permissions.some((permission) => state.permissions.includes(permission))
+    },
+
+    /**
+     * Prefer the active shop's features (same source as TenantFeatureGuard).
+     * null features = shop without tenant → ungated.
+     * Fallback: user tenant features; no tenant_account_id → ungated.
+     */
+    hasFeature: (state) => (feature) => {
+      if (!feature) {
+        return true
+      }
+
+      const shopStore = useShopStore()
+      const activeShop = shopStore.activeShop
+
+      if (activeShop && Object.prototype.hasOwnProperty.call(activeShop, 'features')) {
+        if (activeShop.features === null) {
+          return true
+        }
+
+        return Array.isArray(activeShop.features) && activeShop.features.includes(feature)
+      }
+
+      if (!state.user?.tenant_account_id) {
+        return true
+      }
+
+      return state.features.includes(feature)
     }
   },
 
@@ -107,11 +138,18 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem(storage.authPermissionsKey, JSON.stringify(this.permissions))
     },
 
+    setFeatures(features) {
+      this.features = Array.isArray(features) ? features : []
+      localStorage.setItem(storage.authFeaturesKey, JSON.stringify(this.features))
+    },
+
     clearSession() {
       this.setAccessToken(null)
       this.setUser(null)
       this.setPermissions([])
+      this.setFeatures([])
       localStorage.removeItem(storage.authPermissionsKey)
+      localStorage.removeItem(storage.authFeaturesKey)
       useShopStore().clear()
     },
 
@@ -134,9 +172,10 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchCurrentUser() {
       const payload = await authService.me()
-      const { user, permissions, accessibleShops } = normalizeMePayload(payload)
+      const { user, permissions, features, accessibleShops } = normalizeMePayload(payload)
       this.setUser(user)
       this.setPermissions(permissions)
+      this.setFeatures(features)
       const shopStore = useShopStore()
       shopStore.setAccessibleShops(accessibleShops)
       shopStore.resolveActiveShopId(user)
@@ -152,6 +191,7 @@ export const useAuthStore = defineStore('auth', {
       if (!this.accessToken) {
         this.setUser(null)
         this.setPermissions([])
+        this.setFeatures([])
         return null
       }
 

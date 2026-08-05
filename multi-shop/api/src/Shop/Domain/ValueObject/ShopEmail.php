@@ -2,6 +2,9 @@
 
 namespace App\Shop\Domain\ValueObject;
 
+/**
+ * @deprecated Gap A — shop users no longer receive synthetic .local emails.
+ */
 final readonly class ShopEmail
 {
     private function __construct(

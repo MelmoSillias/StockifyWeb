@@ -47,7 +47,15 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
 
     public function findByShopId(Uuid $shopId): array
     {
-        return $this->findBy(['shopId' => $shopId], ['lastName' => 'ASC', 'firstName' => 'ASC']);
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.shopMemberships', 'm')
+            ->andWhere('u.shopId = :shopId OR m.shopId = :shopId')
+            ->setParameter('shopId', $shopId, 'uuid')
+            ->orderBy('u.lastName', 'ASC')
+            ->addOrderBy('u.firstName', 'ASC')
+            ->distinct()
+            ->getQuery()
+            ->getResult();
     }
 
     public function findPlatformOwner(): ?User
@@ -58,6 +66,11 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
     public function findById(Uuid $id): ?User
     {
         return $this->find($id);
+    }
+
+    public function findByIdentityId(Uuid $identityId): ?User
+    {
+        return $this->findOneBy(['identityId' => $identityId]);
     }
 
     public function loadUserByIdentifier(string $identifier): ?User

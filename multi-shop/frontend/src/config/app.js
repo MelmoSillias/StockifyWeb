@@ -45,7 +45,8 @@ export const appConfig = {
         label: 'Analytics',
         icon: 'pi pi-chart-bar',
         routeName: 'analytics',
-        requiredPermission: 'analytics.view'
+        requiredPermission: 'analytics.view',
+        requiredFeature: 'stockify.analytics'
       },
       {
         key: 'clients',
@@ -171,6 +172,13 @@ export const appConfig = {
         ]
       },
       {
+        key: 'shops',
+        label: 'Boutiques',
+        icon: 'pi pi-building',
+        routeName: 'admin-shops',
+        requiredPermission: 'platform.shops.view'
+      },
+      {
         key: 'access',
         label: 'Accès & Audit',
         icon: 'pi pi-shield',
@@ -224,6 +232,7 @@ export const appConfig = {
     authTokenKey: 'stockify-access-token',
     authUserKey: 'stockify-auth-user',
     authPermissionsKey: 'stockify-auth-permissions',
+    authFeaturesKey: 'stockify-auth-features',
     commerceCartKey: 'stockify-commerce-cart'
   },
   axios: {

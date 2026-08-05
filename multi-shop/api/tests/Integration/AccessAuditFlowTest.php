@@ -16,6 +16,8 @@ final class AccessAuditFlowTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $payload = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('permissions', $payload);
+        $this->assertArrayHasKey('features', $payload);
+        $this->assertIsArray($payload['features']);
         $this->assertContains('access.users.view', $payload['permissions']);
     }
 

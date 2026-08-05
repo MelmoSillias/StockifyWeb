@@ -115,8 +115,8 @@ const filteredItems = computed(() => {
 
   return items.value.filter((item) =>
     `${item.first_name} ${item.last_name}`.toLowerCase().includes(term)
-    || item.username.toLowerCase().includes(term)
-    || item.email.toLowerCase().includes(term)
+    || (item.username || '').toLowerCase().includes(term)
+    || (item.email || '').toLowerCase().includes(term)
   )
 })
 
@@ -132,16 +132,20 @@ const load = async () => {
   }
 }
 
+const STAFF_ROLE_CODES = ['caissier', 'magasinier', 'comptable', 'consultant', 'gerant']
+
 const loadRoles = async () => {
   const roles = await accessService.listRoles()
-  roleOptions.value = roles.map((role) => ({ code: role.code, label: role.label }))
+  roleOptions.value = roles
+    .filter((role) => STAFF_ROLE_CODES.includes(role.code))
+    .map((role) => ({ code: role.code, label: role.label }))
 }
 
 const openCreate = () => {
   form.username = ''
   form.first_name = ''
   form.last_name = ''
-  form.roles = ['gerant']
+  form.roles = ['caissier']
   dialogVisible.value = true
 }
 

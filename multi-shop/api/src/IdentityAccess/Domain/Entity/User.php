@@ -20,13 +20,19 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'uniq_user_shop_username', columns: ['shop_id', 'username'])]
+#[ORM\UniqueConstraint(name: 'uniq_user_identity_id', columns: ['identity_id'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use UuidEntityTrait;
     use TimestampableTrait;
 
-    #[ORM\Column(length: 180)]
-    private string $email;
+    private static string $authIdentifierMode = 'email';
+
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(name: 'legacy_email', length: 180, nullable: true)]
+    private ?string $legacyEmail = null;
 
     #[ORM\Column(length: 50)]
     private string $username;
@@ -39,6 +45,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 100)]
     private string $lastName;
+
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $phone = null;
 
     #[ORM\Column(enumType: UserStatus::class)]
     private UserStatus $status = UserStatus::Pending;
@@ -62,6 +71,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $tenantAccountId = null;
 
+    #[ORM\Column(name: 'identity_id', type: 'uuid', nullable: true)]
+    private ?Uuid $identityId = null;
+
     #[ORM\Column]
     private bool $mustChangePassword = false;
 
@@ -73,8 +85,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserPermission::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $userPermissions;
 
+    /** @var Collection<int, UserShopMembership> */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserShopMembership::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $shopMemberships;
+
     public function __construct(
-        string $email,
+        ?string $email,
         string $username,
         string $passwordHash,
         string $firstName,
@@ -82,29 +98,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     ) {
         $this->initializeUuid();
         $this->initializeTimestamps();
-        $this->email = strtolower($email);
+        $this->email = self::normalizeEmail($email);
         $this->username = strtolower($username);
         $this->passwordHash = $passwordHash;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->userRoles = new ArrayCollection();
         $this->userPermissions = new ArrayCollection();
+        $this->shopMemberships = new ArrayCollection();
     }
 
-    public function getEmail(): string
+    public static function setAuthIdentifierMode(string $mode): void
+    {
+        self::$authIdentifierMode = $mode;
+    }
+
+    public static function getAuthIdentifierMode(): string
+    {
+        return self::$authIdentifierMode;
+    }
+
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(?string $email): void
     {
-        $this->email = strtolower($email);
+        $this->email = self::normalizeEmail($email);
+        $this->touch();
+    }
+
+    public function getLegacyEmail(): ?string
+    {
+        return $this->legacyEmail;
+    }
+
+    public function setLegacyEmail(?string $legacyEmail): void
+    {
+        $this->legacyEmail = self::normalizeEmail($legacyEmail);
+        $this->touch();
+    }
+
+    /**
+     * Moves a synthetic .local address into legacy_email and clears email.
+     */
+    public function nullifySyntheticEmail(): void
+    {
+        if (null === $this->email || !str_ends_with($this->email, '.local')) {
+            return;
+        }
+
+        $this->legacyEmail = $this->email;
+        $this->email = null;
         $this->touch();
     }
 
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        if ('username' === self::$authIdentifierMode) {
+            return $this->username;
+        }
+
+        return $this->email ?? $this->username;
+    }
+
+    private static function normalizeEmail(?string $email): ?string
+    {
+        if (null === $email) {
+            return null;
+        }
+
+        $normalized = strtolower(trim($email));
+
+        return '' === $normalized ? null : $normalized;
     }
 
     public function getUsername(): string
@@ -165,6 +232,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): void
     {
         $this->lastName = $lastName;
+        $this->touch();
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): void
+    {
+        if (null === $phone) {
+            $this->phone = null;
+            $this->touch();
+
+            return;
+        }
+
+        $normalized = trim($phone);
+        $this->phone = '' === $normalized ? null : $normalized;
         $this->touch();
     }
 
@@ -243,7 +329,93 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->shopId = $shopId;
+        $this->addShopMembership($shopId, true);
         $this->touch();
+    }
+
+    /** @return Collection<int, UserShopMembership> */
+    public function getShopMemberships(): Collection
+    {
+        return $this->shopMemberships;
+    }
+
+    /** @return list<Uuid> */
+    public function getShopIds(): array
+    {
+        $ids = [];
+        foreach ($this->shopMemberships as $membership) {
+            $ids[$membership->getShopId()->toRfc4122()] = $membership->getShopId();
+        }
+
+        // The legacy column is still authoritative for users not yet backfilled.
+        if (null !== $this->shopId) {
+            $ids[$this->shopId->toRfc4122()] = $this->shopId;
+        }
+
+        return array_values($ids);
+    }
+
+    public function addShopMembership(Uuid $shopId, bool $primary = false): void
+    {
+        if ($this->isPlatformOwner) {
+            throw new \DomainException('Platform owner cannot be a member of a shop.');
+        }
+
+        foreach ($this->shopMemberships as $membership) {
+            if ($membership->getShopId()->equals($shopId)) {
+                if ($primary) {
+                    $this->makePrimary($membership);
+                }
+
+                return;
+            }
+        }
+
+        $membership = new UserShopMembership($this, $shopId, $primary);
+        $this->shopMemberships->add($membership);
+
+        if ($primary) {
+            $this->makePrimary($membership);
+        }
+
+        $this->touch();
+    }
+
+    public function removeShopMembership(Uuid $shopId): void
+    {
+        foreach ($this->shopMemberships as $membership) {
+            if (!$membership->getShopId()->equals($shopId)) {
+                continue;
+            }
+
+            $this->shopMemberships->removeElement($membership);
+
+            if (null !== $this->shopId && $this->shopId->equals($shopId)) {
+                $remaining = $this->shopMemberships->first();
+                $this->shopId = false !== $remaining ? $remaining->getShopId() : null;
+                if (false !== $remaining) {
+                    $remaining->markAsPrimary();
+                }
+            }
+
+            $this->touch();
+
+            return;
+        }
+    }
+
+    private function makePrimary(UserShopMembership $primary): void
+    {
+        foreach ($this->shopMemberships as $membership) {
+            if ($membership === $primary) {
+                $membership->markAsPrimary();
+                continue;
+            }
+
+            $membership->demoteFromPrimary();
+        }
+
+        $this->shopId = $primary->getShopId();
     }
 
     public function isPlatformOwner(): bool
@@ -255,6 +427,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->isPlatformOwner = true;
         $this->shopId = null;
+        $this->shopMemberships->clear();
         $roles = $this->roles;
         if (!in_array('ROLE_PLATFORM_OWNER', $roles, true)) {
             $roles[] = 'ROLE_PLATFORM_OWNER';
@@ -265,7 +438,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function belongsToShop(Uuid $shopId): bool
     {
-        return null !== $this->shopId && $this->shopId->equals($shopId);
+        if (null !== $this->shopId && $this->shopId->equals($shopId)) {
+            return true;
+        }
+
+        foreach ($this->shopMemberships as $membership) {
+            if ($membership->getShopId()->equals($shopId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getTenantAccountId(): ?Uuid
@@ -280,6 +463,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->tenantAccountId = $tenantAccountId;
+        $this->touch();
+    }
+
+    public function getIdentityId(): ?Uuid
+    {
+        return $this->identityId;
+    }
+
+    public function setIdentityId(?Uuid $identityId): void
+    {
+        $this->identityId = $identityId;
         $this->touch();
     }
 

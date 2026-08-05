@@ -4,6 +4,9 @@ namespace App\IdentityAccess\Application\Query\GetUserProfile;
 
 use App\AccessAudit\Application\Service\PermissionResolverService;
 use App\IdentityAccess\Domain\Entity\User;
+use App\Integration\Application\Service\TenantEntitlementResolver;
+use App\Integration\Domain\Repository\TenantAccountRepositoryInterface;
+use App\Shop\Domain\Entity\Shop;
 use App\Shop\Domain\Repository\ShopRepositoryInterface;
 
 final class GetUserProfileHandler
@@ -11,10 +14,19 @@ final class GetUserProfileHandler
     public function __construct(
         private readonly PermissionResolverService $permissionResolver,
         private readonly ShopRepositoryInterface $shopRepository,
+        private readonly TenantAccountRepositoryInterface $tenantAccountRepository,
+        private readonly TenantEntitlementResolver $entitlementResolver,
     ) {
     }
 
-    /** @return array{user: array<string, mixed>, permissions: list<string>, accessible_shops: list<array<string, mixed>>} */
+    /**
+     * @return array{
+     *     user: array<string, mixed>,
+     *     permissions: list<string>,
+     *     features: list<string>,
+     *     accessible_shops: list<array<string, mixed>>
+     * }
+     */
     public function handle(GetUserProfileQuery $query): array
     {
         $user = $query->user;
@@ -39,8 +51,25 @@ final class GetUserProfileHandler
                 'created_at' => $user->getCreatedAt()->format(\DateTimeInterface::ATOM),
             ],
             'permissions' => $permissions,
+            'features' => $this->resolveFeatures($user),
             'accessible_shops' => $this->resolveAccessibleShops($user),
         ];
+    }
+
+    /** @return list<string> */
+    private function resolveFeatures(User $user): array
+    {
+        $tenantAccountId = $user->getTenantAccountId();
+        if (null === $tenantAccountId) {
+            return [];
+        }
+
+        $account = $this->tenantAccountRepository->findById($tenantAccountId);
+        if (null === $account) {
+            return [];
+        }
+
+        return $this->entitlementResolver->getFeatures($account);
     }
 
     /** @return list<array<string, mixed>> */
@@ -48,42 +77,54 @@ final class GetUserProfileHandler
     {
         if ($user->isPlatformOwner()) {
             return array_map(
-                static fn ($shop) => [
-                    'id' => (string) $shop->getId(),
-                    'name' => $shop->getName(),
-                    'slug' => $shop->getSlug(),
-                    'status' => $shop->getStatus()->value,
-                ],
+                fn (Shop $shop) => $this->serializeAccessibleShop($shop),
                 $this->shopRepository->findAllOrderedByName(),
             );
         }
 
-        if (null !== $user->getTenantAccountId()) {
-            return array_map(
-                static fn ($shop) => [
-                    'id' => (string) $shop->getId(),
-                    'name' => $shop->getName(),
-                    'slug' => $shop->getSlug(),
-                    'status' => $shop->getStatus()->value,
-                ],
-                $this->shopRepository->findByTenantAccountId($user->getTenantAccountId()),
-            );
+        $shops = [];
+        foreach ($user->getShopIds() as $shopId) {
+            $shop = $this->shopRepository->findById($shopId);
+            if (null === $shop) {
+                continue;
+            }
+
+            $shops[] = $this->serializeAccessibleShop($shop);
         }
 
-        if (null === $user->getShopId()) {
-            return [];
-        }
+        usort($shops, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
 
-        $shop = $this->shopRepository->findById($user->getShopId());
-        if (null === $shop) {
-            return [];
-        }
+        return $shops;
+    }
 
-        return [[
+    /**
+     * @return array{id: string, name: string, slug: string, status: string, features: list<string>|null}
+     */
+    private function serializeAccessibleShop(Shop $shop): array
+    {
+        return [
             'id' => (string) $shop->getId(),
             'name' => $shop->getName(),
             'slug' => $shop->getSlug(),
             'status' => $shop->getStatus()->value,
-        ]];
+            // null = no tenant → ungated (mirrors TenantFeatureGuard)
+            'features' => $this->resolveFeaturesForShop($shop),
+        ];
+    }
+
+    /** @return list<string>|null */
+    private function resolveFeaturesForShop(Shop $shop): ?array
+    {
+        $tenantAccountId = $shop->getTenantAccountId();
+        if (null === $tenantAccountId) {
+            return null;
+        }
+
+        $account = $this->tenantAccountRepository->findById($tenantAccountId);
+        if (null === $account) {
+            return [];
+        }
+
+        return $this->entitlementResolver->getFeatures($account);
     }
 }

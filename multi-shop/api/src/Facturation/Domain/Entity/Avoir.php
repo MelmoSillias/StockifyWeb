@@ -4,6 +4,8 @@ namespace App\Facturation\Domain\Entity;
 
 use App\Commerce\Domain\Enum\CommerceLineType;
 use App\Facturation\Infrastructure\Persistence\Doctrine\DoctrineAvoirRepository;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,9 +18,10 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity(repositoryClass: DoctrineAvoirRepository::class)]
 #[ORM\Table(name: 'avoirs')]
-class Avoir
+class Avoir implements ShopScopedInterface
 {
     use UuidEntityTrait;
+    use ShopScopedTrait;
 
     #[ORM\Column(length: 30, unique: true)]
     private string $numero;

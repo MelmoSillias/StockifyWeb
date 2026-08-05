@@ -9,12 +9,15 @@ use App\Integration\Domain\Repository\TenantAccountRepositoryInterface;
 use App\Shop\Application\Command\CreateShop\CreateShopCommand;
 use App\Shop\Application\Command\CreateShop\CreateShopHandler;
 use App\Shop\Domain\Entity\Shop;
+use App\Shop\Domain\Repository\ShopRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class CreateTenantShopResult
 {
     public function __construct(
         public Shop $shop,
         public ?string $adminEmail = null,
+        public ?string $adminUsername = null,
         public ?string $temporaryPassword = null,
     ) {
     }
@@ -32,6 +35,10 @@ final readonly class CreateTenantShopCommand
         public ?string $adminEmail = null,
         public ?string $adminPassword = null,
         public bool $createAdmin = true,
+        public ?string $identityId = null,
+        public ?string $adminFirstName = null,
+        public ?string $adminLastName = null,
+        public ?string $adminPhone = null,
     ) {
     }
 
@@ -47,6 +54,9 @@ final readonly class CreateTenantShopCommand
             adminEmail: isset($payload['admin_email']) ? (string) $payload['admin_email'] : null,
             adminPassword: isset($payload['admin_password']) ? (string) $payload['admin_password'] : null,
             createAdmin: !array_key_exists('create_admin', $payload) || (bool) $payload['create_admin'],
+            adminFirstName: isset($payload['admin_first_name']) ? (string) $payload['admin_first_name'] : null,
+            adminLastName: isset($payload['admin_last_name']) ? (string) $payload['admin_last_name'] : null,
+            adminPhone: isset($payload['admin_phone']) ? (string) $payload['admin_phone'] : null,
         );
     }
 }
@@ -56,48 +66,83 @@ final class CreateTenantShopHandler
     public function __construct(
         private readonly TenantAccountRepositoryInterface $tenantAccountRepository,
         private readonly CreateShopHandler $createShopHandler,
+        private readonly ShopRepositoryInterface $shopRepository,
         private readonly CreateTenantShopAdminService $createTenantShopAdminService,
         private readonly TenantFeatureGuard $tenantFeatureGuard,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     public function handle(CreateTenantShopCommand $command): CreateTenantShopResult
     {
         $account = $this->requireActiveAccount($command->externalAccountId);
+        $slug = strtolower(trim($command->slug));
+
+        $existing = '' !== $slug ? $this->shopRepository->findBySlug($slug) : null;
+        if (null !== $existing) {
+            $existingTenantId = $existing->getTenantAccountId();
+            if (null !== $existingTenantId && $existingTenantId->equals($account->getId())) {
+                return $this->resumeExistingShop($existing, $account, $command);
+            }
+
+            throw new \InvalidArgumentException('Ce slug est déjà utilisé.');
+        }
+
         $this->tenantFeatureGuard->assertCanCreateShop($account);
 
-        $shop = $this->createShopHandler->handle(new CreateShopCommand(
-            name: $command->name,
-            slug: $command->slug,
-            currency: $command->currency,
-            address: $command->address,
-            phone: $command->phone,
-        ));
+        return $this->entityManager->wrapInTransaction(function () use ($command, $account): CreateTenantShopResult {
+            $shop = $this->createShopHandler->handle(new CreateShopCommand(
+                name: $command->name,
+                slug: $command->slug,
+                currency: $command->currency,
+                address: $command->address,
+                phone: $command->phone,
+            ));
 
-        $shop->setTenantAccountId($account->getId());
+            $shop->setTenantAccountId($account->getId());
+            $this->shopRepository->save($shop, false);
 
+            return $this->withOptionalAdmin($shop, $account, $command);
+        });
+    }
+
+    private function resumeExistingShop(
+        Shop $shop,
+        TenantAccount $account,
+        CreateTenantShopCommand $command,
+    ): CreateTenantShopResult {
+        return $this->withOptionalAdmin($shop, $account, $command);
+    }
+
+    private function withOptionalAdmin(
+        Shop $shop,
+        TenantAccount $account,
+        CreateTenantShopCommand $command,
+    ): CreateTenantShopResult {
         $adminEmail = null;
+        $adminUsername = null;
         $temporaryPassword = null;
 
         if ($command->createAdmin) {
-            $email = $command->adminEmail ?? $this->defaultAdminEmail($command);
             $admin = $this->createTenantShopAdminService->create(
                 $shop,
                 $account->getId(),
-                $email,
+                $command->adminEmail,
                 $command->name,
                 $command->adminPassword,
+                $command->slug.'-admin',
+                $command->identityId,
+                $command->adminFirstName,
+                $command->adminLastName,
+                $command->adminPhone,
             );
             $adminEmail = $admin['user']->getEmail();
+            $adminUsername = $admin['user']->getUsername();
             $temporaryPassword = $admin['temporary_password'];
+            $this->entityManager->flush();
         }
 
-        return new CreateTenantShopResult($shop, $adminEmail, $temporaryPassword);
-    }
-
-    private function defaultAdminEmail(CreateTenantShopCommand $command): string
-    {
-        return sprintf('admin+%s@tenant.stockify.local', $command->slug);
+        return new CreateTenantShopResult($shop, $adminEmail, $adminUsername, $temporaryPassword);
     }
 
     private function requireActiveAccount(string $externalAccountId): TenantAccount

@@ -6,9 +6,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class IntegrationUser implements UserInterface
 {
+    /** @param list<string> $roles */
+    public function __construct(
+        private readonly string $identifier = 'integration-control-plane',
+        private readonly array $roles = ['ROLE_INTEGRATION'],
+    ) {
+    }
+
     public function getRoles(): array
     {
-        return ['ROLE_INTEGRATION'];
+        return $this->roles;
     }
 
     public function eraseCredentials(): void
@@ -17,6 +24,6 @@ final class IntegrationUser implements UserInterface
 
     public function getUserIdentifier(): string
     {
-        return 'integration-control-plane';
+        return $this->identifier;
     }
 }

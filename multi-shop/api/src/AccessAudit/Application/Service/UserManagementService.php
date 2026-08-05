@@ -62,7 +62,7 @@ final class UserManagementService
      * @param array<string, bool> $permissionOverrides
      */
     public function createUser(
-        string $email,
+        ?string $email,
         string $username,
         string $password,
         string $firstName,
@@ -70,7 +70,8 @@ final class UserManagementService
         array $roleCodes,
         array $permissionOverrides = [],
     ): User {
-        if ($this->userRepository->findByEmail($email) !== null) {
+        $normalizedEmail = null !== $email && '' !== trim($email) ? strtolower(trim($email)) : null;
+        if (null !== $normalizedEmail && $this->userRepository->findByEmail($normalizedEmail) !== null) {
             throw new \InvalidArgumentException('Cet email est déjà utilisé.');
         }
 
@@ -83,9 +84,13 @@ final class UserManagementService
             throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
         }
 
-        $user = new User($email, $username, 'placeholder', $firstName, $lastName);
+        $user = new User($normalizedEmail, $username, 'placeholder', $firstName, $lastName);
         $user->setPasswordHash($this->passwordHasher->hashPassword($user, $password));
         $user->activate();
+
+        if (null !== $shopContext) {
+            $user->assignToShop($shopContext->getShopId());
+        }
 
         $this->assignRolesAndPermissions($user, $roleCodes, $permissionOverrides);
         $this->userRepository->save($user);
@@ -117,13 +122,14 @@ final class UserManagementService
         }
 
         if ($email !== null) {
-            if (strtolower($email) !== $user->getEmail()) {
-                $existing = $this->userRepository->findByEmail($email);
+            $normalizedEmail = '' !== trim($email) ? strtolower(trim($email)) : null;
+            if (null !== $normalizedEmail && $normalizedEmail !== $user->getEmail()) {
+                $existing = $this->userRepository->findByEmail($normalizedEmail);
                 if ($existing !== null && !$existing->getId()->equals($user->getId())) {
                     throw new \InvalidArgumentException('Cet email est déjà utilisé.');
                 }
             }
-            $user->setEmail($email);
+            $user->setEmail($normalizedEmail);
         }
 
         if ($username !== null) {

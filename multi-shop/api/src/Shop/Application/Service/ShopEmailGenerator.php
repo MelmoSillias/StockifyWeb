@@ -5,6 +5,9 @@ namespace App\Shop\Application\Service;
 use App\Shop\Domain\Entity\Shop;
 use App\Shop\Domain\ValueObject\ShopEmail;
 
+/**
+ * @deprecated Gap A — CreateShopUser creates users with a null email instead.
+ */
 final class ShopEmailGenerator
 {
     public function generate(string $username, Shop $shop): ShopEmail

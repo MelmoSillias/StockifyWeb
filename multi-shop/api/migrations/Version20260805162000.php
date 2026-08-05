@@ -7,19 +7,20 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20260709120000 extends AbstractMigration
+final class Version20260805162000 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Ensure users.roles JSON column exists';
+        return 'Add nullable phone on users for public signup identity profile.';
     }
 
     public function up(Schema $schema): void
     {
-        // No-op for mono (roles already in initial migration).
+        $this->addSql('ALTER TABLE users ADD phone VARCHAR(40) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
+        $this->addSql('ALTER TABLE users DROP phone');
     }
 }

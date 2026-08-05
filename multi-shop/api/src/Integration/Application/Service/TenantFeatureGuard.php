@@ -13,11 +13,14 @@ final class TenantFeatureGuard
     public function __construct(
         private readonly TenantAccountRepositoryInterface $tenantAccountRepository,
         private readonly TenantEntitlementResolver $entitlementResolver,
+        private readonly EntitlementPullService $entitlementPullService,
     ) {
     }
 
     public function assertCanCreateShop(TenantAccount $account): void
     {
+        $this->entitlementPullService->ensureFresh($account);
+
         if (!$this->entitlementResolver->canCreateShop($account)) {
             throw new \DomainException(sprintf(
                 'Shop quota exceeded (max %d).',
@@ -38,6 +41,8 @@ final class TenantFeatureGuard
             return;
         }
 
+        $this->entitlementPullService->ensureFresh($account);
+
         if (!$this->entitlementResolver->hasFeature($account, $featureCode)) {
             throw new AccessDeniedHttpException(sprintf('Feature "%s" is not enabled for this tenant.', $featureCode));
         }
@@ -53,6 +58,8 @@ final class TenantFeatureGuard
         if (null === $account) {
             return;
         }
+
+        $this->entitlementPullService->ensureFresh($account);
 
         if (!$this->entitlementResolver->hasFeature($account, $featureCode)) {
             throw new AccessDeniedHttpException(sprintf('Feature "%s" is not enabled for this tenant.', $featureCode));

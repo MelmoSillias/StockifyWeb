@@ -5,6 +5,8 @@ namespace App\Commerce\Domain\Entity;
 use App\Commerce\Domain\Enum\CommerceLineType;
 use App\Commerce\Domain\ValueObject\Acheteur;
 use App\Commerce\Infrastructure\Persistence\Doctrine\DoctrineVenteRepository;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,9 +16,10 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DoctrineVenteRepository::class)]
 #[ORM\Table(name: 'ventes')]
-class Vente
+class Vente implements ShopScopedInterface
 {
     use UuidEntityTrait;
+    use ShopScopedTrait;
 
     #[ORM\Column(length: 30, unique: true)]
     private string $reference;

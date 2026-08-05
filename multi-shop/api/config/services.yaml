@@ -3,6 +3,13 @@
 parameters:
     upload-dir: 'public/uploads'
     integration_webhook_enabled_default: false
+    integration_jwt_issuer_default: 'sim-saas-admin'
+    integration_jwt_audience_default: 'stockify'
+    identity_jwt_issuer_default: 'sim-saas-admin'
+    identity_jwt_audience_default: 'stockify'
+    auth_global_identity_enabled_default: false
+    tenant_purge_enabled_default: false
+    entitlement_stale_after_seconds_default: 86400
 
 services:
     _defaults:
@@ -125,10 +132,16 @@ services:
     App\Integration\Domain\Repository\IntegrationRequestLogRepositoryInterface:
         alias: App\Integration\Infrastructure\Persistence\Doctrine\DoctrineIntegrationRequestLogRepository
 
+    App\Integration\Application\Service\TenantPurgeService:
+        arguments:
+            $purgeEnabled: '%env(default:tenant_purge_enabled_default:bool:TENANT_PURGE_ENABLED)%'
+
     App\Integration\Security\IntegrationJwtValidator:
         arguments:
-            $publicKeyPath: '%kernel.project_dir%/config/jwt/integration_public.pem'
+            $publicKeyPath: '%env(resolve:INTEGRATION_JWT_PUBLIC_KEY)%'
             $enabled: '%env(bool:INTEGRATION_ENABLED)%'
+            $expectedIssuer: '%env(default:integration_jwt_issuer_default:INTEGRATION_JWT_ISSUER)%'
+            $expectedAudience: '%env(default:integration_jwt_audience_default:INTEGRATION_JWT_AUDIENCE)%'
 
     App\Integration\Application\Service\UsageWebhookDispatcher:
         arguments:
@@ -139,9 +152,24 @@ services:
     App\Onboarding\Application\Service\ControlPlaneClient:
         arguments:
             $controlPlaneBaseUrl: '%env(default::CONTROL_PLANE_BASE_URL)%'
+            $webhookSecret: '%env(default::INTEGRATION_WEBHOOK_SECRET)%'
 
     App\Onboarding\Application\Service\ControlPlaneGatewayInterface:
         alias: App\Onboarding\Application\Service\ControlPlaneClient
+
+    App\Integration\Application\Service\EntitlementPullService:
+        arguments:
+            $staleAfterSeconds: '%env(int:default:entitlement_stale_after_seconds_default:ENTITLEMENT_STALE_AFTER_SECONDS)%'
+
+    App\IdentityAccess\Security\IdentityAssertionValidator:
+        arguments:
+            $publicKeyPath: '%env(resolve:IDENTITY_JWT_PUBLIC_KEY)%'
+            $expectedIssuer: '%env(default:identity_jwt_issuer_default:IDENTITY_JWT_ISSUER)%'
+            $expectedAudience: '%env(default:identity_jwt_audience_default:IDENTITY_JWT_AUDIENCE)%'
+
+    App\IdentityAccess\Application\Service\GlobalAuthService:
+        arguments:
+            $enabled: '%env(default:auth_global_identity_enabled_default:bool:AUTH_GLOBAL_IDENTITY_ENABLED)%'
 
     App\Impression\Application\Renderer\DocumentRendererInterface:
         alias: App\Impression\Infrastructure\Renderer\TwigDocumentRenderer

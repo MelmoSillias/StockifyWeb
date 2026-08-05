@@ -177,7 +177,7 @@ final class PermissionCatalog
 
         return [
             'admin' => $all,
-            'gerant' => array_values(array_unique(array_merge($gerant, ['access.audit.view'], $analyticsAll))),
+            'gerant' => array_values(array_unique(array_merge($gerant, ['access.audit.view', 'access.roles.view'], $analyticsAll))),
             'caissier' => $caissier,
             'magasinier' => $magasinier,
             'comptable' => $comptable,

@@ -118,6 +118,7 @@ export const DASHBOARD_QUICK_ACTIONS = [
   {
     id: 'analytics',
     permission: 'analytics.view',
+    feature: 'stockify.analytics',
     label: 'Voir analytics',
     icon: 'pi pi-chart-bar',
     routeName: 'analytics'

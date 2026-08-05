@@ -3,6 +3,8 @@
 namespace App\Commerce\Domain\Entity;
 
 use App\Commerce\Domain\Enum\CommerceLineType;
+use App\SharedKernel\Domain\Contract\ShopScopedInterface;
+use App\SharedKernel\Domain\Trait\ShopScopedTrait;
 use App\SharedKernel\Domain\Trait\UuidEntityTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,9 +12,10 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'devis_lines')]
-class DevisLine
+class DevisLine implements ShopScopedInterface
 {
     use UuidEntityTrait;
+    use ShopScopedTrait;
 
     #[ORM\ManyToOne(targetEntity: Devis::class, inversedBy: 'lines')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
