@@ -1,0 +1,62 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-stockify_multishop}
+      MYSQL_USER: ${MYSQL_USER:-stockify}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - stockify_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-prod}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: mysql://${MYSQL_USER:-stockify}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-stockify_multishop}?charset=utf8mb4
+      DEFAULT_URI: ${DEFAULT_URI}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE}
+      INTEGRATION_ENABLED: ${INTEGRATION_ENABLED:-true}
+      INTEGRATION_JWT_PUBLIC_KEY: ${INTEGRATION_JWT_PUBLIC_KEY:-%kernel.project_dir%/config/jwt/integration_public.pem}
+      INTEGRATION_JWT_ISSUER: ${INTEGRATION_JWT_ISSUER:-sim-saas-admin}
+      INTEGRATION_WEBHOOK_SECRET: ${INTEGRATION_WEBHOOK_SECRET}
+      INTEGRATION_WEBHOOK_ENABLED: ${INTEGRATION_WEBHOOK_ENABLED:-true}
+      CONTROL_PLANE_BASE_URL: ${CONTROL_PLANE_BASE_URL}
+      IDENTITY_JWT_PUBLIC_KEY: ${IDENTITY_JWT_PUBLIC_KEY:-%kernel.project_dir%/config/jwt/identity_public.pem}
+      IDENTITY_JWT_ISSUER: ${IDENTITY_JWT_ISSUER:-sim-saas-admin}
+      IDENTITY_JWT_AUDIENCE: ${IDENTITY_JWT_AUDIENCE:-stockify}
+      TENANT_PURGE_ENABLED: ${TENANT_PURGE_ENABLED:-0}
+    expose:
+      - "8001"
+    volumes:
+      - stockify_jwt:/app/config/jwt
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8001
+    expose:
+      - "5176"
+
+volumes:
+  stockify_mysql:
+  stockify_jwt:
