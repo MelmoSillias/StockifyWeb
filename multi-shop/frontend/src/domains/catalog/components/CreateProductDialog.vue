@@ -676,7 +676,7 @@ defineExpose({
 
 .tab-indicator--optional,
 .tab-indicator--pending {
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .form-grid {
@@ -726,7 +726,7 @@ defineExpose({
 
 .lots-section__hint {
   margin: 0;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
   font-size: 0.875rem;
 }
 

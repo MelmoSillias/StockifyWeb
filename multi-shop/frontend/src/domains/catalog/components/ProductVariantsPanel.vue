@@ -155,7 +155,7 @@ const variantRowActions = (variant) => [
 .product-variants-panel__title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .variant-name-cell {

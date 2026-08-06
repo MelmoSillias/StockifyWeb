@@ -171,6 +171,7 @@ export function useLayoutTheme() {
     setSidebarSearchPosition: layoutStore.setSidebarSearchPosition,
     setTopbarLogoVisibility: layoutStore.setTopbarLogoVisibility,
     setTopbarProfilePosition: layoutStore.setTopbarProfilePosition,
-    setTopbarSearchPosition: layoutStore.setTopbarSearchPosition
+    setTopbarSearchPosition: layoutStore.setTopbarSearchPosition,
+    setLayoutStyle: layoutStore.setLayoutStyle
   }
 }

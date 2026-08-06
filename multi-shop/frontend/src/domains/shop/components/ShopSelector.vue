@@ -233,7 +233,7 @@ const selectShopMobile = async (shopId) => {
 
 .shop-selector__slug {
   font-size: 0.72rem;
-  color: var(--layout-text-muted, var(--p-text-muted-color));
+  color: var(--layout-text-muted);
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -255,7 +255,7 @@ const selectShopMobile = async (shopId) => {
 }
 
 .shop-selector__placeholder {
-  color: var(--layout-text-muted, var(--p-text-muted-color));
+  color: var(--layout-text-muted);
 }
 
 .shop-selector__trigger {
@@ -271,7 +271,7 @@ const selectShopMobile = async (shopId) => {
 
 .shop-selector__trigger-chevron {
   font-size: 0.65rem;
-  color: var(--layout-text-muted, var(--p-text-muted-color));
+  color: var(--layout-text-muted);
 }
 
 .shop-selector__menu {
@@ -294,7 +294,7 @@ const selectShopMobile = async (shopId) => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--layout-text-muted, var(--p-text-muted-color));
+  color: var(--layout-text-muted);
 }
 
 .shop-selector__menu-count {

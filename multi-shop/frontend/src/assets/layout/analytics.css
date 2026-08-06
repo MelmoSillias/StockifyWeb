@@ -88,18 +88,9 @@
 }
 
 .analytics-period-toolbar__presets .p-togglebutton {
-  border-radius: 999px !important;
-  border: 1px solid var(--layout-panel-border) !important;
-  background: transparent !important;
   font-size: 0.82rem;
   padding-inline: 0.85rem;
-  transition: all var(--layout-transition-fast, 0.15s ease);
-}
-
-.analytics-period-toolbar__presets .p-togglebutton.p-togglebutton-checked {
-  background: var(--layout-accent-soft) !important;
-  border-color: color-mix(in srgb, var(--layout-accent-strong) 35%, var(--layout-panel-border)) !important;
-  color: var(--layout-accent-strong) !important;
+  border-radius: 999px !important;
 }
 
 /* KPI cards */

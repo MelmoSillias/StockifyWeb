@@ -210,7 +210,7 @@ const filteredItems = computed(() => {
 
 .dettes-table__empty {
   margin: 0;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
   font-size: 0.9rem;
 }
 </style>

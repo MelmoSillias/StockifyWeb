@@ -85,6 +85,6 @@ const onConfirm = () => {
 }
 
 .confirm-commande-dialog__hint {
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 </style>

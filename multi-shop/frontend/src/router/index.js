@@ -21,9 +21,15 @@ const routes = [
     meta: { requiresGuest: true }
   },
   {
+    path: '/verify-email/pending',
+    name: 'verify-email-pending',
+    component: () => import('@/domains/auth/views/VerifyEmailPendingView.vue'),
+    meta: { requiresAuth: appConfig.auth.enabled, requiresVerifiedEmail: false }
+  },
+  {
     path: '/app',
     component: () => import('@/domains/layout/components/AppShell.vue'),
-    meta: { requiresAuth: appConfig.auth.enabled },
+    meta: { requiresAuth: appConfig.auth.enabled, requiresVerifiedEmail: true },
     children: [
       {
         path: '',
@@ -337,7 +343,20 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    if (!authStore.isEmailVerified) {
+      return { name: 'verify-email-pending' }
+    }
+
     return { name: routeConfig.homeRouteName }
+  }
+
+  if (
+    authStore.isAuthenticated
+    && !authStore.isEmailVerified
+    && to.meta.requiresVerifiedEmail !== false
+    && to.name !== 'verify-email-pending'
+  ) {
+    return { name: 'verify-email-pending' }
   }
 
   if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {

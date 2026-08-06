@@ -39,6 +39,7 @@ final class LocalSignupProvisioner
         ?string $adminPhone = null,
         ?string $shopPhone = null,
         ?string $shopAddress = null,
+        ?string $emailVerifiedAt = null,
     ): CreateTenantShopResult {
         $this->provisionAccountHandler->handle(new ProvisionAccountCommand(
             externalAccountId: $externalAccountId,
@@ -58,6 +59,7 @@ final class LocalSignupProvisioner
             adminFirstName: $adminFirstName,
             adminLastName: $adminLastName,
             adminPhone: $adminPhone,
+            emailVerifiedAt: $emailVerifiedAt,
         ));
 
         $this->shopRepository->save($result->shop);

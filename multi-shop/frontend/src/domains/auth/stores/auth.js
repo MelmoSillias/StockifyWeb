@@ -93,6 +93,22 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
 
+    isEmailVerified: (state) => {
+      if (!state.user) {
+        return false
+      }
+
+      if (!state.user.identity_id) {
+        return true
+      }
+
+      if (typeof state.user.email_verified === 'boolean') {
+        return state.user.email_verified
+      }
+
+      return !!state.user.email_verified_at
+    },
+
     hasPermission: (state) => (permission) => {
       if (!permission) {
         return true

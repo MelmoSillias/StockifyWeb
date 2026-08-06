@@ -262,7 +262,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function activate(): void
     {
         $this->status = UserStatus::Active;
-        $this->emailVerifiedAt = new \DateTimeImmutable();
+        $this->touch();
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return null !== $this->emailVerifiedAt;
+    }
+
+    public function syncEmailVerification(?\DateTimeImmutable $verifiedAt): void
+    {
+        $this->emailVerifiedAt = $verifiedAt;
         $this->touch();
     }
 

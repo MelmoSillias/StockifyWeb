@@ -63,6 +63,8 @@ final class IdentityAssertionValidator
             $subject,
             (string) $parsed->claims()->get('email', ''),
             $this->extractAccounts($parsed),
+            (bool) $parsed->claims()->get('email_verified', false),
+            (string) $parsed->claims()->get('auth_provider', 'local'),
         );
     }
 

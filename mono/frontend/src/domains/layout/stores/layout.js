@@ -37,7 +37,8 @@ const createInitialState = () => {
     sidebarSearchPosition: appShellDefaults.layout.sidebarSearchPosition,
     topbarLogoVisibility: appShellDefaults.layout.topbarLogoVisibility,
     topbarProfilePosition: appShellDefaults.layout.topbarProfilePosition,
-    topbarSearchPosition: appShellDefaults.layout.topbarSearchPosition
+    topbarSearchPosition: appShellDefaults.layout.topbarSearchPosition,
+    layoutStyle: appShellDefaults.layout.layoutStyle
   }
 
   try {
@@ -87,7 +88,8 @@ export const useLayoutStore = defineStore('layout', {
           sidebarSearchPosition: this.sidebarSearchPosition,
           topbarLogoVisibility: this.topbarLogoVisibility,
           topbarProfilePosition: this.topbarProfilePosition,
-          topbarSearchPosition: this.topbarSearchPosition
+          topbarSearchPosition: this.topbarSearchPosition,
+          layoutStyle: this.layoutStyle
         })
       )
     },
@@ -224,6 +226,11 @@ export const useLayoutStore = defineStore('layout', {
 
     setTopbarSearchPosition(value) {
       this.topbarSearchPosition = value
+      this.persist()
+    },
+
+    setLayoutStyle(value) {
+      this.layoutStyle = value
       this.persist()
     }
   }

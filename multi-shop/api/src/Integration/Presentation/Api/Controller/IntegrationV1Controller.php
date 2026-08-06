@@ -14,6 +14,8 @@ use App\Integration\Application\Command\ProvisionAccount\ProvisionAccountCommand
 use App\Integration\Application\Command\ProvisionAccount\ProvisionAccountHandler;
 use App\Integration\Application\Command\SuspendAccount\SuspendAccountCommand;
 use App\Integration\Application\Command\SuspendAccount\SuspendAccountHandler;
+use App\Integration\Application\Command\SyncIdentityState\SyncIdentityStateCommand;
+use App\Integration\Application\Command\SyncIdentityState\SyncIdentityStateHandler;
 use App\Integration\Application\Command\UpdateEntitlements\UpdateEntitlementsCommand;
 use App\Integration\Application\Command\UpdateEntitlements\UpdateEntitlementsHandler;
 use App\Integration\Application\Query\GetAccountUsage\GetAccountUsageHandler;
@@ -49,6 +51,7 @@ final class IntegrationV1Controller extends AbstractController
         private readonly GetAccountUsageHandler $getAccountUsageHandler,
         private readonly CreateTenantShopHandler $createTenantShopHandler,
         private readonly InviteTenantUserHandler $inviteTenantUserHandler,
+        private readonly SyncIdentityStateHandler $syncIdentityStateHandler,
         private readonly UsageWebhookDispatcher $usageWebhookDispatcher,
         private readonly IntegrationRequestLogger $requestLogger,
         private readonly ShopRepositoryInterface $shopRepository,
@@ -322,6 +325,35 @@ final class IntegrationV1Controller extends AbstractController
             $this->requestLogger->complete($log, Response::HTTP_CONFLICT, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
 
             return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
+        }
+    }
+
+    #[Route('/identities/{identityId}', name: 'integration_v1_identities_sync', methods: ['PATCH'])]
+    #[IsGranted(IntegrationTokenClaims::ROLE_WRITE)]
+    public function syncIdentityState(string $identityId, Request $request): JsonResponse
+    {
+        $startedAt = microtime(true);
+        $payload = $this->decodePayload($request);
+        $log = $this->requestLogger->start($request->getMethod(), $request->getPathInfo(), null, null, $payload);
+
+        try {
+            $this->syncIdentityStateHandler->handle(
+                SyncIdentityStateCommand::fromPayload($identityId, $payload),
+            );
+            $data = [
+                'identity_id' => $identityId,
+                'email_verified_at' => $payload['email_verified_at'] ?? null,
+            ];
+            $this->requestLogger->complete($log, Response::HTTP_OK, $data, $this->durationMs($startedAt));
+
+            return $this->json(['data' => $data]);
+        } catch (\InvalidArgumentException $exception) {
+            $status = str_contains(strtolower($exception->getMessage()), 'not found')
+                ? Response::HTTP_NOT_FOUND
+                : Response::HTTP_BAD_REQUEST;
+            $this->requestLogger->complete($log, $status, ['error' => $exception->getMessage()], $this->durationMs($startedAt));
+
+            return $this->json(['error' => $exception->getMessage()], $status);
         }
     }
 

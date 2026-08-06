@@ -38,6 +38,7 @@ const {
   sidebarMode,
   motionPreset,
   gradientMode,
+  layoutStyle,
   sidebarLogoPosition,
   sidebarProfilePosition,
   sidebarSearchPosition,
@@ -60,6 +61,7 @@ const {
   setSidebarMode,
   setMotionPreset,
   setGradientMode,
+  setLayoutStyle,
   setSidebarLogoPosition,
   setSidebarProfilePosition,
   setSidebarSearchPosition,
@@ -196,6 +198,11 @@ const updateAccentColor = (value) => {
         <div class="app-theme-field">
           <span>Sidebar</span>
           <SelectButton :model-value="sidebarMode" :options="options.sidebarModes" option-label="label" option-value="value" @update:modelValue="setSidebarMode" />
+        </div>
+
+        <div class="app-theme-field">
+          <span>Mode layout</span>
+          <SelectButton :model-value="layoutStyle" :options="options.layoutStyles" option-label="label" option-value="value" @update:modelValue="setLayoutStyle" />
         </div>
 
         <div class="app-theme-field">

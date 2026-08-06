@@ -25,6 +25,8 @@ interface ControlPlaneGatewayInterface
 
     public function exchangeIdentityToken(string $email, string $password, string $applicationSlug = 'stockify'): string;
 
+    public function resendVerificationEmail(string $email): void;
+
     /**
      * @return array{features: list<string>, quotas: array<string, int|float>, updated_at: ?string}
      */

@@ -1,0 +1,47 @@
+/*
+ * Shared PrimeVue surface selectors for theme-specific effects (glass blur, etc.).
+ * Used by individual theme files via attribute selectors.
+ */
+
+/* Glass frosted surfaces — all PrimeVue panels & overlays */
+:root[data-layout-theme='glass'] .p-select-overlay,
+:root[data-layout-theme='glass'] .p-multiselect-overlay,
+:root[data-layout-theme='glass'] .p-autocomplete-overlay,
+:root[data-layout-theme='glass'] .p-datepicker-panel,
+:root[data-layout-theme='glass'] .p-menu,
+:root[data-layout-theme='glass'] .p-tieredmenu,
+:root[data-layout-theme='glass'] .p-contextmenu,
+:root[data-layout-theme='glass'] .p-confirmpopup,
+:root[data-layout-theme='glass'] .p-drawer,
+:root[data-layout-theme='glass'] .p-treetable,
+:root[data-layout-theme='glass'] .p-dataview,
+:root[data-layout-theme='glass'] .p-tablist,
+:root[data-layout-theme='glass'] .p-toolbar,
+:root[data-layout-theme='glass'] .p-stepper,
+:root[data-layout-theme='glass'] .p-paginator,
+:root[data-layout-theme='glass'] .p-colorpicker-panel {
+  background: var(--layout-panel-bg) !important;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-color: var(--layout-panel-border) !important;
+  box-shadow: var(--layout-shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+:root.app-dark[data-layout-theme='glass'] .p-select-overlay,
+:root.app-dark[data-layout-theme='glass'] .p-multiselect-overlay,
+:root.app-dark[data-layout-theme='glass'] .p-autocomplete-overlay,
+:root.app-dark[data-layout-theme='glass'] .p-datepicker-panel,
+:root.app-dark[data-layout-theme='glass'] .p-menu,
+:root.app-dark[data-layout-theme='glass'] .p-tieredmenu,
+:root.app-dark[data-layout-theme='glass'] .p-contextmenu,
+:root.app-dark[data-layout-theme='glass'] .p-confirmpopup,
+:root.app-dark[data-layout-theme='glass'] .p-drawer,
+:root.app-dark[data-layout-theme='glass'] .p-treetable,
+:root.app-dark[data-layout-theme='glass'] .p-dataview,
+:root.app-dark[data-layout-theme='glass'] .p-tablist,
+:root.app-dark[data-layout-theme='glass'] .p-toolbar,
+:root.app-dark[data-layout-theme='glass'] .p-stepper,
+:root.app-dark[data-layout-theme='glass'] .p-paginator,
+:root.app-dark[data-layout-theme='glass'] .p-colorpicker-panel {
+  box-shadow: var(--layout-shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}

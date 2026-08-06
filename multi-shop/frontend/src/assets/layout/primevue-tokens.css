@@ -1,0 +1,107 @@
+/*
+ * Bridge layout design tokens (--layout-*) to PrimeVue Aura semantic tokens (--p-*).
+ * Keeps all PrimeVue components in sync with the app theme picker.
+ */
+:root {
+  /* Typography */
+  --p-text-color: var(--layout-text-color);
+  --p-text-muted-color: var(--layout-text-muted);
+  --p-text-hover-color: var(--layout-text-color);
+
+  /* Surfaces & content */
+  --p-content-background: var(--layout-panel-bg);
+  --p-content-hover-background: color-mix(in srgb, var(--layout-panel-bg) 88%, var(--layout-accent-soft));
+  --p-content-border-color: var(--layout-panel-border);
+  --p-content-color: var(--layout-text-color);
+
+  --p-surface-0: var(--layout-panel-bg);
+  --p-surface-50: color-mix(in srgb, var(--layout-panel-bg) 96%, var(--layout-accent-soft));
+  --p-surface-100: color-mix(in srgb, var(--layout-panel-bg) 92%, var(--layout-accent-soft));
+  --p-surface-200: var(--layout-panel-border);
+  --p-surface-300: color-mix(in srgb, var(--layout-panel-border) 80%, var(--layout-text-muted));
+  --p-surface-400: var(--layout-text-muted);
+  --p-surface-500: color-mix(in srgb, var(--layout-text-muted) 70%, var(--layout-text-color));
+  --p-surface-600: color-mix(in srgb, var(--layout-text-color) 60%, var(--layout-text-muted));
+  --p-surface-700: color-mix(in srgb, var(--layout-text-color) 80%, black);
+  --p-surface-800: color-mix(in srgb, var(--layout-text-color) 90%, black);
+  --p-surface-900: var(--layout-text-color);
+  --p-surface-950: color-mix(in srgb, var(--layout-text-color) 95%, black);
+
+  /* Primary / accent */
+  --p-primary-color: var(--layout-accent);
+  --p-primary-contrast-color: #ffffff;
+  --p-primary-hover-color: var(--layout-accent-strong);
+  --p-primary-active-color: var(--layout-accent-strong);
+
+  /* Highlight (selected items, active tabs, etc.) */
+  --p-highlight-background: var(--layout-accent-soft);
+  --p-highlight-color: var(--layout-accent-strong);
+  --p-highlight-focus-background: color-mix(in srgb, var(--layout-accent-soft) 80%, var(--layout-accent));
+  --p-highlight-focus-color: var(--layout-accent-strong);
+
+  /* Form fields */
+  --p-form-field-background: color-mix(in srgb, var(--layout-panel-bg) 94%, transparent);
+  --p-form-field-disabled-background: color-mix(in srgb, var(--layout-panel-bg) 70%, var(--layout-panel-border));
+  --p-form-field-filled-background: color-mix(in srgb, var(--layout-panel-bg) 90%, var(--layout-accent-soft));
+  --p-form-field-filled-hover-background: color-mix(in srgb, var(--layout-panel-bg) 88%, var(--layout-accent-soft));
+  --p-form-field-filled-focus-background: color-mix(in srgb, var(--layout-panel-bg) 88%, var(--layout-accent-soft));
+  --p-form-field-border-color: var(--layout-panel-border);
+  --p-form-field-hover-border-color: color-mix(in srgb, var(--layout-accent) 35%, var(--layout-panel-border));
+  --p-form-field-focus-border-color: color-mix(in srgb, var(--layout-accent) 65%, white);
+  --p-form-field-color: var(--layout-text-color);
+  --p-form-field-placeholder-color: var(--layout-text-muted);
+  --p-form-field-icon-color: var(--layout-text-muted);
+  --p-form-field-shadow: none;
+  --p-form-field-invalid-border-color: #ef4444;
+
+  /* List / select options */
+  --p-list-option-focus-background: color-mix(in srgb, var(--layout-accent-soft) 70%, var(--layout-panel-bg));
+  --p-list-option-selected-background: var(--layout-accent-soft);
+  --p-list-option-selected-focus-background: color-mix(in srgb, var(--layout-accent-soft) 85%, var(--layout-accent));
+  --p-list-option-color: var(--layout-text-color);
+  --p-list-option-focus-color: var(--layout-text-color);
+  --p-list-option-selected-color: var(--layout-accent-strong);
+
+  /* DataTable */
+  --p-datatable-header-background: color-mix(in srgb, var(--layout-panel-bg) 92%, var(--layout-accent-soft));
+  --p-datatable-header-color: var(--layout-text-color);
+  --p-datatable-header-border-color: var(--layout-panel-border);
+  --p-datatable-row-background: transparent;
+  --p-datatable-row-hover-background: color-mix(in srgb, var(--layout-accent-soft) 45%, var(--layout-panel-bg));
+  --p-datatable-row-color: var(--layout-text-color);
+  --p-datatable-border-color: var(--layout-panel-border);
+  --p-datatable-body-cell-border-color: var(--layout-panel-border);
+
+  /* Tabs */
+  --p-tabs-tab-background: transparent;
+  --p-tabs-tab-hover-background: color-mix(in srgb, var(--layout-panel-bg) 80%, var(--layout-accent-soft));
+  --p-tabs-tab-active-background: color-mix(in srgb, var(--layout-accent) 10%, var(--layout-panel-bg));
+  --p-tabs-tab-color: var(--layout-text-muted);
+  --p-tabs-tab-hover-color: var(--layout-text-color);
+  --p-tabs-tab-active-color: var(--layout-accent-strong);
+  --p-tabs-tab-border-color: transparent;
+  --p-tabs-tab-active-border-color: color-mix(in srgb, var(--layout-accent) 28%, transparent);
+
+  /* Misc layout */
+  --p-border-radius: var(--layout-radius);
+  --p-border-radius-sm: var(--layout-radius-sm);
+  --p-border-radius-lg: var(--layout-radius-lg);
+  --p-mask-background: rgba(15, 23, 42, 0.45);
+  --p-overlay-modal-background: var(--layout-panel-bg);
+  --p-overlay-modal-border-color: var(--layout-panel-border);
+  --p-overlay-popover-background: var(--layout-panel-bg);
+  --p-overlay-popover-border-color: var(--layout-panel-border);
+  --p-navigation-item-focus-background: var(--layout-accent-soft);
+  --p-navigation-item-active-background: var(--layout-accent-soft);
+  --p-navigation-item-color: var(--layout-text-color);
+  --p-navigation-item-focus-color: var(--layout-accent-strong);
+  --p-navigation-item-active-color: var(--layout-accent-strong);
+  --p-navigation-item-icon-color: var(--layout-text-muted);
+  --p-navigation-item-icon-focus-color: var(--layout-accent-strong);
+  --p-navigation-item-icon-active-color: var(--layout-accent-strong);
+}
+
+.app-dark {
+  --p-mask-background: rgba(2, 6, 23, 0.62);
+  --p-form-field-focus-border-color: color-mix(in srgb, var(--layout-accent) 55%, var(--layout-panel-border));
+}

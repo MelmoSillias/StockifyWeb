@@ -255,7 +255,7 @@ watch(
   margin: 0;
   padding: 1rem;
   text-align: center;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .create-commande-dialog__total {

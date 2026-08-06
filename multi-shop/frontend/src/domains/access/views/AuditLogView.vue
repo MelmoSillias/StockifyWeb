@@ -106,6 +106,6 @@ onMounted(() => load())
   flex-wrap: wrap;
 }
 .audit-header h2 { margin: 0; font-size: 1.1rem; }
-.audit-header p { margin: 0.25rem 0 0; color: var(--p-text-muted-color); font-size: 0.9rem; }
+.audit-header p { margin: 0.25rem 0 0; color: var(--layout-text-muted); font-size: 0.9rem; }
 .audit-filters { display: flex; gap: 0.5rem; align-items: center; }
 </style>

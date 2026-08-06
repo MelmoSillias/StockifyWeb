@@ -37,6 +37,7 @@ final class CreateTenantShopAdminService
         ?string $firstName = null,
         ?string $lastName = null,
         ?string $phone = null,
+        ?\DateTimeImmutable $emailVerifiedAt = null,
     ): array {
         $email = self::normalizeEmail($adminEmail);
 
@@ -76,6 +77,7 @@ final class CreateTenantShopAdminService
             $user->setPhone(trim($phone));
         }
         $user->activate();
+        $user->syncEmailVerification($emailVerifiedAt);
         if (!$userProvidedPassword) {
             $user->requirePasswordChange();
         }

@@ -50,6 +50,10 @@ final class GlobalAuthService
             throw new GlobalAuthFailedException('Your account is not active.', 403);
         }
 
+        if ($claims->emailVerified) {
+            $user->syncEmailVerification(new \DateTimeImmutable());
+        }
+
         $user->recordLogin();
         $this->userRepository->save($user);
 

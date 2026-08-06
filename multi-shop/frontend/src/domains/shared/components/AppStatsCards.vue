@@ -58,8 +58,8 @@ defineProps({
   width: 3rem;
   height: 3rem;
   border-radius: 0.9rem;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--layout-accent) 12%, white);
+  color: var(--layout-accent);
   font-size: 1.15rem;
 }
 
@@ -70,7 +70,7 @@ defineProps({
 }
 
 .stats-card__label {
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
   font-size: 0.9rem;
 }
 
@@ -82,7 +82,7 @@ defineProps({
 
 .stats-card__hint {
   margin-top: 0.35rem;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
   font-size: 0.85rem;
 }
 </style>

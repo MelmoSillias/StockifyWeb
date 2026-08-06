@@ -354,7 +354,7 @@ function onSubmitClick() {
 }
 
 .crud-dialog__help {
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .crud-dialog__switch-row {

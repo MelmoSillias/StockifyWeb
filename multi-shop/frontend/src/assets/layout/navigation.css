@@ -26,6 +26,23 @@
   width: var(--layout-sidebar-collapsed-width);
 }
 
+.app-shell--detached .app-sidebar {
+  height: calc(100vh - (2 * var(--layout-shell-inset)));
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-soft);
+  border-right: none;
+}
+
+.app-shell--detached.app-shell--overlay .app-sidebar-wrapper {
+  top: var(--layout-shell-inset);
+  left: var(--layout-shell-inset);
+  height: calc(100vh - (2 * var(--layout-shell-inset)));
+}
+
+.app-shell--detached.app-shell--collapsed .app-sidebar-wrapper {
+  align-items: flex-start;
+}
+
 .app-sidebar__container {
   display: flex;
   flex-direction: column;
@@ -505,6 +522,39 @@
   box-shadow: var(--layout-shadow-soft);
 }
 
+.app-secondary-sidebar__content {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--layout-spacing-unit) * 0.5);
+}
+
+.app-shell--detached.app-shell--collapsed .app-secondary-sidebar,
+.app-secondary-sidebar.app-secondary-sidebar--floating {
+  position: relative;
+  top: auto;
+  align-self: flex-start;
+  max-height: calc(100vh - (2 * var(--layout-shell-inset)));
+  margin-left: var(--layout-secondary-sidebar-gap);
+  border-radius: var(--layout-radius-lg);
+  border-right: none;
+  overflow: hidden;
+  transition:
+    height var(--layout-secondary-sidebar-transition),
+    opacity var(--layout-secondary-sidebar-transition),
+    transform var(--layout-secondary-sidebar-transition);
+}
+
+.app-secondary-sidebar.app-secondary-sidebar--animating {
+  will-change: height;
+}
+
+.app-shell--detached.app-shell--collapsed .app-secondary-sidebar__item:hover,
+.app-secondary-sidebar.app-secondary-sidebar--floating .app-secondary-sidebar__item:hover,
+.app-shell--detached.app-shell--collapsed .app-secondary-sidebar__item--active,
+.app-secondary-sidebar.app-secondary-sidebar--floating .app-secondary-sidebar__item--active {
+  border-radius: var(--layout-radius-sm);
+}
+
 .app-secondary-sidebar__header {
   display: flex;
   flex-direction: column;
@@ -590,6 +640,21 @@
 .secondary-sidebar-leave-to {
   opacity: 0;
   transform: translateX(-0.5rem);
+}
+
+.secondary-sidebar-float-enter-active,
+.secondary-sidebar-float-leave-active {
+  transition:
+    height var(--layout-secondary-sidebar-transition),
+    opacity var(--layout-secondary-sidebar-transition),
+    transform var(--layout-secondary-sidebar-transition);
+  overflow: hidden;
+}
+
+.secondary-sidebar-float-enter-from,
+.secondary-sidebar-float-leave-to {
+  opacity: 0;
+  transform: translateX(-0.4rem);
 }
 
 /* Drawer */

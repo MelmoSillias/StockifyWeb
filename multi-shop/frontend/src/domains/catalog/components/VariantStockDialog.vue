@@ -166,7 +166,7 @@ watch(
 .variant-stock-dialog__stat-label {
   display: block;
   font-size: 0.8rem;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
   margin-bottom: 0.25rem;
 }
 

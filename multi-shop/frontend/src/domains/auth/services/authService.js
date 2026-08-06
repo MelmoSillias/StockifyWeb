@@ -10,5 +10,10 @@ export const authService = {
   async me() {
     const response = await apiClient.get(appConfig.auth.meEndpoint)
     return response.data
+  },
+
+  async resendVerificationEmail() {
+    const response = await apiClient.post('/api/auth/verification/resend')
+    return response.data
   }
 }

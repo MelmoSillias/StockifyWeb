@@ -88,16 +88,8 @@
 
 .dashboard-period-toolbar__presets .p-togglebutton {
   border-radius: 999px !important;
-  border: 1px solid var(--layout-panel-border) !important;
-  background: transparent !important;
   font-size: 0.82rem;
   padding-inline: 0.85rem;
-}
-
-.dashboard-period-toolbar__presets .p-togglebutton.p-togglebutton-checked {
-  background: var(--layout-accent-soft) !important;
-  border-color: color-mix(in srgb, var(--layout-accent-strong) 35%, var(--layout-panel-border)) !important;
-  color: var(--layout-accent-strong) !important;
 }
 
 .dashboard-period-toolbar__range {
@@ -300,21 +292,6 @@
 .dashboard-carousel .p-carousel-indicator-list {
   gap: 0.35rem;
   margin-top: 0.75rem;
-}
-
-.dashboard-carousel .p-carousel-indicator-button {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 999px;
-}
-
-.dashboard-carousel .p-carousel-prev-button,
-.dashboard-carousel .p-carousel-next-button {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  border: 1px solid var(--layout-panel-border);
-  background: color-mix(in srgb, var(--layout-panel-bg) 92%, transparent);
 }
 
 .dashboard-carousel__body {

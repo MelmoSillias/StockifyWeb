@@ -153,14 +153,23 @@ const credentials = ref({
 })
 
 watch(
-  () => route.query.email,
-  (email) => {
-    if (typeof email === 'string' && email) {
-      credentials.value.email = email
+  () => route.query,
+  (query) => {
+    if (typeof query.email === 'string' && query.email) {
+      credentials.value.email = query.email
       loginMethod.value = 'email'
     }
+
+    if (query.verified === '1') {
+      toast.add({
+        severity: 'success',
+        summary: 'E-mail vérifié',
+        detail: 'Connectez-vous pour accéder à votre espace.',
+        life: 5000
+      })
+    }
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 const errors = ref({})
@@ -195,6 +204,11 @@ const { pending: loading, run: handleLogin } = useAsyncAction(async () => {
       detail: 'Bienvenue !',
       life: 3000
     })
+
+    if (!authStore.isEmailVerified) {
+      await router.replace({ name: 'verify-email-pending' })
+      return
+    }
 
     await router.replace(route.query.redirect || { name: 'home' })
   } catch (error) {

@@ -570,7 +570,7 @@ onMounted(load)
   display: block;
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .client-journal__actions {

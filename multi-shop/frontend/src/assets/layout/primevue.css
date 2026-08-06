@@ -260,6 +260,445 @@
   box-shadow: var(--layout-shadow-panel);
 }
 
+/* Select / MultiSelect */
+.p-select,
+.p-multiselect {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius);
+  color: var(--pv-text);
+  transition:
+    border-color var(--layout-transition-fast),
+    box-shadow var(--layout-transition-fast);
+}
+
+.p-select:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled):hover {
+  border-color: color-mix(in srgb, var(--pv-accent) 35%, var(--pv-surface-border));
+}
+
+.p-select:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus {
+  border-color: color-mix(in srgb, var(--pv-accent) 65%, white);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--pv-accent-soft) 85%, transparent);
+}
+
+.p-select-label,
+.p-multiselect-label {
+  color: var(--pv-text);
+}
+
+.p-select-label.p-placeholder,
+.p-multiselect-label.p-placeholder {
+  color: var(--pv-text-muted);
+}
+
+.p-select-dropdown,
+.p-multiselect-dropdown {
+  color: var(--pv-text-muted);
+}
+
+.p-select-overlay,
+.p-multiselect-overlay {
+  background: var(--pv-surface-bg-strong);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-panel);
+}
+
+.p-select-option,
+.p-multiselect-option {
+  color: var(--pv-text);
+  border-radius: var(--layout-radius-sm);
+}
+
+.p-select-option:not(.p-disabled).p-focus,
+.p-multiselect-option:not(.p-disabled).p-focus {
+  background: color-mix(in srgb, var(--pv-accent-soft) 70%, var(--pv-surface-bg));
+  color: var(--pv-text);
+}
+
+.p-select-option.p-select-option-selected,
+.p-multiselect-option.p-multiselect-option-selected {
+  background: var(--pv-accent-soft);
+  color: var(--pv-accent-strong);
+}
+
+.p-multiselect-chip-item .p-chip,
+.p-chip {
+  background: var(--pv-accent-soft);
+  color: var(--pv-accent-strong);
+  border-radius: 999px;
+}
+
+/* Textarea */
+.p-textarea {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius);
+  color: var(--pv-text);
+  box-shadow: none;
+}
+
+.p-textarea::placeholder {
+  color: var(--pv-text-muted);
+}
+
+.p-textarea:enabled:focus {
+  border-color: color-mix(in srgb, var(--pv-accent) 65%, white);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--pv-accent-soft) 85%, transparent);
+}
+
+/* DatePicker */
+.p-datepicker {
+  color: var(--pv-text);
+}
+
+.p-datepicker-panel {
+  background: var(--pv-surface-bg-strong);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-panel);
+  color: var(--pv-text);
+}
+
+.p-datepicker-header {
+  border-bottom: 1px solid var(--pv-surface-border);
+  color: var(--pv-text);
+}
+
+.p-datepicker-title,
+.p-datepicker-select-month,
+.p-datepicker-select-year {
+  color: var(--pv-text);
+}
+
+.p-datepicker-day,
+.p-datepicker-weekday {
+  color: var(--pv-text-muted);
+}
+
+.p-datepicker-day:not(.p-disabled):hover {
+  background: color-mix(in srgb, var(--pv-accent-soft) 70%, var(--pv-surface-bg));
+  color: var(--pv-text);
+}
+
+.p-datepicker-day-selected,
+.p-datepicker-day-selected-range {
+  background: var(--pv-accent) !important;
+  color: #fff !important;
+}
+
+.p-datepicker-today > .p-datepicker-day {
+  border-color: color-mix(in srgb, var(--pv-accent) 45%, transparent);
+}
+
+/* DataTable / TreeTable / DataView */
+.p-datatable,
+.p-treetable,
+.p-dataview {
+  background: transparent;
+  color: var(--pv-text);
+  border-color: var(--pv-surface-border);
+}
+
+.p-datatable-header,
+.p-treetable-header,
+.p-dataview-header {
+  background: color-mix(in srgb, var(--pv-surface-bg) 92%, var(--pv-accent-soft));
+  border-color: var(--pv-surface-border);
+  color: var(--pv-text);
+}
+
+.p-datatable-thead > tr > th,
+.p-treetable-thead > tr > th {
+  background: color-mix(in srgb, var(--pv-surface-bg) 92%, var(--pv-accent-soft));
+  border-color: var(--pv-surface-border);
+  color: var(--pv-text);
+  font-weight: 600;
+}
+
+.p-datatable-tbody > tr,
+.p-treetable-tbody > tr {
+  background: transparent;
+  color: var(--pv-text);
+}
+
+.p-datatable-tbody > tr > td,
+.p-treetable-tbody > tr > td {
+  border-color: var(--pv-surface-border);
+}
+
+.p-datatable-tbody > tr:hover,
+.p-treetable-tbody > tr:hover {
+  background: color-mix(in srgb, var(--pv-accent-soft) 45%, var(--pv-surface-bg));
+}
+
+.p-datatable-tbody > tr.p-row-odd,
+.p-treetable-tbody > tr.p-row-odd {
+  background: color-mix(in srgb, var(--pv-surface-bg) 50%, transparent);
+}
+
+.p-datatable-tbody > tr.p-row-odd:hover,
+.p-treetable-tbody > tr.p-row-odd:hover {
+  background: color-mix(in srgb, var(--pv-accent-soft) 45%, var(--pv-surface-bg));
+}
+
+.p-datatable-footer,
+.p-treetable-footer {
+  background: color-mix(in srgb, var(--pv-surface-bg) 92%, var(--pv-accent-soft));
+  border-color: var(--pv-surface-border);
+  color: var(--pv-text);
+}
+
+/* Paginator */
+.p-paginator {
+  background: transparent;
+  border-color: var(--pv-surface-border);
+  color: var(--pv-text);
+  gap: 0.35rem;
+}
+
+.p-paginator-page,
+.p-paginator-first,
+.p-paginator-prev,
+.p-paginator-next,
+.p-paginator-last {
+  border-radius: var(--layout-radius-sm);
+  color: var(--pv-text);
+}
+
+.p-paginator-page:not(.p-disabled):hover,
+.p-paginator-first:not(.p-disabled):hover,
+.p-paginator-prev:not(.p-disabled):hover,
+.p-paginator-next:not(.p-disabled):hover,
+.p-paginator-last:not(.p-disabled):hover {
+  background: color-mix(in srgb, var(--pv-accent-soft) 70%, var(--pv-surface-bg));
+  color: var(--pv-accent-strong);
+}
+
+.p-paginator-page.p-paginator-page-selected {
+  background: var(--pv-accent-soft);
+  border-color: color-mix(in srgb, var(--pv-accent) 38%, transparent);
+  color: var(--pv-accent-strong);
+}
+
+.p-paginator-current {
+  color: var(--pv-text-muted);
+}
+
+/* Tabs */
+.p-tablist {
+  border-color: var(--pv-surface-border);
+}
+
+.p-tab {
+  color: var(--pv-text-muted);
+  border-radius: var(--layout-radius-sm);
+  transition:
+    background var(--layout-transition-fast),
+    color var(--layout-transition-fast),
+    border-color var(--layout-transition-fast);
+}
+
+.p-tab:not(.p-disabled):hover {
+  background: color-mix(in srgb, var(--pv-surface-bg) 80%, var(--pv-accent-soft));
+  color: var(--pv-text);
+}
+
+.p-tab.p-tab-active {
+  background: color-mix(in srgb, var(--pv-accent) 10%, var(--pv-surface-bg));
+  border-color: color-mix(in srgb, var(--pv-accent) 28%, transparent);
+  color: var(--pv-accent-strong);
+  font-weight: 600;
+}
+
+.p-tabpanels {
+  color: var(--pv-text);
+}
+
+.p-tabpanel {
+  color: var(--pv-text);
+}
+
+/* ToggleSwitch / Checkbox */
+.p-toggleswitch-slider {
+  background: color-mix(in srgb, var(--pv-surface-border) 80%, var(--pv-surface-muted));
+  border-radius: 999px;
+}
+
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: var(--pv-accent);
+}
+
+.p-checkbox-box {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-sm);
+}
+
+.p-checkbox-checked .p-checkbox-box {
+  background: var(--pv-accent);
+  border-color: var(--pv-accent);
+}
+
+.p-checkbox-icon {
+  color: #fff;
+}
+
+/* Menu */
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu {
+  background: var(--pv-surface-bg-strong);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-panel);
+  color: var(--pv-text);
+}
+
+.p-menuitem-link,
+.p-menuitem-content {
+  color: var(--pv-text);
+  border-radius: var(--layout-radius-sm);
+}
+
+.p-menuitem-link:not(.p-disabled):hover,
+.p-menuitem:not(.p-disabled) > .p-menuitem-content:hover {
+  background: var(--pv-accent-soft);
+  color: var(--pv-accent-strong);
+}
+
+.p-menuitem-icon {
+  color: var(--pv-text-muted);
+}
+
+.p-menuitem-link:hover .p-menuitem-icon,
+.p-menuitem:not(.p-disabled) > .p-menuitem-content:hover .p-menuitem-icon {
+  color: var(--pv-accent-strong);
+}
+
+/* Toolbar */
+.p-toolbar {
+  background: transparent;
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-lg);
+  color: var(--pv-text);
+  gap: 0.75rem;
+}
+
+/* Skeleton */
+.p-skeleton {
+  background: color-mix(in srgb, var(--pv-surface-muted) 85%, var(--pv-surface-border));
+}
+
+/* ProgressSpinner */
+.p-progressspinner-circle {
+  stroke: var(--pv-accent) !important;
+}
+
+/* Carousel */
+.p-carousel-indicator-button {
+  background: color-mix(in srgb, var(--pv-surface-border) 80%, var(--pv-surface-muted));
+  border-radius: 999px;
+}
+
+.p-carousel-indicator-active .p-carousel-indicator-button {
+  background: var(--pv-accent);
+}
+
+.p-carousel-prev-button,
+.p-carousel-next-button {
+  border-radius: 999px;
+  border: 1px solid var(--pv-surface-border);
+  background: var(--pv-surface-bg);
+  color: var(--pv-text);
+}
+
+.p-carousel-prev-button:not(.p-disabled):hover,
+.p-carousel-next-button:not(.p-disabled):hover {
+  background: var(--pv-accent-soft);
+  border-color: color-mix(in srgb, var(--pv-accent) 35%, var(--pv-surface-border));
+  color: var(--pv-accent-strong);
+}
+
+/* Stepper */
+.p-stepper {
+  color: var(--pv-text);
+}
+
+.p-step-header {
+  color: var(--pv-text-muted);
+}
+
+.p-step-active .p-step-header,
+.p-step.p-step-active .p-step-header {
+  color: var(--pv-accent-strong);
+}
+
+.p-step-number {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border);
+  color: var(--pv-text-muted);
+}
+
+.p-step-active .p-step-number,
+.p-step.p-step-active .p-step-number {
+  background: var(--pv-accent);
+  border-color: var(--pv-accent);
+  color: #fff;
+}
+
+.p-stepper-separator {
+  background: var(--pv-surface-border);
+}
+
+/* ToggleButton (SelectButton v4) */
+.p-togglebutton {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border) !important;
+  border-radius: var(--layout-radius) !important;
+  color: var(--pv-text);
+}
+
+.p-togglebutton.p-togglebutton-checked {
+  background: var(--pv-accent-soft) !important;
+  border-color: color-mix(in srgb, var(--pv-accent) 38%, var(--pv-surface-border)) !important;
+  color: var(--pv-accent-strong) !important;
+}
+
+/* ConfirmDialog */
+.p-confirmdialog {
+  border-radius: var(--layout-radius-lg);
+}
+
+.p-confirmdialog .p-dialog-header,
+.p-confirmdialog .p-dialog-content,
+.p-confirmdialog .p-dialog-footer {
+  background: var(--pv-surface-bg);
+  color: var(--pv-text);
+}
+
+.p-confirmpopup {
+  background: var(--pv-surface-bg-strong);
+  border: 1px solid var(--pv-surface-border);
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-panel);
+  color: var(--pv-text);
+}
+
+.app-dark .p-select,
+.app-dark .p-multiselect,
+.app-dark .p-textarea,
+.app-dark .p-datepicker-panel,
+.app-dark .p-menu,
+.app-dark .p-tieredmenu,
+.app-dark .p-confirmpopup,
+.app-dark .p-select-overlay,
+.app-dark .p-multiselect-overlay {
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+}
+
 .app-dark .p-button.p-button-secondary,
 .app-dark .p-button.p-button-outlined,
 .app-dark .p-selectbutton .p-button,

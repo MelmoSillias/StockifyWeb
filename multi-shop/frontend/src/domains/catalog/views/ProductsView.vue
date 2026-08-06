@@ -945,7 +945,7 @@ onBeforeUnmount(() => {
 
 .filter-toggle__hint {
   font-size: 0.85rem;
-  color: var(--p-text-muted-color);
+  color: var(--layout-text-muted);
 }
 
 .filter-count {
@@ -1002,11 +1002,11 @@ onBeforeUnmount(() => {
 }
 
 :deep(tr.product-row--highlight > td) {
-  background: color-mix(in srgb, var(--p-primary-color) 16%, transparent);
+  background: color-mix(in srgb, var(--layout-accent) 16%, transparent);
 }
 
 :deep(tr.product-row--highlight-static > td) {
-  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  background: color-mix(in srgb, var(--layout-accent) 12%, transparent);
 }
 
 :deep(tr.product-row--highlight-calm > td) {
@@ -1020,7 +1020,7 @@ onBeforeUnmount(() => {
 @keyframes product-row-highlight-calm {
   0%,
   70% {
-    background: color-mix(in srgb, var(--p-primary-color) 14%, transparent);
+    background: color-mix(in srgb, var(--layout-accent) 14%, transparent);
   }
   100% {
     background: transparent;
@@ -1029,10 +1029,10 @@ onBeforeUnmount(() => {
 
 @keyframes product-row-highlight-expressive {
   0% {
-    background: color-mix(in srgb, var(--p-primary-color) 28%, transparent);
+    background: color-mix(in srgb, var(--layout-accent) 28%, transparent);
   }
   55% {
-    background: color-mix(in srgb, var(--p-primary-color) 16%, transparent);
+    background: color-mix(in srgb, var(--layout-accent) 16%, transparent);
   }
   100% {
     background: transparent;
@@ -1042,7 +1042,7 @@ onBeforeUnmount(() => {
 @media (prefers-reduced-motion: reduce) {
   :deep(tr.product-row--highlight > td) {
     animation: none !important;
-    background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+    background: color-mix(in srgb, var(--layout-accent) 12%, transparent);
   }
 }
 </style>

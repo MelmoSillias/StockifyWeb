@@ -55,6 +55,9 @@ final class PublicSignupService
 
         $entitlement = is_array($controlPlaneResult['entitlement'] ?? null) ? $controlPlaneResult['entitlement'] : [];
         $identityId = isset($controlPlaneResult['identityId']) ? (string) $controlPlaneResult['identityId'] : null;
+        $emailVerifiedAt = isset($controlPlaneResult['emailVerifiedAt']) && is_string($controlPlaneResult['emailVerifiedAt'])
+            ? $controlPlaneResult['emailVerifiedAt']
+            : null;
 
         $localResult = $this->localSignupProvisioner->provision(
             externalAccountId: $accountId,
@@ -72,6 +75,7 @@ final class PublicSignupService
             adminPhone: self::optionalString($data['phone'] ?? null),
             shopPhone: self::optionalString($data['shopPhone'] ?? null),
             shopAddress: self::optionalString($data['shopAddress'] ?? null),
+            emailVerifiedAt: $emailVerifiedAt,
         );
 
         $completionPayload = [

@@ -24,7 +24,9 @@
 @import "./layout/appearance.css";
 @import "./layout/dashboard-home.css";
 @import "./layout/analytics.css";
+@import "./layout/primevue-tokens.css";
 @import "./layout/primevue.css";
+@import "./layout/themes/primevue-surfaces.css";
 
 html,
 body,

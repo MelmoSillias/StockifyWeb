@@ -20,7 +20,7 @@ const layoutStore = useLayoutStore()
 const router = useRouter()
 const toast = useToast()
 
-const { motionPreset } = storeToRefs(layoutStore)
+const { motionPreset, layoutStyle } = storeToRefs(layoutStore)
 
 const {
   brand,
@@ -58,7 +58,8 @@ const displayName = computed(() => {
 const shellClasses = computed(() => ({
   'app-shell--fixed': sidebarMode.value === 'fixed',
   'app-shell--overlay': sidebarMode.value === 'overlay',
-  'app-shell--collapsed': sidebarCollapsed.value
+  'app-shell--collapsed': sidebarCollapsed.value,
+  'app-shell--detached': layoutStyle.value === 'detached'
 }))
 
 const pageTransition = computed(() => {

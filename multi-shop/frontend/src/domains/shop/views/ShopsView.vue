@@ -267,7 +267,7 @@ onMounted(load)
 <style scoped>
 .quota-hint {
   margin: 0.5rem 0 0;
-  color: var(--p-text-muted-color, #6b7280);
+  color: var(--layout-text-muted);
   font-size: 0.875rem;
 }
 </style>

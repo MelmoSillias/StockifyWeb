@@ -6,12 +6,7 @@
     <h2>Compte créé avec succès</h2>
     <p>
       Votre espace LafiaSugu est prêt.
-      <template v-if="result.shopCredentials?.passwordProvided">
-        Connectez-vous avec l’e-mail et le mot de passe que vous avez choisis.
-      </template>
-      <template v-else>
-        Conservez ces identifiants pour votre première connexion.
-      </template>
+      Consultez votre boîte mail et cliquez sur le lien de confirmation pour activer votre compte.
     </p>
 
     <div class="register-success__credentials">
@@ -27,6 +22,10 @@
       size="large"
       @click="goToLogin"
     />
+
+    <p class="register-success__hint">
+      Après connexion, vous serez guidé vers la page de vérification si votre e-mail n'est pas encore confirmé.
+    </p>
 
     <RouterLink :to="landingTo" class="register-success__back mkt-link">
       <i class="pi pi-arrow-left"></i>
@@ -119,6 +118,13 @@ const goToLogin = () => {
   justify-content: center;
   color: var(--mkt-light-muted);
   font-size: 0.92rem;
+}
+
+.register-success__hint {
+  color: var(--mkt-light-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: center;
 }
 
 @media (max-width: 400px) {

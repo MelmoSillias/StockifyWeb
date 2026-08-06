@@ -108,6 +108,26 @@ class ControlPlaneClient implements ControlPlaneGatewayInterface
         return $assertion;
     }
 
+    public function resendVerificationEmail(string $email): void
+    {
+        $baseUrl = $this->requireBaseUrl();
+
+        $response = $this->httpClient->request('POST', rtrim($baseUrl, '/').'/api/public/verification/resend', [
+            'json' => ['email' => $email],
+            'timeout' => 15,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        if ($statusCode >= 400) {
+            $body = $this->decodeJsonResponse($response->getContent(false), $statusCode);
+            $message = is_array($body)
+                ? (string) ($body['error'] ?? $body['message'] ?? 'Verification resend failed')
+                : 'Verification resend failed';
+
+            throw new ControlPlaneException($message, $statusCode);
+        }
+    }
+
     /**
      * @param array<string, mixed> $payload
      *

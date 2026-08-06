@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -147,6 +147,25 @@ const closeSecondarySidebar = () => {
   secondaryGroup.value = null
 }
 
+const handleSimpleNavClick = () => {
+  closeSecondarySidebar()
+}
+
+watch(
+  () => route.name,
+  () => {
+    if (props.collapsed && !activeParentGroup.value) {
+      closeSecondarySidebar()
+    }
+  }
+)
+
+watch(activeParentGroup, (group) => {
+  if (group && secondaryGroup.value?.key === group.key) {
+    secondaryGroup.value = null
+  }
+})
+
 const toggleProfileMenu = (event) => {
   profileMenu.value.toggle(event)
 }
@@ -222,6 +241,7 @@ const openProfile = () => {
               :item="item"
               :active="activeKey === item.key"
               :collapsed="collapsed"
+              @click="handleSimpleNavClick"
             />
             <AppNavGroup
               v-else
@@ -279,7 +299,6 @@ const openProfile = () => {
         :group="effectiveSecondaryGroup"
         :visible="!!effectiveSecondaryGroup && collapsed"
         :active-key="activeKey"
-        @close="closeSecondarySidebar"
       />
     </div>
 
@@ -337,6 +356,7 @@ const openProfile = () => {
             :item="item"
             :active="activeKey === item.key"
             :collapsed="false"
+            @click="handleSimpleNavClick"
           />
           <AppNavGroup
             v-else

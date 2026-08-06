@@ -46,6 +46,29 @@
   box-shadow: var(--layout-shadow-soft);
 }
 
+/* Mode Detached (floating layout) */
+.app-shell--detached {
+  --layout-shell-inset: clamp(0.75rem, 2vw, 1.25rem);
+  padding: var(--layout-shell-inset);
+  box-sizing: border-box;
+}
+
+.app-shell--detached .app-shell__main {
+  max-height: calc(100vh - (2 * var(--layout-shell-inset)));
+}
+
+.app-shell--detached .app-topbar-host {
+  padding: 0 var(--layout-shell-inset);
+  box-sizing: border-box;
+}
+
+.app-shell--detached .app-topbar {
+  border-radius: var(--layout-radius-lg);
+  box-shadow: var(--layout-shadow-panel);
+  border: 1px solid var(--layout-panel-border);
+  border-bottom: 1px solid var(--layout-panel-border);
+}
+
 .app-shell__main {
   min-width: 0;
   width: 100%;
@@ -1006,6 +1029,26 @@
 @media (max-width: 1023px) {
   .app-shell {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell--detached {
+    --layout-shell-inset: 0px;
+    padding: 0;
+  }
+
+  .app-shell--detached .app-shell__main {
+    max-height: 100vh;
+  }
+
+  .app-shell--detached .app-topbar-host {
+    padding: 0;
+  }
+
+  .app-shell--detached .app-topbar {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid var(--layout-panel-border);
   }
 
   .app-topbar__leading {

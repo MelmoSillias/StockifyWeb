@@ -39,6 +39,7 @@ final readonly class CreateTenantShopCommand
         public ?string $adminFirstName = null,
         public ?string $adminLastName = null,
         public ?string $adminPhone = null,
+        public ?string $emailVerifiedAt = null,
     ) {
     }
 
@@ -54,9 +55,11 @@ final readonly class CreateTenantShopCommand
             adminEmail: isset($payload['admin_email']) ? (string) $payload['admin_email'] : null,
             adminPassword: isset($payload['admin_password']) ? (string) $payload['admin_password'] : null,
             createAdmin: !array_key_exists('create_admin', $payload) || (bool) $payload['create_admin'],
+            identityId: isset($payload['identity_id']) ? (string) $payload['identity_id'] : null,
             adminFirstName: isset($payload['admin_first_name']) ? (string) $payload['admin_first_name'] : null,
             adminLastName: isset($payload['admin_last_name']) ? (string) $payload['admin_last_name'] : null,
             adminPhone: isset($payload['admin_phone']) ? (string) $payload['admin_phone'] : null,
+            emailVerifiedAt: isset($payload['email_verified_at']) ? (string) $payload['email_verified_at'] : null,
         );
     }
 }
@@ -135,6 +138,7 @@ final class CreateTenantShopHandler
                 $command->adminFirstName,
                 $command->adminLastName,
                 $command->adminPhone,
+                self::parseEmailVerifiedAt($command->emailVerifiedAt),
             );
             $adminEmail = $admin['user']->getEmail();
             $adminUsername = $admin['user']->getUsername();
@@ -157,5 +161,19 @@ final class CreateTenantShopHandler
         }
 
         return $account;
+    }
+
+    private static function parseEmailVerifiedAt(?string $value): ?\DateTimeImmutable
+    {
+        if (null === $value || '' === trim($value)) {
+            return null;
+        }
+
+        $parsed = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, trim($value));
+        if (false === $parsed) {
+            $parsed = new \DateTimeImmutable(trim($value));
+        }
+
+        return $parsed;
     }
 }

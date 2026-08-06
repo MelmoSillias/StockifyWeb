@@ -7,6 +7,8 @@ use App\IdentityAccess\Application\Service\GlobalAuthFailedException;
 use App\IdentityAccess\Application\Service\GlobalAuthService;
 use App\IdentityAccess\Application\Service\RefreshTokenService;
 use App\IdentityAccess\Application\Service\RegisterUserService;
+use App\IdentityAccess\Application\Service\ResendVerificationEmailService;
+use App\IdentityAccess\Domain\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +23,7 @@ final class AuthController extends AbstractController
         private readonly RegisterUserService $registerUserService,
         private readonly RefreshTokenService $refreshTokenService,
         private readonly GlobalAuthService $globalAuthService,
+        private readonly ResendVerificationEmailService $resendVerificationEmailService,
     ) {
     }
 
@@ -95,5 +98,27 @@ final class AuthController extends AbstractController
         }
 
         return $this->json($result);
+    }
+
+    #[Route('/auth/verification/resend', name: 'api_auth_verification_resend', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function resendVerificationEmail(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->json(['error' => 'Authentication required.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if ($user->isEmailVerified()) {
+            return $this->json(['message' => 'Email is already verified.']);
+        }
+
+        try {
+            $this->resendVerificationEmailService->resend($user);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json(['message' => 'If your account requires verification, a new email has been sent.']);
     }
 }

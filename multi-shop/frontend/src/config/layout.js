@@ -80,6 +80,10 @@ export const layoutOptionSets = {
     { label: 'Fixed', value: 'fixed' },
     { label: 'Overlay', value: 'overlay' }
   ],
+  layoutStyles: [
+    { label: 'Classique', value: 'attached' },
+    { label: 'Detache', value: 'detached' }
+  ],
   motionPresets: [
     { label: 'Calm', value: 'calm' },
     { label: 'Expressive', value: 'expressive' },
@@ -134,6 +138,7 @@ export const layoutDefaults = {
     gradientMode: 'gradient'
   },
   layout: {
+    layoutStyle: 'attached',
     sidebarLogoPosition: 'top',
     sidebarProfilePosition: 'bottom',
     sidebarSearchPosition: 'hidden',

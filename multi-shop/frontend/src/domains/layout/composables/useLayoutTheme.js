@@ -1,8 +1,25 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { palette, updatePrimaryPalette } from '@primeuix/themes'
 
 import { layoutOptionSets } from '@/domains/layout/config/appLayout'
 import { useLayoutStore } from '@/domains/layout/stores/layout'
+
+const accentColorMap = {
+  emerald: '#10b981',
+  cyan: '#06b6d4',
+  amber: '#f59e0b',
+  rose: '#f43f5e',
+  orange: '#f79e1b'
+}
+
+const resolveAccentHex = (accentName, accentColor) => {
+  if (accentName === 'custom') {
+    return normalizeHex(accentColor) || accentColorMap.emerald
+  }
+
+  return accentColorMap[accentName] || accentColorMap.emerald
+}
 
 const normalizeHex = (value) => {
   if (!value) {
@@ -128,9 +145,9 @@ export function useLayoutTheme() {
       root.dataset.layoutGradient = gradientMode.value
       root.classList.toggle('app-dark', isDarkModeActive.value)
 
-      if (accentName.value === 'custom') {
-        const resolvedAccent = normalizeHex(accentColor.value) || '#10b981'
+      const resolvedAccent = resolveAccentHex(accentName.value, accentColor.value)
 
+      if (accentName.value === 'custom') {
         root.style.setProperty('--layout-accent', resolvedAccent)
         root.style.setProperty('--layout-accent-strong', mixHex(resolvedAccent, '#000000', 0.28))
         root.style.setProperty('--layout-accent-soft', toRgba(resolvedAccent, 0.16))
@@ -139,6 +156,8 @@ export function useLayoutTheme() {
         root.style.removeProperty('--layout-accent-strong')
         root.style.removeProperty('--layout-accent-soft')
       }
+
+      updatePrimaryPalette(palette(resolvedAccent))
     },
     { immediate: true }
   )
@@ -171,6 +190,7 @@ export function useLayoutTheme() {
     setSidebarSearchPosition: layoutStore.setSidebarSearchPosition,
     setTopbarLogoVisibility: layoutStore.setTopbarLogoVisibility,
     setTopbarProfilePosition: layoutStore.setTopbarProfilePosition,
-    setTopbarSearchPosition: layoutStore.setTopbarSearchPosition
+    setTopbarSearchPosition: layoutStore.setTopbarSearchPosition,
+    setLayoutStyle: layoutStore.setLayoutStyle
   }
 }
