@@ -1,6 +1,9 @@
 export const featureLabels = {
   'stockify.multi_shop': 'Multi-boutiques',
-  'stockify.analytics': 'Analytics avancées'
+  'stockify.orders': 'Commandes',
+  'stockify.quotes': 'Devis',
+  'stockify.analytics': 'Analytics avancées',
+  'stockify.suppliers': 'Fournisseurs'
 }
 
 export const heroPillars = [
@@ -63,7 +66,7 @@ export const showcaseSections = [
 export const heroStats = [
   { value: 'Multi', label: 'Boutiques gérées' },
   { value: '100%', label: 'Centralisé' },
-  { value: 'Gratuit', label: 'Pendant la bêta' }
+  { value: '1 mois', label: 'Essai Starter' }
 ]
 
 export const trustLogos = [
@@ -145,4 +148,4 @@ export const featureModules = [
 
 export const defaultApplicationSlug = 'stockify'
 
-export const betaPlanNotice = 'Plan Starter — gratuit pendant la bêta'
+export const betaPlanNotice = 'Plan Starter — 1 mois d’essai gratuit'

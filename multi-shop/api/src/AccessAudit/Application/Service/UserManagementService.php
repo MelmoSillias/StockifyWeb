@@ -15,6 +15,9 @@ use App\AccessAudit\Domain\Repository\UserRoleRepositoryInterface;
 use App\IdentityAccess\Domain\Entity\User;
 use App\IdentityAccess\Domain\Enum\UserStatus;
 use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
+use App\Integration\Domain\Repository\TenantAccountRepositoryInterface;
+use App\Shop\Domain\Repository\ShopRepositoryInterface;
 use App\SharedKernel\Infrastructure\Shop\ShopContextHolder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -33,6 +36,9 @@ final class UserManagementService
         private readonly EntityManagerInterface $entityManager,
         private readonly AuditLoggerService $auditLogger,
         private readonly ShopContextHolder $shopContextHolder,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
+        private readonly ShopRepositoryInterface $shopRepository,
+        private readonly TenantAccountRepositoryInterface $tenantAccountRepository,
     ) {
     }
 
@@ -76,9 +82,19 @@ final class UserManagementService
         }
 
         $shopContext = $this->shopContextHolder->get();
+        $tenantAccountId = null;
         if (null !== $shopContext) {
             if ($this->userRepository->findByUsernameAndShop($username, $shopContext->getShopId()) !== null) {
                 throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
+            }
+
+            $shop = $this->shopRepository->findById($shopContext->getShopId());
+            $tenantAccountId = $shop?->getTenantAccountId();
+            if (null !== $tenantAccountId) {
+                $account = $this->tenantAccountRepository->findById($tenantAccountId);
+                if (null !== $account) {
+                    $this->tenantFeatureGuard->assertCanCreateUser($account);
+                }
             }
         } elseif ($this->userRepository->findByUsername($username) !== null) {
             throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
@@ -90,6 +106,9 @@ final class UserManagementService
 
         if (null !== $shopContext) {
             $user->assignToShop($shopContext->getShopId());
+            if (null !== $tenantAccountId) {
+                $user->assignToTenantAccount($tenantAccountId);
+            }
         }
 
         $this->assignRolesAndPermissions($user, $roleCodes, $permissionOverrides);

@@ -109,6 +109,34 @@ class ControlPlaneClient implements ControlPlaneGatewayInterface
     }
 
     /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>
+     */
+    public function submitQuoteRequest(array $payload): array
+    {
+        $baseUrl = $this->requireBaseUrl();
+
+        $response = $this->httpClient->request('POST', rtrim($baseUrl, '/').'/api/public/quote-requests', [
+            'json' => $payload,
+            'timeout' => 15,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        $body = $this->decodeJsonResponse($response->getContent(false), $statusCode);
+
+        if ($statusCode >= 400) {
+            $message = is_array($body)
+                ? (string) ($body['error'] ?? $body['message'] ?? 'Quote request failed')
+                : 'Quote request failed';
+
+            throw new ControlPlaneException($message, $statusCode);
+        }
+
+        return $body;
+    }
+
+    /**
      * @return array{features: list<string>, quotas: array<string, int|float>, updated_at: ?string}
      */
     public function pullEntitlements(string $externalAccountId, string $applicationSlug = 'stockify'): array

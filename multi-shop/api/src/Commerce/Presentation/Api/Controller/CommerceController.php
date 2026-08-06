@@ -11,6 +11,7 @@ use App\Commerce\Domain\Entity\Devis;
 use App\Commerce\Domain\Repository\CommandeRepositoryInterface;
 use App\Commerce\Domain\Repository\DevisRepositoryInterface;
 use App\Commerce\Domain\Repository\VenteRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ final class CommerceController extends AbstractController
         private readonly VenteRepositoryInterface $venteRepository,
         private readonly CommandeRepositoryInterface $commandeRepository,
         private readonly DevisRepositoryInterface $devisRepository,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
     ) {
     }
 
@@ -92,6 +94,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.view')]
     public function listCommandes(): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         return $this->json(array_map(
             fn ($commande) => $this->commandeDetailMapper->map($commande)->toArray(),
             $this->commandeRepository->findAll(),
@@ -102,6 +106,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.view')]
     public function showCommande(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         return $this->json($this->commandeDetailMapper->map($this->getCommande($id))->toArray());
     }
 
@@ -109,6 +115,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.create')]
     public function createCommande(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         try {
             $commande = $this->commerceService->initierCommande($request->toArray());
         } catch (\InvalidArgumentException $e) {
@@ -122,6 +130,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.confirm')]
     public function confirmCommande(string $id, Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         $commande = $this->getCommande($id);
         try {
             $this->commerceService->confirmerCommande($commande, $request->toArray());
@@ -138,6 +148,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.cancel')]
     public function cancelCommande(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         $commande = $this->getCommande($id);
         try {
             $this->commerceService->annulerCommande($commande);
@@ -152,6 +164,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.devis.view')]
     public function listDevis(): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+
         return $this->json(array_map(
             fn ($devis) => $this->devisDetailMapper->map($devis)->toArray(),
             $this->devisRepository->findAll(),
@@ -162,6 +176,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.devis.view')]
     public function showDevis(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+
         return $this->json($this->devisDetailMapper->map($this->getDevis($id))->toArray());
     }
 
@@ -169,6 +185,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.devis.create')]
     public function createDevis(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+
         try {
             $devis = $this->commerceService->creerDevis($request->toArray());
         } catch (\InvalidArgumentException $e) {
@@ -182,6 +200,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.devis.cancel')]
     public function cancelDevis(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+
         $devis = $this->getDevis($id);
         try {
             $this->commerceService->annulerDevis($devis);
@@ -197,6 +217,8 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.ventes.create')]
     public function convertDevisToVente(string $id, Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+
         $devis = $this->getDevis($id);
         try {
             $vente = $this->commerceService->convertirDevisEnVente($devis, $request->toArray());
@@ -217,6 +239,9 @@ final class CommerceController extends AbstractController
     #[IsGranted('commerce.commandes.create')]
     public function convertDevisToCommande(string $id, Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.quotes');
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.orders');
+
         $devis = $this->getDevis($id);
         try {
             $commande = $this->commerceService->convertirDevisEnCommande($devis, $request->toArray());

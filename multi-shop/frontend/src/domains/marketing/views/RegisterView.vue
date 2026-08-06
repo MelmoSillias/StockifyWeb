@@ -11,8 +11,8 @@
             <span class="mkt-tag">Inscription</span>
             <h1 class="mkt-title mkt-title--sm">Rejoignez LafiaSugu</h1>
             <p class="mkt-lead">
-              Pendant la bêta, tous les nouveaux comptes démarrent sur le plan Starter.
-              L'infrastructure de paiement arrivera prochainement pour activer les plans avancés.
+              Tous les nouveaux comptes démarrent sur le plan Starter avec 1 mois d’essai gratuit.
+              L’infrastructure de paiement arrivera prochainement pour activer les plans avancés.
             </p>
           </div>
 

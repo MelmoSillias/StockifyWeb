@@ -2,6 +2,7 @@
 
 namespace App\Integration\Application\Service;
 
+use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
 use App\Integration\Domain\Entity\TenantAccount;
 use App\Shop\Domain\Repository\ShopRepositoryInterface;
 
@@ -9,6 +10,7 @@ final class TenantEntitlementResolver
 {
     public function __construct(
         private readonly ShopRepositoryInterface $shopRepository,
+        private readonly UserRepositoryInterface $userRepository,
     ) {
     }
 
@@ -64,5 +66,24 @@ final class TenantEntitlementResolver
         $maxShops = $this->getQuota($account, 'max_shops', 1);
 
         return max(0, $maxShops - $this->countShops($account));
+    }
+
+    public function countUsers(TenantAccount $account): int
+    {
+        return $this->userRepository->countByTenantAccountId($account->getId());
+    }
+
+    public function canCreateUser(TenantAccount $account): bool
+    {
+        $maxUsers = $this->getQuota($account, 'max_users', 3);
+
+        return $this->countUsers($account) < $maxUsers;
+    }
+
+    public function remainingUserQuota(TenantAccount $account): int
+    {
+        $maxUsers = $this->getQuota($account, 'max_users', 3);
+
+        return max(0, $maxUsers - $this->countUsers($account));
     }
 }

@@ -29,4 +29,11 @@ interface ControlPlaneGatewayInterface
      * @return array{features: list<string>, quotas: array<string, int|float>, updated_at: ?string}
      */
     public function pullEntitlements(string $externalAccountId, string $applicationSlug = 'stockify'): array;
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>
+     */
+    public function submitQuoteRequest(array $payload): array;
 }

@@ -2,16 +2,18 @@
   <div class="register-form">
     <div class="register-form__header">
       <h2>Créez votre compte</h2>
-      <p>Identité, connexion, puis votre boutique — en trois étapes.</p>
+      <p>Identité, boutique, connexion, plan, puis récapitulatif.</p>
     </div>
 
     <span class="register-form__badge">{{ betaPlanNotice }}</span>
 
-    <Stepper v-model:value="step" class="stepper-animated">
+    <Stepper v-model:value="step" linear class="stepper-animated">
       <StepList>
         <Step value="1">Identité</Step>
-        <Step value="2">Connexion</Step>
-        <Step value="3">Boutique</Step>
+        <Step value="2">Boutique</Step>
+        <Step value="3">Connexion</Step>
+        <Step value="4">Plan</Step>
+        <Step value="5">Récap</Step>
       </StepList>
       <StepPanels>
         <StepPanel v-slot="{ active }" value="1">
@@ -59,55 +61,6 @@
         <StepPanel v-slot="{ active }" value="2">
           <Transition :name="transitionName" mode="out-in">
             <div v-if="active" key="step-2" class="register-form__panel">
-              <div class="register-form__field">
-                <label for="adminEmail">E-mail</label>
-                <InputText
-                  id="adminEmail"
-                  v-model="adminEmail"
-                  type="email"
-                  placeholder="owner@example.com"
-                  fluid
-                  :invalid="!!errors.adminEmail"
-                />
-                <small v-if="errors.adminEmail" class="register-form__error">{{ errors.adminEmail }}</small>
-              </div>
-
-              <div class="register-form__field">
-                <label for="adminPassword">Mot de passe</label>
-                <Password
-                  id="adminPassword"
-                  v-model="adminPassword"
-                  placeholder="Minimum 8 caractères"
-                  fluid
-                  toggle-mask
-                  :feedback="false"
-                  :invalid="!!errors.adminPassword"
-                />
-                <small v-if="errors.adminPassword" class="register-form__error">{{ errors.adminPassword }}</small>
-              </div>
-
-              <div class="register-form__field">
-                <label for="adminPasswordConfirm">Confirmer le mot de passe</label>
-                <Password
-                  id="adminPasswordConfirm"
-                  v-model="adminPasswordConfirm"
-                  placeholder="Retapez le mot de passe"
-                  fluid
-                  toggle-mask
-                  :feedback="false"
-                  :invalid="!!errors.adminPasswordConfirm"
-                />
-                <small v-if="errors.adminPasswordConfirm" class="register-form__error">
-                  {{ errors.adminPasswordConfirm }}
-                </small>
-              </div>
-            </div>
-          </Transition>
-        </StepPanel>
-
-        <StepPanel v-slot="{ active }" value="3">
-          <Transition :name="transitionName" mode="out-in">
-            <div v-if="active" key="step-3" class="register-form__panel">
               <div class="register-form__field">
                 <label for="accountName">Nom de la boutique</label>
                 <InputText
@@ -159,6 +112,92 @@
             </div>
           </Transition>
         </StepPanel>
+
+        <StepPanel v-slot="{ active }" value="3">
+          <Transition :name="transitionName" mode="out-in">
+            <div v-if="active" key="step-3" class="register-form__panel">
+              <div class="register-form__field">
+                <label for="adminEmail">E-mail</label>
+                <InputText
+                  id="adminEmail"
+                  v-model="adminEmail"
+                  type="email"
+                  placeholder="owner@example.com"
+                  fluid
+                  :invalid="!!errors.adminEmail"
+                />
+                <small v-if="errors.adminEmail" class="register-form__error">{{ errors.adminEmail }}</small>
+              </div>
+
+              <div class="register-form__field">
+                <label for="adminPassword">Mot de passe</label>
+                <Password
+                  id="adminPassword"
+                  v-model="adminPassword"
+                  placeholder="Minimum 8 caractères"
+                  fluid
+                  toggle-mask
+                  :feedback="false"
+                  :invalid="!!errors.adminPassword"
+                />
+                <small v-if="errors.adminPassword" class="register-form__error">{{ errors.adminPassword }}</small>
+              </div>
+
+              <div class="register-form__field">
+                <label for="adminPasswordConfirm">Confirmer le mot de passe</label>
+                <Password
+                  id="adminPasswordConfirm"
+                  v-model="adminPasswordConfirm"
+                  placeholder="Retapez le mot de passe"
+                  fluid
+                  toggle-mask
+                  :feedback="false"
+                  :invalid="!!errors.adminPasswordConfirm"
+                />
+                <small v-if="errors.adminPasswordConfirm" class="register-form__error">
+                  {{ errors.adminPasswordConfirm }}
+                </small>
+              </div>
+            </div>
+          </Transition>
+        </StepPanel>
+
+        <StepPanel v-slot="{ active }" value="4">
+          <Transition :name="transitionName" mode="out-in">
+            <div v-if="active" key="step-4" class="register-form__panel">
+              <div class="register-form__field">
+                <label for="planCode">Plan</label>
+                <Select
+                  id="planCode"
+                  v-model="selectedPlanCode"
+                  :options="planOptions"
+                  option-label="label"
+                  option-value="code"
+                  placeholder="Choisir un plan"
+                  fluid
+                  :invalid="!!errors.planCode"
+                />
+                <small v-if="errors.planCode" class="register-form__error">{{ errors.planCode }}</small>
+                <small class="register-form__optional">
+                  Pendant la bêta, le serveur peut forcer le plan Starter.
+                </small>
+              </div>
+            </div>
+          </Transition>
+        </StepPanel>
+
+        <StepPanel v-slot="{ active }" value="5">
+          <Transition :name="transitionName" mode="out-in">
+            <div v-if="active" key="step-5" class="register-form__panel">
+              <div class="register-form__recap text-sm">
+                <p><strong>Client :</strong> {{ firstName }} {{ lastName }}</p>
+                <p><strong>Boutique :</strong> {{ accountName }} ({{ accountSlug }})</p>
+                <p><strong>E-mail :</strong> {{ adminEmail }}</p>
+                <p><strong>Plan :</strong> {{ selectedPlanLabel }}</p>
+              </div>
+            </div>
+          </Transition>
+        </StepPanel>
       </StepPanels>
     </Stepper>
 
@@ -176,7 +215,7 @@
         @click="prevStep"
       />
       <Button
-        v-if="step !== '3'"
+        v-if="step !== '5'"
         type="button"
         label="Suivant"
         icon="pi pi-arrow-right"
@@ -205,12 +244,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import Password from 'primevue/password'
+import Select from 'primevue/select'
 import Step from 'primevue/step'
 import StepList from 'primevue/steplist'
 import StepPanel from 'primevue/steppanel'
@@ -219,6 +259,7 @@ import Stepper from 'primevue/stepper'
 import { betaPlanNotice } from '@/domains/marketing/config/marketingContent'
 import { useAccountSlug } from '@/domains/marketing/composables/useAccountSlug'
 import { useMarketingAuth } from '@/domains/marketing/composables/useMarketingAuth'
+import { plansService } from '@/domains/marketing/services/plansService'
 import { signupService } from '@/domains/marketing/services/signupService'
 import { extractApiError } from '@/domains/shared/services/http'
 import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
@@ -242,103 +283,93 @@ const adminPasswordConfirm = ref('')
 const accountName = ref('')
 const shopPhone = ref('')
 const shopAddress = ref('')
+const plans = ref([])
+const selectedPlanCode = ref(route.query.plan ? String(route.query.plan) : 'starter')
 const errors = ref({})
-const requestedPlanCode = route.query.plan ? String(route.query.plan) : null
 
 const { accountSlug, onSlugInput } = useAccountSlug(accountName)
 
-const validateIdentityStep = () => {
-  const nextErrors = {}
-
-  if (!firstName.value.trim()) {
-    nextErrors.firstName = 'Le prénom est requis.'
-  }
-
-  if (!lastName.value.trim()) {
-    nextErrors.lastName = 'Le nom est requis.'
-  }
-
-  errors.value = nextErrors
-
-  return Object.keys(nextErrors).length === 0
+const formatPlanPrice = (plan) => {
+  const amount = plan.priceFcfa ?? plan.priceCents ?? 0
+  if (!amount) return 'Gratuit'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'XOF',
+    maximumFractionDigits: 0
+  }).format(amount)
 }
 
-const validateCredentialsStep = () => {
+const planOptions = computed(() =>
+  plans.value.map((plan) => ({
+    ...plan,
+    label: `${plan.name} — ${formatPlanPrice(plan)}`
+  }))
+)
+
+const selectedPlanLabel = computed(() => {
+  const plan = plans.value.find((p) => p.code === selectedPlanCode.value)
+  return plan ? `${plan.name} (${formatPlanPrice(plan)})` : selectedPlanCode.value
+})
+
+const validateIdentityStep = () => {
   const nextErrors = {}
-
-  if (!adminEmail.value.trim()) {
-    nextErrors.adminEmail = 'L’e-mail est requis.'
-  }
-
-  if (!adminPassword.value) {
-    nextErrors.adminPassword = 'Le mot de passe est requis.'
-  } else if (adminPassword.value.length < 8) {
-    nextErrors.adminPassword = 'Le mot de passe doit contenir au moins 8 caractères.'
-  }
-
-  if (!adminPasswordConfirm.value) {
-    nextErrors.adminPasswordConfirm = 'Veuillez confirmer le mot de passe.'
-  } else if (adminPasswordConfirm.value !== adminPassword.value) {
-    nextErrors.adminPasswordConfirm = 'Les mots de passe ne correspondent pas.'
-  }
-
+  if (!firstName.value.trim()) nextErrors.firstName = 'Le prénom est requis.'
+  if (!lastName.value.trim()) nextErrors.lastName = 'Le nom est requis.'
   errors.value = nextErrors
-
   return Object.keys(nextErrors).length === 0
 }
 
 const validateShopStep = () => {
   const nextErrors = {}
-
-  if (!accountName.value.trim()) {
-    nextErrors.accountName = 'Le nom de la boutique est requis.'
-  }
-
-  if (!accountSlug.value.trim()) {
-    nextErrors.accountSlug = 'Le slug est requis.'
-  }
-
+  if (!accountName.value.trim()) nextErrors.accountName = 'Le nom de la boutique est requis.'
+  if (!accountSlug.value.trim()) nextErrors.accountSlug = 'Le slug est requis.'
   errors.value = nextErrors
+  return Object.keys(nextErrors).length === 0
+}
 
+const validateCredentialsStep = () => {
+  const nextErrors = {}
+  if (!adminEmail.value.trim()) nextErrors.adminEmail = 'L’e-mail est requis.'
+  if (!adminPassword.value) {
+    nextErrors.adminPassword = 'Le mot de passe est requis.'
+  } else if (adminPassword.value.length < 8) {
+    nextErrors.adminPassword = 'Le mot de passe doit contenir au moins 8 caractères.'
+  }
+  if (!adminPasswordConfirm.value) {
+    nextErrors.adminPasswordConfirm = 'Veuillez confirmer le mot de passe.'
+  } else if (adminPasswordConfirm.value !== adminPassword.value) {
+    nextErrors.adminPasswordConfirm = 'Les mots de passe ne correspondent pas.'
+  }
+  errors.value = nextErrors
+  return Object.keys(nextErrors).length === 0
+}
+
+const validatePlanStep = () => {
+  const nextErrors = {}
+  if (!selectedPlanCode.value) nextErrors.planCode = 'Choisissez un plan.'
+  errors.value = nextErrors
   return Object.keys(nextErrors).length === 0
 }
 
 const prevStep = () => {
   stepDirection.value = 'back'
-  if (step.value === '3') {
-    step.value = '2'
-  } else if (step.value === '2') {
-    step.value = '1'
-  }
+  const current = Number(step.value)
+  if (current > 1) step.value = String(current - 1)
   errors.value = {}
 }
 
 const nextStep = () => {
-  if (step.value === '1') {
-    if (!validateIdentityStep()) {
-      return
-    }
-    errors.value = {}
-    stepDirection.value = 'forward'
-    step.value = '2'
-    return
-  }
-
-  if (step.value === '2') {
-    if (!validateCredentialsStep()) {
-      return
-    }
-    errors.value = {}
-    stepDirection.value = 'forward'
-    step.value = '3'
-  }
+  if (step.value === '1' && !validateIdentityStep()) return
+  if (step.value === '2' && !validateShopStep()) return
+  if (step.value === '3' && !validateCredentialsStep()) return
+  if (step.value === '4' && !validatePlanStep()) return
+  errors.value = {}
+  stepDirection.value = 'forward'
+  step.value = String(Number(step.value) + 1)
 }
 
 const { pending: loading, run: submit } = useAsyncAction(async () => {
-  if (!validateShopStep()) {
-    return
-  }
-
+  if (!validatePlanStep()) return
   errors.value = {}
 
   try {
@@ -353,7 +384,7 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
       shopPhone: shopPhone.value.trim() || undefined,
       shopAddress: shopAddress.value.trim() || undefined,
       billingEmail: adminEmail.value.trim(),
-      requestedPlanCode
+      requestedPlanCode: selectedPlanCode.value
     })
 
     emit('success', result)
@@ -363,6 +394,17 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
       general: apiError.message,
       ...apiError.fieldErrors
     }
+  }
+})
+
+onMounted(async () => {
+  try {
+    plans.value = await plansService.list()
+    if (!plans.value.some((p) => p.code === selectedPlanCode.value)) {
+      selectedPlanCode.value = plans.value[0]?.code || 'starter'
+    }
+  } catch {
+    plans.value = [{ code: 'starter', name: 'Starter', priceFcfa: 0 }]
   }
 })
 </script>
@@ -479,6 +521,11 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   padding-top: 0.5rem;
 }
 
+.register-form__recap p {
+  margin: 0 0 0.5rem;
+  color: var(--mkt-light-text);
+}
+
 .register-form__field {
   display: flex;
   flex-direction: column;
@@ -509,7 +556,6 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   font-weight: 700;
 }
 
-/* —— Stepper: light surface + animated header —— */
 .register-form :deep(.stepper-animated),
 .register-form :deep(.p-stepper) {
   min-width: 0;
@@ -541,6 +587,7 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   font-size: 0.68rem;
   line-height: 1;
   border-width: 1.5px;
+  box-shadow: none;
   transition:
     min-width 320ms cubic-bezier(0.22, 1, 0.36, 1),
     width 320ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -548,8 +595,11 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
     font-size 280ms ease,
     background-color 280ms ease,
     border-color 280ms ease,
-    color 280ms ease,
-    box-shadow 280ms ease;
+    color 280ms ease;
+}
+
+.register-form :deep(.p-step-number::after) {
+  box-shadow: none;
 }
 
 .register-form :deep(.p-step-active .p-step-number) {
@@ -559,7 +609,13 @@ const { pending: loading, run: submit } = useAsyncAction(async () => {
   background: var(--mkt-accent);
   border-color: var(--mkt-accent);
   color: #ffffff;
-  box-shadow: 0 6px 16px var(--mkt-accent-glow);
+  box-shadow: none;
+}
+
+.register-form :deep(.p-step-header:disabled),
+.register-form :deep(.p-step.p-disabled .p-step-header) {
+  cursor: default;
+  opacity: 1;
 }
 
 .register-form :deep(.p-step:has(~ .p-step-active) .p-step-number) {

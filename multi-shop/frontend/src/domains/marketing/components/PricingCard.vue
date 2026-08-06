@@ -1,6 +1,7 @@
 <template>
   <article class="pricing-card" :class="{ 'pricing-card--featured': featured }">
     <span v-if="featured" class="pricing-card__badge">Recommandé</span>
+    <span v-if="isStarter" class="pricing-card__trial">1 mois d’essai gratuit</span>
 
     <div class="pricing-card__head">
       <p class="pricing-card__name">{{ plan.name }}</p>
@@ -15,9 +16,17 @@
         <i class="pi pi-check"></i>
         {{ maxShops }} boutique{{ maxShops > 1 ? 's' : '' }} incluse{{ maxShops > 1 ? 's' : '' }}
       </li>
+      <li v-if="maxUsers">
+        <i class="pi pi-check"></i>
+        {{ maxUsers }} utilisateur{{ maxUsers > 1 ? 's' : '' }}
+      </li>
       <li v-for="feature in featureItems" :key="feature">
         <i class="pi pi-check"></i>
         {{ feature }}
+      </li>
+      <li v-if="!featureItems.length && isStarter">
+        <i class="pi pi-check"></i>
+        Stock, panier, ventes et paiements
       </li>
     </ul>
 
@@ -49,16 +58,19 @@ const props = defineProps({
   }
 })
 
+const isStarter = computed(() => props.plan.code === 'starter')
+
 const formattedPrice = computed(() => {
-  if (!props.plan.priceCents) {
+  const amount = props.plan.priceFcfa ?? props.plan.priceCents ?? 0
+  if (!amount) {
     return 'Gratuit'
   }
 
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'EUR',
+    currency: 'XOF',
     maximumFractionDigits: 0
-  }).format(props.plan.priceCents / 100)
+  }).format(amount)
 })
 
 const billingLabel = computed(() => (
@@ -66,6 +78,7 @@ const billingLabel = computed(() => (
 ))
 
 const maxShops = computed(() => props.plan.quotas?.max_shops ?? null)
+const maxUsers = computed(() => props.plan.quotas?.max_users ?? null)
 
 const featureItems = computed(() => (
   (props.plan.features ?? []).map((feature) => featureLabels[feature.code] ?? feature.name)
@@ -78,7 +91,11 @@ const ctaLabel = computed(() => {
     return 'Accéder au dashboard'
   }
 
-  return props.featured ? 'Commencer gratuitement' : 'Choisir ce plan'
+  if (isStarter.value) {
+    return 'Commencer gratuitement'
+  }
+
+  return props.featured ? 'Choisir Essentiels' : 'Choisir ce plan'
 })
 </script>
 
@@ -121,6 +138,16 @@ const ctaLabel = computed(() => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.pricing-card__trial {
+  align-self: flex-start;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--mkt-radius-pill);
+  background: color-mix(in srgb, var(--mkt-accent) 12%, white);
+  color: var(--mkt-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .pricing-card__name {

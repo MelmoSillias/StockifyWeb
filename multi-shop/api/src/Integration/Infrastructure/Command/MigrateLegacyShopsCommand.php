@@ -66,8 +66,8 @@ final class MigrateLegacyShopsCommand extends Command
             }
 
             $tenant = new TenantAccount($externalAccountId, [
-                'features' => ['stockify.multi_shop'],
-                'quotas' => ['max_shops' => 1],
+                'features' => [],
+                'quotas' => ['max_shops' => 1, 'max_users' => 3],
             ]);
             $tenant->markProvisioned();
 

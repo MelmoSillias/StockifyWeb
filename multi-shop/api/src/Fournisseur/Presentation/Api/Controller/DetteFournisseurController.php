@@ -6,6 +6,7 @@ use App\Fournisseur\Application\Service\AchatsService;
 use App\Fournisseur\Application\Service\DetteDetailMapper;
 use App\Fournisseur\Domain\Enum\DetteFilterStatus;
 use App\Fournisseur\Domain\Repository\DetteFournisseurRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ final class DetteFournisseurController extends AbstractController
         private readonly DetteDetailMapper $detteDetailMapper,
         private readonly DetteFournisseurRepositoryInterface $detteRepository,
         private readonly AchatsService $achatsService,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
     ) {
     }
 
@@ -28,6 +30,8 @@ final class DetteFournisseurController extends AbstractController
     #[IsGranted('fournisseur.dettes.view')]
     public function list(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $fournisseurId = $request->query->get('fournisseur_id');
         $status = $this->resolveStatus($request->query->get('status'));
 
@@ -51,6 +55,8 @@ final class DetteFournisseurController extends AbstractController
     #[IsGranted('fournisseur.dettes.view')]
     public function show(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $dette = $this->detteRepository->findById(Uuid::fromString($id));
         if (null === $dette) {
             throw $this->createNotFoundException();
@@ -63,6 +69,8 @@ final class DetteFournisseurController extends AbstractController
     #[IsGranted('fournisseur.dettes.create')]
     public function create(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         try {
             $dette = $this->achatsService->creerDetteManuelle($request->toArray());
         } catch (\InvalidArgumentException | \ValueError $e) {

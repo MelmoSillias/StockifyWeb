@@ -5,12 +5,12 @@
         <p class="mkt-eyebrow">Tarifs</p>
         <h2 class="mkt-title mkt-title--sm">Des plans adaptés à chaque étape.</h2>
         <p class="mkt-lead">
-          Tarifs synchronisés dynamiquement — commencez gratuitement avec Starter pendant la bêta.
+          Démarrez avec 1 mois d’essai gratuit sur Starter, puis choisissez le plan qui suit votre croissance.
         </p>
       </div>
 
       <div v-if="loading" class="landing-pricing__state">
-        <Skeleton v-for="index in 2" :key="index" height="20rem" class="landing-pricing__skeleton" />
+        <Skeleton v-for="index in 4" :key="index" height="20rem" class="landing-pricing__skeleton" />
       </div>
 
       <div v-else-if="error" class="landing-pricing__state landing-pricing__error">
@@ -23,8 +23,9 @@
           v-for="plan in plans"
           :key="plan.id"
           :plan="plan"
-          :featured="plan.code === 'starter'"
+          :featured="plan.code === 'essentiels'"
         />
+        <QuoteRequestCard />
       </div>
     </div>
   </section>
@@ -35,6 +36,7 @@ import { onMounted, ref } from 'vue'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
 import PricingCard from '@/domains/marketing/components/PricingCard.vue'
+import QuoteRequestCard from '@/domains/marketing/components/QuoteRequestCard.vue'
 import { plansService } from '@/domains/marketing/services/plansService'
 import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
 
@@ -66,7 +68,7 @@ onMounted(loadPlans)
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
   gap: 1.25rem;
-  max-width: 52rem;
+  max-width: 72rem;
   margin-inline: auto;
 }
 

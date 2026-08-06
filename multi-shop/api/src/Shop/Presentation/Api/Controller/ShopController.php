@@ -163,6 +163,8 @@ final class ShopController extends AbstractController
             );
         } catch (\InvalidArgumentException $exception) {
             return $this->json(['error' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\DomainException $exception) {
+            return $this->json(['error' => $exception->getMessage()], Response::HTTP_CONFLICT);
         }
 
         return $this->json([

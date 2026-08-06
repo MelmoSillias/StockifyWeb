@@ -5,6 +5,7 @@ namespace App\Fournisseur\Presentation\Api\Controller;
 use App\Fournisseur\Application\Service\PaiementFournisseurSerializer;
 use App\Fournisseur\Application\Service\PaiementFournisseurService;
 use App\Fournisseur\Domain\Repository\PaiementFournisseurRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ final class PaiementFournisseurController extends AbstractController
         private readonly PaiementFournisseurService $paiementFournisseurService,
         private readonly PaiementFournisseurRepositoryInterface $paiementFournisseurRepository,
         private readonly PaiementFournisseurSerializer $paiementFournisseurSerializer,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
     ) {
     }
 
@@ -27,6 +29,8 @@ final class PaiementFournisseurController extends AbstractController
     #[IsGranted('fournisseur.dettes.view')]
     public function list(): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         return $this->json(array_map(
             [$this->paiementFournisseurSerializer, 'serialize'],
             $this->paiementFournisseurRepository->findAll(),
@@ -37,6 +41,8 @@ final class PaiementFournisseurController extends AbstractController
     #[IsGranted('fournisseur.paiements.create')]
     public function create(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         try {
             $paiement = $this->paiementFournisseurService->enregistrer($request->toArray());
         } catch (\InvalidArgumentException | \ValueError $e) {
@@ -52,6 +58,8 @@ final class PaiementFournisseurController extends AbstractController
     #[IsGranted('fournisseur.paiements.cancel')]
     public function cancel(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $paiement = $this->paiementFournisseurRepository->findById(Uuid::fromString($id));
         if (null === $paiement) {
             throw $this->createNotFoundException();

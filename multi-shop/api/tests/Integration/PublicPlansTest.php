@@ -16,8 +16,11 @@ final class PublicPlansTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $payload = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(2, $payload['items']);
+        $this->assertCount(3, $payload['items']);
         $this->assertSame('starter', $payload['items'][0]['code']);
-        $this->assertSame('pro', $payload['items'][1]['code']);
+        $this->assertSame('essentiels', $payload['items'][1]['code']);
+        $this->assertSame('pro', $payload['items'][2]['code']);
+        $this->assertSame(4500, $payload['items'][0]['priceFcfa']);
+        $this->assertSame(3, $payload['items'][0]['quotas']['max_users']);
     }
 }

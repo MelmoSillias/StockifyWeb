@@ -16,6 +16,8 @@ interface UserRepositoryInterface
     /** @return list<User> */
     public function findByShopId(Uuid $shopId): array;
 
+    public function countByTenantAccountId(Uuid $tenantAccountId): int;
+
     public function findPlatformOwner(): ?User;
 
     public function findById(Uuid $id): ?User;

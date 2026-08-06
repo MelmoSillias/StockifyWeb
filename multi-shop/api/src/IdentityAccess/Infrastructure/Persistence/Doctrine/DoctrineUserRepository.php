@@ -58,6 +58,16 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
             ->getResult();
     }
 
+    public function countByTenantAccountId(Uuid $tenantAccountId): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.tenantAccountId = :tenantAccountId')
+            ->setParameter('tenantAccountId', $tenantAccountId, 'uuid')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findPlatformOwner(): ?User
     {
         return $this->findOneBy(['isPlatformOwner' => true]);

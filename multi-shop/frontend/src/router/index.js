@@ -126,7 +126,8 @@ const routes = [
           title: 'Commandes',
           section: 'Commerce',
           layoutKey: 'commerce-orders',
-          permission: 'commerce.commandes.view'
+          permission: 'commerce.commandes.view',
+          feature: 'stockify.orders'
         }
       },
       {
@@ -137,7 +138,8 @@ const routes = [
           title: 'Devis',
           section: 'Commerce',
           layoutKey: 'commerce-quotes',
-          permission: 'commerce.devis.view'
+          permission: 'commerce.devis.view',
+          feature: 'stockify.quotes'
         }
       },
       {
@@ -192,7 +194,8 @@ const routes = [
           title: 'Fournisseurs',
           section: 'Fournisseurs',
           layoutKey: 'fournisseurs',
-          permission: 'fournisseur.view'
+          permission: 'fournisseur.view',
+          feature: 'stockify.suppliers'
         }
       },
       {
@@ -203,7 +206,8 @@ const routes = [
           title: 'Carnet de dettes fournisseurs',
           section: 'Fournisseurs',
           layoutKey: 'fournisseur-dettes',
-          permission: 'fournisseur.dettes.view'
+          permission: 'fournisseur.dettes.view',
+          feature: 'stockify.suppliers'
         }
       },
       {
@@ -214,7 +218,8 @@ const routes = [
           title: 'Journal fournisseur',
           section: 'Fournisseurs',
           layoutKey: 'fournisseur-journal',
-          permission: 'fournisseur.view'
+          permission: 'fournisseur.view',
+          feature: 'stockify.suppliers'
         }
       },
       {

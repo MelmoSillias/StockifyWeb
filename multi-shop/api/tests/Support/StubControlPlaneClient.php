@@ -33,6 +33,9 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
     /**
      * @return array<string, mixed>
      */
+    /** @var array<string, mixed>|null */
+    public ?array $lastQuoteRequestPayload = null;
+
     public function fetchPublicPlans(string $applicationSlug = 'stockify'): array
     {
         return [
@@ -41,10 +44,41 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
                     'id' => 'plan-starter',
                     'code' => 'starter',
                     'name' => 'Starter',
-                    'priceCents' => 0,
+                    'priceFcfa' => 4500,
+                    'priceCents' => 4500,
                     'billingPeriod' => 'monthly',
                     'features' => [],
-                    'quotas' => ['max_shops' => 1],
+                    'quotas' => ['max_shops' => 1, 'max_users' => 3],
+                ],
+                [
+                    'id' => 'plan-essentiels',
+                    'code' => 'essentiels',
+                    'name' => 'Essentiels',
+                    'priceFcfa' => 8000,
+                    'priceCents' => 8000,
+                    'billingPeriod' => 'monthly',
+                    'features' => [
+                        ['code' => 'stockify.multi_shop'],
+                        ['code' => 'stockify.orders'],
+                        ['code' => 'stockify.quotes'],
+                    ],
+                    'quotas' => ['max_shops' => 3, 'max_users' => 12],
+                ],
+                [
+                    'id' => 'plan-pro',
+                    'code' => 'pro',
+                    'name' => 'Pro',
+                    'priceFcfa' => 20000,
+                    'priceCents' => 20000,
+                    'billingPeriod' => 'monthly',
+                    'features' => [
+                        ['code' => 'stockify.multi_shop'],
+                        ['code' => 'stockify.orders'],
+                        ['code' => 'stockify.quotes'],
+                        ['code' => 'stockify.analytics'],
+                        ['code' => 'stockify.suppliers'],
+                    ],
+                    'quotas' => ['max_shops' => 7, 'max_users' => 50],
                 ],
             ],
         ];
@@ -76,8 +110,8 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
             ],
             'subscription' => ['planCode' => $payload['planCode']],
             'entitlement' => [
-                'features' => ['stockify.multi_shop'],
-                'quotas' => ['max_shops' => 1],
+                'features' => [],
+                'quotas' => ['max_shops' => 1, 'max_users' => 3],
             ],
             'identityId' => $identityId,
             'shopCredentials' => [
@@ -141,9 +175,27 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
         }
 
         return [
-            'features' => ['stockify.multi_shop'],
-            'quotas' => ['max_shops' => 1],
+            'features' => [],
+            'quotas' => ['max_shops' => 1, 'max_users' => 3],
             'updated_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<string, mixed>
+     */
+    public function submitQuoteRequest(array $payload): array
+    {
+        $this->lastQuoteRequestPayload = $payload;
+
+        return [
+            'id' => 'quote-request-stub',
+            'applicationSlug' => $payload['applicationSlug'] ?? 'stockify',
+            'contactName' => $payload['contactName'] ?? '',
+            'email' => $payload['email'] ?? '',
+            'status' => 'new',
         ];
     }
 

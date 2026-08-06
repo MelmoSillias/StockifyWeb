@@ -5,6 +5,8 @@ namespace App\Shop\Application\Command\CreateShopUser;
 use App\AccessAudit\Application\Service\UserManagementService;
 use App\IdentityAccess\Domain\Entity\User;
 use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
+use App\Integration\Domain\Repository\TenantAccountRepositoryInterface;
 use App\Shop\Application\Service\ShopPasswordGenerator;
 use App\Shop\Domain\Repository\ShopRepositoryInterface;
 use App\Shop\Domain\ValueObject\ShopUsername;
@@ -16,6 +18,8 @@ final class CreateShopUserHandler
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserManagementService $userManagementService,
         private readonly ShopPasswordGenerator $passwordGenerator,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
+        private readonly TenantAccountRepositoryInterface $tenantAccountRepository,
     ) {
     }
 
@@ -27,6 +31,14 @@ final class CreateShopUserHandler
         $shop = $this->shopRepository->findById($command->shopId);
         if (null === $shop) {
             throw new \InvalidArgumentException('Boutique introuvable.');
+        }
+
+        $tenantAccountId = $shop->getTenantAccountId();
+        if (null !== $tenantAccountId) {
+            $account = $this->tenantAccountRepository->findById($tenantAccountId);
+            if (null !== $account) {
+                $this->tenantFeatureGuard->assertCanCreateUser($account);
+            }
         }
 
         $username = ShopUsername::fromString($command->username)->value();
@@ -47,7 +59,6 @@ final class CreateShopUserHandler
         );
 
         $user->assignToShop($shop->getId());
-        $tenantAccountId = $shop->getTenantAccountId();
         if (null !== $tenantAccountId && null === $user->getTenantAccountId()) {
             $user->assignToTenantAccount($tenantAccountId);
         }

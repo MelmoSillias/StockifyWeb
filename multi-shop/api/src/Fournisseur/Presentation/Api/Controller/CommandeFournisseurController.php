@@ -5,6 +5,7 @@ namespace App\Fournisseur\Presentation\Api\Controller;
 use App\Fournisseur\Application\Service\AchatsService;
 use App\Fournisseur\Domain\Entity\CommandeFournisseur;
 use App\Fournisseur\Domain\Repository\CommandeFournisseurRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ final class CommandeFournisseurController extends AbstractController
     public function __construct(
         private readonly AchatsService $achatsService,
         private readonly CommandeFournisseurRepositoryInterface $commandeRepository,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
     ) {
     }
 
@@ -26,6 +28,8 @@ final class CommandeFournisseurController extends AbstractController
     #[IsGranted('fournisseur.commandes.view')]
     public function list(): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         return $this->json(array_map(
             [$this, 'serialize'],
             $this->commandeRepository->findAll(),
@@ -43,6 +47,8 @@ final class CommandeFournisseurController extends AbstractController
     #[IsGranted('fournisseur.commandes.create')]
     public function create(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         try {
             $commande = $this->achatsService->creer($request->toArray());
         } catch (\InvalidArgumentException | \ValueError $e) {
@@ -110,6 +116,8 @@ final class CommandeFournisseurController extends AbstractController
 
     private function getCommande(string $id): CommandeFournisseur
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $commande = $this->commandeRepository->findById(Uuid::fromString($id));
         if (null === $commande) {
             throw $this->createNotFoundException();

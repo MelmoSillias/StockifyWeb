@@ -54,6 +54,7 @@ export const DASHBOARD_CAROUSEL_SLIDE_DEFINITIONS = [
     id: 'recent_orders',
     type: 'recent_orders',
     permission: 'commerce.commandes.view',
+    feature: 'stockify.orders',
     title: 'Dernières commandes',
     shortTitle: 'Commandes',
     icon: 'pi pi-list',
@@ -140,6 +141,7 @@ export const DASHBOARD_QUICK_ACTIONS = [
   {
     id: 'supplier-orders',
     permission: 'fournisseur.commandes.view',
+    feature: 'stockify.suppliers',
     label: 'Commandes fournisseur',
     icon: 'pi pi-truck',
     routeName: 'fournisseurs'
@@ -172,6 +174,7 @@ export const DASHBOARD_FINANCE_WIDGETS = [
   {
     id: 'supplier_dettes',
     permission: 'fournisseur.dettes.view',
+    feature: 'stockify.suppliers',
     title: 'Dettes fournisseurs',
     icon: 'pi pi-building',
     routeName: 'fournisseur-dettes',

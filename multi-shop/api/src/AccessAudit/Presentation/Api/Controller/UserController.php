@@ -74,6 +74,8 @@ final class UserController extends AbstractController
             );
         } catch (\InvalidArgumentException $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\DomainException $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
         }
 
         return $this->json(['data' => $this->userManagementService->serializeUser($user)], Response::HTTP_CREATED);

@@ -105,7 +105,8 @@ export const appConfig = {
             icon: 'pi pi-list',
             routeName: 'commerce-orders',
             section: 'Commerce',
-            requiredPermission: 'commerce.commandes.view'
+            requiredPermission: 'commerce.commandes.view',
+            requiredFeature: 'stockify.orders'
           },
           {
             key: 'commerce-quotes',
@@ -113,7 +114,8 @@ export const appConfig = {
             icon: 'pi pi-file-edit',
             routeName: 'commerce-quotes',
             section: 'Commerce',
-            requiredPermission: 'commerce.devis.view'
+            requiredPermission: 'commerce.devis.view',
+            requiredFeature: 'stockify.quotes'
           },
           {
             key: 'commerce-sales',
@@ -152,6 +154,7 @@ export const appConfig = {
         key: 'fournisseurs',
         label: 'Fournisseurs',
         icon: 'pi pi-truck',
+        requiredFeature: 'stockify.suppliers',
         items: [
           {
             key: 'fournisseurs-list',
@@ -159,7 +162,8 @@ export const appConfig = {
             icon: 'pi pi-list',
             routeName: 'fournisseurs',
             section: 'Fournisseurs',
-            requiredPermission: 'fournisseur.view'
+            requiredPermission: 'fournisseur.view',
+            requiredFeature: 'stockify.suppliers'
           },
           {
             key: 'fournisseur-dettes',
@@ -167,7 +171,8 @@ export const appConfig = {
             icon: 'pi pi-book',
             routeName: 'fournisseur-dettes',
             section: 'Fournisseurs',
-            requiredPermission: 'fournisseur.dettes.view'
+            requiredPermission: 'fournisseur.dettes.view',
+            requiredFeature: 'stockify.suppliers'
           }
         ]
       },

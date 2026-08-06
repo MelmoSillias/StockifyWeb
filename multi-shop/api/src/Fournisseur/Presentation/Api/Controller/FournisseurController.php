@@ -12,6 +12,7 @@ use App\Fournisseur\Domain\Enum\FournisseurStatus;
 use App\Fournisseur\Domain\Repository\CommandeFournisseurRepositoryInterface;
 use App\Fournisseur\Domain\Repository\FournisseurRepositoryInterface;
 use App\Fournisseur\Domain\Repository\PaiementFournisseurRepositoryInterface;
+use App\Integration\Application\Service\TenantFeatureGuard;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,7 @@ final class FournisseurController extends AbstractController
         private readonly DetteDetailMapper $detteDetailMapper,
         private readonly PaiementFournisseurRepositoryInterface $paiementFournisseurRepository,
         private readonly PaiementFournisseurSerializer $paiementFournisseurSerializer,
+        private readonly TenantFeatureGuard $tenantFeatureGuard,
     ) {
     }
 
@@ -37,6 +39,8 @@ final class FournisseurController extends AbstractController
     #[IsGranted('fournisseur.view')]
     public function list(): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         return $this->json(array_map([$this, 'serialize'], $this->fournisseurRepository->findAll()));
     }
 
@@ -44,6 +48,8 @@ final class FournisseurController extends AbstractController
     #[IsGranted('fournisseur.view')]
     public function show(string $id): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         return $this->json($this->serialize($this->getFournisseur($id)));
     }
 
@@ -51,6 +57,8 @@ final class FournisseurController extends AbstractController
     #[IsGranted('fournisseur.manage')]
     public function create(Request $request): JsonResponse
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $data = $request->toArray();
         if (empty($data['name'])) {
             return $this->json(['error' => 'name is required'], Response::HTTP_BAD_REQUEST);
@@ -135,6 +143,8 @@ final class FournisseurController extends AbstractController
 
     private function getFournisseur(string $id): Fournisseur
     {
+        $this->tenantFeatureGuard->assertFeatureForActiveShop('stockify.suppliers');
+
         $fournisseur = $this->fournisseurRepository->findById(Uuid::fromString($id));
         if (null === $fournisseur) {
             throw $this->createNotFoundException();

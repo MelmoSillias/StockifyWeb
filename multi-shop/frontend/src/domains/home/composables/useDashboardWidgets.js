@@ -27,7 +27,9 @@ export function useDashboardWidgets() {
   const showCarousel = computed(() => visibleSlides.value.length > 0)
   const showSalesChart = computed(() => hasPermission('commerce.ventes.view'))
   const showPendingDeliveries = computed(() => hasPermission('commerce.livraisons.view'))
-  const showPendingSupplierOrders = computed(() => hasPermission('fournisseur.commandes.view'))
+  const showPendingSupplierOrders = computed(() => (
+    hasPermission('fournisseur.commandes.view') && hasFeature('stockify.suppliers')
+  ))
   const showRecentAudit = computed(() => hasPermission('access.audit.view'))
   const showFinancePanel = computed(() => visibleFinanceWidgets.value.length > 0)
 

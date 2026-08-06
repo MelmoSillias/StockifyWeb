@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "currency": "XOF",
+  "application": {
+    "slug": "stockify",
+    "name": "Stockify Multi-Shop",
+    "contractVersion": "v1",
+    "capabilities": ["accounts", "entitlements", "health", "usage", "shops", "multi_shop"]
+  },
+  "features": [
+    { "code": "stockify.multi_shop", "name": "Multi-boutique" },
+    { "code": "stockify.orders", "name": "Commandes" },
+    { "code": "stockify.quotes", "name": "Devis" },
+    { "code": "stockify.analytics", "name": "Analytique" },
+    { "code": "stockify.suppliers", "name": "Fournisseurs" }
+  ],
+  "quotas": [
+    {
+      "key": "max_shops",
+      "name": "Boutiques maximales",
+      "description": "Nombre de boutiques autorisées pour le compte",
+      "unit": "shops"
+    },
+    {
+      "key": "max_users",
+      "name": "Utilisateurs maximaux",
+      "description": "Nombre d'utilisateurs autorisés pour le compte",
+      "unit": "users"
+    }
+  ],
+  "plans": [
+    {
+      "code": "starter",
+      "name": "Starter",
+      "priceFcfa": 4500,
+      "billingPeriod": "monthly",
+      "featureCodes": [],
+      "quotas": { "max_shops": 1, "max_users": 3 }
+    },
+    {
+      "code": "essentiels",
+      "name": "Essentiels",
+      "priceFcfa": 8000,
+      "billingPeriod": "monthly",
+      "featureCodes": ["stockify.multi_shop", "stockify.orders", "stockify.quotes"],
+      "quotas": { "max_shops": 3, "max_users": 12 }
+    },
+    {
+      "code": "pro",
+      "name": "Pro",
+      "priceFcfa": 20000,
+      "billingPeriod": "monthly",
+      "featureCodes": [
+        "stockify.multi_shop",
+        "stockify.orders",
+        "stockify.quotes",
+        "stockify.analytics",
+        "stockify.suppliers"
+      ],
+      "quotas": { "max_shops": 7, "max_users": 50 }
+    }
+  ],
+  "onboarding": {
+    "initialResource": {
+      "enabled": true,
+      "label": "Boutique",
+      "integrationOp": "create_shop",
+      "fields": [
+        { "key": "name", "label": "Nom de la boutique", "type": "text", "required": true },
+        { "key": "slug", "label": "Identifiant URL", "type": "slug", "required": true, "from": "name" },
+        { "key": "phone", "label": "Téléphone boutique", "type": "text", "required": false },
+        { "key": "address", "label": "Adresse", "type": "text", "required": false }
+      ]
+    }
+  }
+}
