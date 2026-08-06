@@ -305,6 +305,11 @@
   --layout-sidebar-bg: #e2e8f0;
 }
 
+:root[data-layout-gradient='solid'][data-layout-theme='glass'] {
+  --layout-shell-bg: #e8eef8;
+  --layout-sidebar-bg: rgba(255, 255, 255, 0.72);
+}
+
 :root[data-layout-gradient='solid'].app-dark {
   --layout-shell-bg: #06080d;
   --layout-sidebar-bg: #0f172a;

@@ -12,7 +12,8 @@ export const themeDefaultAccents = {
   ink: 'amber',
   sage: 'emerald',
   coral: 'rose',
-  slatework: 'cyan'
+  slatework: 'cyan',
+  glass: 'cyan'
 }
 
 export const layoutOptionSets = {
@@ -30,7 +31,8 @@ export const layoutOptionSets = {
     { label: 'Ink', value: 'ink' },
     { label: 'Sage', value: 'sage' },
     { label: 'Coral', value: 'coral' },
-    { label: 'Slatework', value: 'slatework' }
+    { label: 'Slatework', value: 'slatework' },
+    { label: 'Glass', value: 'glass' }
   ],
   accents: [
     { label: 'Emerald', value: 'emerald' },
