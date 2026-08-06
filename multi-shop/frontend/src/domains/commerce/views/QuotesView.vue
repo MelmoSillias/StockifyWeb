@@ -150,6 +150,7 @@ import Tag from 'primevue/tag'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import CheckoutDialog from '@/domains/commerce/components/CheckoutDialog.vue'
 import DevisDetailDialog from '@/domains/commerce/components/DevisDetailDialog.vue'
 import CommerceFiltersCard from '@/domains/commerce/components/CommerceFiltersCard.vue'
@@ -172,6 +173,7 @@ import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
 const router = useRouter()
 const quotesStore = useQuotesStore()
 const clientsStore = useClientsStore()
+const { hasFeature } = usePermissions()
 const {
   checkoutVisible: freeOperationVisible,
   submitting: freeSubmitting,
@@ -294,7 +296,7 @@ const quoteRowActions = (quote) => [
   {
     label: 'Convertir en commande',
     icon: 'pi pi-list',
-    visible: quote.status === 'actif',
+    visible: quote.status === 'actif' && hasFeature('stockify.orders'),
     command: () => openOrderConversion(quote)
   },
   {

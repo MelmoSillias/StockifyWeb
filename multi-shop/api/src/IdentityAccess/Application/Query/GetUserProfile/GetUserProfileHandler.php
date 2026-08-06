@@ -24,6 +24,8 @@ final class GetUserProfileHandler
      *     user: array<string, mixed>,
      *     permissions: list<string>,
      *     features: list<string>,
+     *     quotas: array{max_shops: int, max_users: int}|null,
+     *     usage: array{shops: int, users: int}|null,
      *     accessible_shops: list<array<string, mixed>>
      * }
      */
@@ -32,6 +34,7 @@ final class GetUserProfileHandler
         $user = $query->user;
         $roleCodes = $this->permissionResolver->resolveRoleCodes($user);
         $permissions = $this->permissionResolver->resolvePermissions($user);
+        $entitlements = $this->resolveQuotasAndUsage($user);
 
         return [
             'user' => [
@@ -52,6 +55,8 @@ final class GetUserProfileHandler
             ],
             'permissions' => $permissions,
             'features' => $this->resolveFeatures($user),
+            'quotas' => $entitlements['quotas'],
+            'usage' => $entitlements['usage'],
             'accessible_shops' => $this->resolveAccessibleShops($user),
         ];
     }
@@ -70,6 +75,36 @@ final class GetUserProfileHandler
         }
 
         return $this->entitlementResolver->getFeatures($account);
+    }
+
+    /**
+     * @return array{
+     *     quotas: array{max_shops: int, max_users: int}|null,
+     *     usage: array{shops: int, users: int}|null
+     * }
+     */
+    private function resolveQuotasAndUsage(User $user): array
+    {
+        $tenantAccountId = $user->getTenantAccountId();
+        if (null === $tenantAccountId) {
+            return ['quotas' => null, 'usage' => null];
+        }
+
+        $account = $this->tenantAccountRepository->findById($tenantAccountId);
+        if (null === $account) {
+            return ['quotas' => null, 'usage' => null];
+        }
+
+        return [
+            'quotas' => [
+                'max_shops' => $this->entitlementResolver->getQuota($account, 'max_shops', 1),
+                'max_users' => $this->entitlementResolver->getQuota($account, 'max_users', 3),
+            ],
+            'usage' => [
+                'shops' => $this->entitlementResolver->countShops($account),
+                'users' => $this->entitlementResolver->countUsers($account),
+            ],
+        ];
     }
 
     /** @return list<array<string, mixed>> */

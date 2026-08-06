@@ -11,6 +11,10 @@ export function usePermissions() {
 
   const permissions = computed(() => authStore.permissions)
   const features = computed(() => authStore.features)
+  const quotas = computed(() => authStore.quotas)
+  const usage = computed(() => authStore.usage)
+  const canCreateShop = computed(() => authStore.canCreateShop)
+  const canCreateUser = computed(() => authStore.canCreateUser)
 
   const hasPermission = (permission) => authStore.hasPermission(permission)
 
@@ -57,6 +61,10 @@ export function usePermissions() {
   return {
     permissions,
     features,
+    quotas,
+    usage,
+    canCreateShop,
+    canCreateUser,
     hasPermission,
     hasAnyPermission,
     hasFeature,

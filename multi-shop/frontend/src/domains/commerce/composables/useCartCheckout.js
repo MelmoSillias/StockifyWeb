@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 
+import { useAuthStore } from '@/domains/auth/stores/auth'
 import { commerceService } from '@/domains/commerce/services/commerceService'
 import { useCartStore } from '@/domains/commerce/stores/cart'
 import { useOrdersStore } from '@/domains/commerce/stores/orders'
@@ -9,6 +10,7 @@ import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
 import { toIsoDate, toIsoDateTime } from '@/domains/shared/services/createCrudService'
 
 export const useCartCheckout = () => {
+  const authStore = useAuthStore()
   const cart = useCartStore()
   const salesStore = useSalesStore()
   const ordersStore = useOrdersStore()
@@ -105,12 +107,33 @@ export const useCartCheckout = () => {
   }
 
   const openCheckout = (mode) => {
+    if (mode === 'order' && !authStore.hasFeature('stockify.orders')) {
+      showError('Les commandes ne sont pas incluses dans votre plan.')
+      return
+    }
+
+    if (mode === 'quote' && !authStore.hasFeature('stockify.quotes')) {
+      showError('Les devis ne sont pas inclus dans votre plan.')
+      return
+    }
+
     checkoutMode.value = mode
     checkoutVisible.value = true
   }
 
   const onCheckoutConfirm = async ({ payment, operationDate, paymentDate, deliveryDate, confirmOrder, validUntil }) => {
     if (submitting.value) return false
+
+    if (checkoutMode.value === 'quote' && !authStore.hasFeature('stockify.quotes')) {
+      showError('Les devis ne sont pas inclus dans votre plan.')
+      return false
+    }
+
+    if (checkoutMode.value === 'order' && !authStore.hasFeature('stockify.orders')) {
+      showError('Les commandes ne sont pas incluses dans votre plan.')
+      return false
+    }
+
     submitting.value = true
     try {
       if (checkoutMode.value === 'quote') {

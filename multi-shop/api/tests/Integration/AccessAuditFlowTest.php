@@ -18,6 +18,8 @@ final class AccessAuditFlowTest extends ApiTestCase
         $this->assertArrayHasKey('permissions', $payload);
         $this->assertArrayHasKey('features', $payload);
         $this->assertIsArray($payload['features']);
+        $this->assertArrayHasKey('quotas', $payload);
+        $this->assertArrayHasKey('usage', $payload);
         $this->assertContains('access.users.view', $payload['permissions']);
     }
 

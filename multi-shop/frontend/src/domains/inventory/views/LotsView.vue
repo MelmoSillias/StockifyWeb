@@ -101,6 +101,7 @@ import AppFiltersCard from '@/domains/shared/components/AppFiltersCard.vue'
 import AppCrudDialog from '@/domains/shared/components/AppCrudDialog.vue'
 import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { useVariantOptions } from '@/domains/catalog/composables/useVariantOptions'
 import { useFournisseurOptions } from '@/domains/fournisseur/composables/useFournisseurOptions'
 import { useCrudDialog } from '@/domains/shared/composables/useCrudDialog'
@@ -109,10 +110,12 @@ import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
 import { useInventoryStore } from '@/domains/inventory/stores/inventory'
 
 const inventoryStore = useInventoryStore()
+const { hasFeature } = usePermissions()
 const { options: variantOptions, loading: variantsLoading, load: loadVariantOptions } = useVariantOptions()
 const { options: fournisseurOptions, load: loadFournisseurOptions } = useFournisseurOptions()
 const { showSuccess, showError } = useEntityActions()
 const { formatCompactNumber } = useDisplayFormatters()
+const canUseSuppliers = computed(() => hasFeature('stockify.suppliers'))
 
 const selectedVariantId = ref(null)
 
@@ -126,22 +129,29 @@ const createReceiveForm = () => ({
 
 const receiveDialog = useCrudDialog(createReceiveForm)
 
-const receiveFields = computed(() => [
-  { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
-  { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
-  { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
-  {
-    name: 'fournisseur_id',
-    label: 'Fournisseur',
-    type: 'select',
-    options: fournisseurOptions.value,
-    optionLabel: 'label',
-    optionValue: 'value',
-    placeholder: 'Optionnel',
-    icon: 'pi pi-truck'
-  },
-  { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
-])
+const receiveFields = computed(() => {
+  const fields = [
+    { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
+    { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
+    { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
+    { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
+  ]
+
+  if (canUseSuppliers.value) {
+    fields.splice(3, 0, {
+      name: 'fournisseur_id',
+      label: 'Fournisseur',
+      type: 'select',
+      options: fournisseurOptions.value,
+      optionLabel: 'label',
+      optionValue: 'value',
+      placeholder: 'Optionnel',
+      icon: 'pi pi-truck'
+    })
+  }
+
+  return fields
+})
 
 const loadLots = async (variantId) => {
   if (!variantId) {
@@ -179,7 +189,12 @@ const receiveLot = async () => {
 
 onMounted(async () => {
   try {
-    await Promise.all([loadVariantOptions(), loadFournisseurOptions()])
+    const tasks = [loadVariantOptions()]
+    if (canUseSuppliers.value) {
+      tasks.push(loadFournisseurOptions())
+    }
+
+    await Promise.all(tasks)
     if (variantOptions.value.length) {
       selectedVariantId.value = variantOptions.value[0].value
       await loadLots(selectedVariantId.value)

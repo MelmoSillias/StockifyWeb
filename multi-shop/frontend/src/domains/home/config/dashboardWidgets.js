@@ -25,6 +25,7 @@ export const DASHBOARD_KPI_DEFINITIONS = [
   {
     id: 'deliveries',
     permission: 'commerce.livraisons.view',
+    feature: 'stockify.orders',
     title: 'Livraisons',
     icon: 'pi pi-truck',
     toneClass: 'dashboard-kpi-card--deliveries',

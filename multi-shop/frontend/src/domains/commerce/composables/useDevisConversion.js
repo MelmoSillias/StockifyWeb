@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 
+import { useAuthStore } from '@/domains/auth/stores/auth'
 import { commerceService } from '@/domains/commerce/services/commerceService'
 import { useOrdersStore } from '@/domains/commerce/stores/orders'
 import { useQuotesStore } from '@/domains/commerce/stores/quotes'
@@ -8,6 +9,7 @@ import { useEntityActions } from '@/domains/shared/composables/useEntityActions'
 import { toIsoDateTime } from '@/domains/shared/services/createCrudService'
 
 export const useDevisConversion = () => {
+  const authStore = useAuthStore()
   const quotesStore = useQuotesStore()
   const salesStore = useSalesStore()
   const ordersStore = useOrdersStore()
@@ -71,6 +73,11 @@ export const useDevisConversion = () => {
   }
 
   const openConversion = (devis, mode) => {
+    if (mode === 'order' && !authStore.hasFeature('stockify.orders')) {
+      showError('Les commandes ne sont pas incluses dans votre plan.')
+      return
+    }
+
     selectedDevis.value = devis
     checkoutMode.value = mode
     checkoutVisible.value = true
@@ -82,6 +89,12 @@ export const useDevisConversion = () => {
     }
 
     if (submitting.value) return false
+
+    if (checkoutMode.value === 'order' && !authStore.hasFeature('stockify.orders')) {
+      showError('Les commandes ne sont pas incluses dans votre plan.')
+      return false
+    }
+
     submitting.value = true
     try {
       if (checkoutMode.value === 'sale') {

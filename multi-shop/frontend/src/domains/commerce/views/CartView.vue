@@ -107,12 +107,14 @@
 
           <div class="cart-actions">
             <Button
+              v-if="canCreateOrder"
               label="Commande"
               icon="pi pi-list"
               :disabled="cart.isEmpty || cart.isCheckedOut"
               @click="openCheckout('order')"
             />
             <Button
+              v-if="canCreateQuote"
               label="Devis"
               icon="pi pi-file-edit"
               severity="secondary"
@@ -155,6 +157,7 @@ import InputText from 'primevue/inputtext'
 import Tag from 'primevue/tag'
 import { computed, onMounted, ref } from 'vue'
 
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import AcheteurSelector from '@/domains/commerce/components/AcheteurSelector.vue'
 import CartLinesPanel from '@/domains/commerce/components/CartLinesPanel.vue'
 import CartVariantPicker from '@/domains/commerce/components/CartVariantPicker.vue'
@@ -170,9 +173,13 @@ import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 const { isMobile } = useBreakpoint()
 const cart = useCartStore()
 const clientsStore = useClientsStore()
+const { hasFeature } = usePermissions()
 const { showError } = useEntityActions()
 const { checkoutVisible, checkoutMode, submitting, openCheckout, onCheckoutConfirm } = useCartCheckout()
 const { formatMoney } = useDisplayFormatters()
+
+const canCreateOrder = computed(() => hasFeature('stockify.orders'))
+const canCreateQuote = computed(() => hasFeature('stockify.quotes'))
 
 const variants = ref([])
 const variantsLoading = ref(false)

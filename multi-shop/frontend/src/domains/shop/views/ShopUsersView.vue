@@ -6,6 +6,7 @@
           :title="`Utilisateurs — ${shopName}`"
           :count-label="`${items.length} utilisateur(s)`"
           create-label="Nouvel utilisateur"
+          :show-create="canCreateUser"
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
@@ -14,6 +15,9 @@
           :reloading="loading"
           @reload="load"
         />
+        <p v-if="!canCreateUser" class="quota-hint">
+          Limite du plan atteinte (utilisateurs).
+        </p>
       </template>
       <template #content>
         <AppTableState :loading="loading" :error="error" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucun utilisateur" @retry="load">
@@ -79,6 +83,8 @@ import Tag from 'primevue/tag'
 
 import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
+import { useAuthStore } from '@/domains/auth/stores/auth'
 import { accessService } from '@/domains/access/services/accessService'
 import { shopService } from '@/domains/shop/services/shopService'
 import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
@@ -86,7 +92,9 @@ import { useShopStore } from '@/domains/shop/stores/shop'
 
 const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 const shopStore = useShopStore()
+const { canCreateUser } = usePermissions()
 
 const shopId = computed(() => route.params.id)
 const shopName = computed(() => shopStore.accessibleShops.find((shop) => shop.id === shopId.value)?.name || 'Boutique')
@@ -142,6 +150,16 @@ const loadRoles = async () => {
 }
 
 const openCreate = () => {
+  if (!canCreateUser.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Limite du plan atteinte',
+      detail: 'Vous ne pouvez plus créer d\'utilisateur avec votre plan actuel.',
+      life: 4000
+    })
+    return
+  }
+
   form.username = ''
   form.first_name = ''
   form.last_name = ''
@@ -151,10 +169,21 @@ const openCreate = () => {
 
 const { pending: submitting, run: save } = useAsyncAction(async () => {
   try {
+    if (!canCreateUser.value) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Limite du plan atteinte',
+        detail: 'Vous ne pouvez plus créer d\'utilisateur avec votre plan actuel.',
+        life: 4000
+      })
+      return
+    }
+
     const result = await shopService.createShopUser(shopId.value, { ...form })
     generatedPassword.value = result.generated_password
     dialogVisible.value = false
     passwordDialogVisible.value = true
+    await authStore.fetchCurrentUser()
     await load()
   } catch (error) {
     toast.add({
@@ -184,5 +213,10 @@ onMounted(async () => {
   background: var(--surface-100);
   font-family: monospace;
   font-size: 1.1rem;
+}
+.quota-hint {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color, #6b7280);
+  font-size: 0.875rem;
 }
 </style>

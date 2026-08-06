@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import Popover from 'primevue/popover'
 
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import AcheteurSelector from '@/domains/commerce/components/AcheteurSelector.vue'
 import CheckoutDialog from '@/domains/commerce/components/CheckoutDialog.vue'
 import { useCartCheckout } from '@/domains/commerce/composables/useCartCheckout'
@@ -29,8 +30,12 @@ const emit = defineEmits(['open-panel'])
 const cart = useCartStore()
 const clientsStore = useClientsStore()
 const router = useRouter()
+const { hasFeature } = usePermissions()
 const { checkoutVisible, checkoutMode, submitting, openCheckout, onCheckoutConfirm } = useCartCheckout()
 const { formatMoney, formatCompactNumber } = useDisplayFormatters()
+
+const canCreateOrder = computed(() => hasFeature('stockify.orders'))
+const canCreateQuote = computed(() => hasFeature('stockify.quotes'))
 
 const cartPopover = ref()
 
@@ -197,6 +202,7 @@ const resetCart = () => {
       />
       <template v-else>
         <Button
+          v-if="canCreateOrder"
           label="Créer commande"
           icon="pi pi-list"
           severity="secondary"
@@ -206,6 +212,7 @@ const resetCart = () => {
           @click="handleCheckout('order')"
         />
         <Button
+          v-if="canCreateQuote"
           label="Créer devis"
           icon="pi pi-file-edit"
           severity="secondary"
@@ -349,6 +356,7 @@ const resetCart = () => {
           />
           <template v-else>
             <Button
+              v-if="canCreateOrder"
               label="Créer commande"
               icon="pi pi-list"
               severity="secondary"
@@ -358,6 +366,7 @@ const resetCart = () => {
               @click="handleCheckout('order')"
             />
             <Button
+              v-if="canCreateQuote"
               label="Créer devis"
               icon="pi pi-file-edit"
               severity="secondary"

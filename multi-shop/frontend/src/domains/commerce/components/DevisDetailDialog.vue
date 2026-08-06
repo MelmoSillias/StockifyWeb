@@ -64,7 +64,7 @@
     <template #footer>
       <Button label="Fermer" severity="secondary" text @click="$emit('update:visible', false)" />
       <Button
-        v-if="canConvert"
+        v-if="canConvertToOrder"
         v-can="'commerce.devis.convert'"
         label="Convertir en commande"
         icon="pi pi-list"
@@ -90,6 +90,7 @@ import Dialog from 'primevue/dialog'
 import Tag from 'primevue/tag'
 import { computed } from 'vue'
 
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { useDisplayFormatters } from '@/domains/shared/composables/useDisplayFormatters'
 
 const props = defineProps({
@@ -99,6 +100,7 @@ const props = defineProps({
 
 defineEmits(['update:visible', 'convert-sale', 'convert-order'])
 
+const { hasFeature } = usePermissions()
 const { formatDateTime, formatDate, formatMoney, formatCompactNumber, formatBuyerLabel } = useDisplayFormatters()
 
 const statusMap = {
@@ -113,6 +115,7 @@ const statusLabel = (status) => statusMap[status]?.label || status
 const statusSeverity = (status) => statusMap[status]?.severity || 'secondary'
 
 const canConvert = computed(() => props.devis?.status === 'actif')
+const canConvertToOrder = computed(() => canConvert.value && hasFeature('stockify.orders'))
 </script>
 
 <style scoped>

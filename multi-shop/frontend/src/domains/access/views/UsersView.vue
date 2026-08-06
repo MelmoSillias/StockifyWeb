@@ -6,6 +6,7 @@
           title="Utilisateurs"
           :count-label="`${items.length} utilisateur(s)`"
           create-label="Nouvel utilisateur"
+          :show-create="canCreateUserButton"
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
@@ -18,6 +19,9 @@
             <AppTablePrintExportBar table-type="users" :search-term="searchTerm" />
           </template>
         </AppTablePanelHeader>
+        <p v-if="hasPermission('access.users.create') && !canCreateUser" class="quota-hint">
+          Limite du plan atteinte (utilisateurs).
+        </p>
       </template>
       <template #content>
         <AppTableState :loading="loading" :error="error" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucun utilisateur" @retry="load">
@@ -95,13 +99,16 @@ import AppTablePrintExportBar from '@/domains/impression/components/AppTablePrin
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { useBreakpoint } from '@/domains/layout/composables/useBreakpoint'
 import { usePermissions } from '@/domains/auth/composables/usePermissions'
+import { useAuthStore } from '@/domains/auth/stores/auth'
 import { accessService } from '@/domains/access/services/accessService'
 import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 
 const toast = useToast()
+const authStore = useAuthStore()
 const { isMobile } = useBreakpoint()
 const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
-const { hasPermission } = usePermissions()
+const { hasPermission, canCreateUser } = usePermissions()
+const canCreateUserButton = computed(() => hasPermission('access.users.create') && canCreateUser.value)
 const items = ref([])
 const roles = ref([])
 const loading = ref(false)
@@ -153,6 +160,16 @@ const resetForm = () => {
 }
 
 const openCreate = () => {
+  if (!canCreateUser.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Limite du plan atteinte',
+      detail: 'Vous ne pouvez plus créer d\'utilisateur avec votre plan actuel.',
+      life: 4000
+    })
+    return
+  }
+
   dialogMode.value = 'create'
   editingId.value = null
   resetForm()
@@ -173,8 +190,19 @@ const openEdit = (user) => {
 const { pending: submitting, run: save } = useAsyncAction(async () => {
   try {
     if (dialogMode.value === 'create') {
+      if (!canCreateUser.value) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Limite du plan atteinte',
+          detail: 'Vous ne pouvez plus créer d\'utilisateur avec votre plan actuel.',
+          life: 4000
+        })
+        return
+      }
+
       await accessService.createUser({ ...form })
       toast.add({ severity: 'success', summary: 'Utilisateur créé', life: 3000 })
+      await authStore.fetchCurrentUser()
     } else {
       await accessService.updateUser(editingId.value, {
         first_name: form.first_name,
@@ -231,5 +259,10 @@ onMounted(load)
   display: block;
   margin-bottom: 0.35rem;
   font-weight: 600;
+}
+.quota-hint {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color, #6b7280);
+  font-size: 0.875rem;
 }
 </style>

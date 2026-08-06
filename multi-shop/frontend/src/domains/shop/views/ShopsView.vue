@@ -6,7 +6,7 @@
           title="Boutiques"
           :count-label="`${items.length} boutique(s)`"
           create-label="Nouvelle boutique"
-          :show-create="canManageShops"
+          :show-create="canCreateShopButton"
           :search-term="searchTerm"
           search-placeholder="Rechercher..."
           show-search
@@ -15,6 +15,9 @@
           :reloading="loading"
           @reload="load"
         />
+        <p v-if="canManageShops && !canCreateShop" class="quota-hint">
+          Limite du plan atteinte (boutiques).
+        </p>
       </template>
       <template #content>
         <AppTableState :loading="loading" :error="error" :is-empty="!loading && filteredItems.length === 0" empty-title="Aucune boutique" @retry="load">
@@ -80,15 +83,18 @@ import AppTableActionsMenu from '@/domains/shared/components/AppTableActionsMenu
 import AppTablePanelHeader from '@/domains/shared/components/AppTablePanelHeader.vue'
 import AppTableState from '@/domains/shared/components/AppTableState.vue'
 import { usePermissions } from '@/domains/auth/composables/usePermissions'
+import { useAuthStore } from '@/domains/auth/stores/auth'
 import { shopService } from '@/domains/shop/services/shopService'
 import { useAsyncAction } from '@/domains/shared/composables/useAsyncAction'
 import { useShopStore } from '@/domains/shop/stores/shop'
 
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
 const shopStore = useShopStore()
-const { hasPermission } = usePermissions()
+const { hasPermission, canCreateShop } = usePermissions()
 const canManageShops = computed(() => hasPermission('platform.shops.manage'))
+const canCreateShopButton = computed(() => canManageShops.value && canCreateShop.value)
 
 const items = ref([])
 const loading = ref(false)
@@ -158,6 +164,16 @@ const resetForm = () => {
 }
 
 const openCreate = () => {
+  if (!canCreateShop.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Limite du plan atteinte',
+      detail: 'Vous ne pouvez plus créer de boutique avec votre plan actuel.',
+      life: 4000
+    })
+    return
+  }
+
   dialogMode.value = 'create'
   resetForm()
   dialogVisible.value = true
@@ -177,8 +193,19 @@ const openEdit = (shop) => {
 const { pending: submitting, run: save } = useAsyncAction(async () => {
   try {
     if (dialogMode.value === 'create') {
+      if (!canCreateShop.value) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Limite du plan atteinte',
+          detail: 'Vous ne pouvez plus créer de boutique avec votre plan actuel.',
+          life: 4000
+        })
+        return
+      }
+
       await shopService.createShop({ ...form })
       toast.add({ severity: 'success', summary: 'Boutique créée', life: 3000 })
+      await authStore.fetchCurrentUser()
     } else {
       await shopService.updateShop(editingId.value, { ...form })
       toast.add({ severity: 'success', summary: 'Boutique mise à jour', life: 3000 })
@@ -236,3 +263,11 @@ const rowActions = (shop) => [
 
 onMounted(load)
 </script>
+
+<style scoped>
+.quota-hint {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color, #6b7280);
+  font-size: 0.875rem;
+}
+</style>

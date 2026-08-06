@@ -265,6 +265,7 @@ import { useProductsStore } from '@/domains/catalog/stores/products'
 import { useUnitsStore } from '@/domains/catalog/stores/units'
 import { useVariantsStore } from '@/domains/catalog/stores/variants'
 import { useInventoryStore } from '@/domains/inventory/stores/inventory'
+import { usePermissions } from '@/domains/auth/composables/usePermissions'
 import { useFournisseurOptions } from '@/domains/fournisseur/composables/useFournisseurOptions'
 import { inventoryService } from '@/domains/inventory/services/inventoryService'
 import { variantsService } from '@/domains/catalog/services/variantsService'
@@ -283,6 +284,7 @@ const categoriesStore = useCategoriesStore()
 const unitsStore = useUnitsStore()
 const variantsStore = useVariantsStore()
 const inventoryStore = useInventoryStore()
+const { hasFeature } = usePermissions()
 const { options: fournisseurOptions, load: loadFournisseurOptions } = useFournisseurOptions()
 const layoutStore = useLayoutStore()
 const { motionPreset } = storeToRefs(layoutStore)
@@ -290,6 +292,7 @@ const { isMobile } = useBreakpoint()
 const tableLayout = computed(() => (isMobile.value ? 'stack' : 'scroll'))
 const { showSuccess, showError, confirmRemoval } = useEntityActions()
 const { formatCompactNumber } = useDisplayFormatters()
+const canUseSuppliers = computed(() => hasFeature('stockify.suppliers'))
 
 const rowsPerPageOptions = [10, 20, 50, 100]
 const first = ref(0)
@@ -425,22 +428,29 @@ const variantFormFields = computed(() => {
   ]
 })
 
-const receiveFields = computed(() => [
-  { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
-  { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
-  { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
-  {
-    name: 'fournisseur_id',
-    label: 'Fournisseur',
-    type: 'select',
-    options: fournisseurOptions.value,
-    optionLabel: 'label',
-    optionValue: 'value',
-    placeholder: 'Optionnel',
-    icon: 'pi pi-truck'
-  },
-  { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
-])
+const receiveFields = computed(() => {
+  const fields = [
+    { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 100', icon: 'pi pi-box' },
+    { name: 'unit_cost', label: 'Coût unitaire', type: 'text', placeholder: 'Ex: 2.50', icon: 'pi pi-money-bill' },
+    { name: 'reference', label: 'Référence lot', type: 'text', placeholder: 'Ex: LOT-2026-01', icon: 'pi pi-tag' },
+    { name: 'expiry_date', label: 'Date expiration', type: 'date', placeholder: 'Optionnel', icon: 'pi pi-calendar' }
+  ]
+
+  if (canUseSuppliers.value) {
+    fields.splice(3, 0, {
+      name: 'fournisseur_id',
+      label: 'Fournisseur',
+      type: 'select',
+      options: fournisseurOptions.value,
+      optionLabel: 'label',
+      optionValue: 'value',
+      placeholder: 'Optionnel',
+      icon: 'pi pi-truck'
+    })
+  }
+
+  return fields
+})
 
 const stockOutFields = [
   { name: 'quantity', label: 'Quantité', type: 'text', placeholder: 'Ex: 5', icon: 'pi pi-box' },
@@ -902,12 +912,17 @@ watch(
 
 const load = async () => {
   try {
-    await Promise.all([
+    const tasks = [
       categoriesStore.fetchAll(),
       productsStore.fetchAll(),
-      unitsStore.fetchAll(),
-      loadFournisseurOptions()
-    ])
+      unitsStore.fetchAll()
+    ]
+
+    if (canUseSuppliers.value) {
+      tasks.push(loadFournisseurOptions())
+    }
+
+    await Promise.all(tasks)
   } catch (error) {
     showError(error?.message || 'Impossible de charger les produits.')
   }

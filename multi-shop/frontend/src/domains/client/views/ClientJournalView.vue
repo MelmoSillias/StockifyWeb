@@ -44,7 +44,7 @@
             <TabList>
               <Tab value="info">Informations</Tab>
               <Tab value="ventes">Ventes</Tab>
-              <Tab value="commandes">Commandes</Tab>
+              <Tab v-if="canViewOrders" value="commandes">Commandes</Tab>
               <Tab value="factures">Factures</Tab>
               <Tab value="creances">Créances</Tab>
               <Tab value="paiements">Paiements</Tab>
@@ -127,7 +127,7 @@
                 </AppTableState>
               </TabPanel>
 
-              <TabPanel value="commandes">
+              <TabPanel v-if="canViewOrders" value="commandes">
                 <AppTableState
                   :loading="tabLoading.commandes"
                   :is-empty="!tabLoading.commandes && tabData.commandes.length === 0"
@@ -331,7 +331,8 @@ const { formatDateTime, formatMoney } = useDisplayFormatters()
 const { resolveMethodLabel: paymentMethodLabel } = usePaymentMethods()
 const { showError, showSuccess } = useEntityActions()
 const { printDocument } = usePrintDocument()
-const { hasPermission } = usePermissions()
+const { hasPermission, hasFeature } = usePermissions()
+const canViewOrders = computed(() => hasFeature('stockify.orders'))
 
 const activeTab = ref('info')
 const loadError = ref(null)
@@ -419,6 +420,10 @@ const loadTab = async (tab) => {
     return
   }
 
+  if (tab === 'commandes' && !canViewOrders.value) {
+    return
+  }
+
   const fetcher = tabFetchers[tab]
   if (!fetcher) {
     return
@@ -436,6 +441,11 @@ const loadTab = async (tab) => {
 }
 
 const onTabChange = (tab) => {
+  if (tab === 'commandes' && !canViewOrders.value) {
+    activeTab.value = 'info'
+    return
+  }
+
   loadTab(tab)
 }
 

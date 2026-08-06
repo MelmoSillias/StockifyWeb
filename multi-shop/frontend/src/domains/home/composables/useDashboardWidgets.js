@@ -26,7 +26,9 @@ export function useDashboardWidgets() {
   const showKpiGrid = computed(() => visibleKpis.value.length > 0)
   const showCarousel = computed(() => visibleSlides.value.length > 0)
   const showSalesChart = computed(() => hasPermission('commerce.ventes.view'))
-  const showPendingDeliveries = computed(() => hasPermission('commerce.livraisons.view'))
+  const showPendingDeliveries = computed(() => (
+    hasPermission('commerce.livraisons.view') && hasFeature('stockify.orders')
+  ))
   const showPendingSupplierOrders = computed(() => (
     hasPermission('fournisseur.commandes.view') && hasFeature('stockify.suppliers')
   ))
