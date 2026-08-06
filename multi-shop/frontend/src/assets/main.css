@@ -12,6 +12,12 @@
 @import "./layout/themes/canopy.css";
 @import "./layout/themes/dune.css";
 @import "./layout/themes/cosmos.css";
+@import "./layout/themes/paper.css";
+@import "./layout/themes/nordic.css";
+@import "./layout/themes/ink.css";
+@import "./layout/themes/sage.css";
+@import "./layout/themes/coral.css";
+@import "./layout/themes/slatework.css";
 @import "./layout/shell.css";
 @import "./layout/navigation.css";
 @import "./layout/appearance.css";

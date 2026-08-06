@@ -6,7 +6,13 @@ export const themeDefaultAccents = {
   aurora: 'rose',
   canopy: 'emerald',
   dune: 'amber',
-  cosmos: 'cyan'
+  cosmos: 'cyan',
+  paper: 'emerald',
+  nordic: 'cyan',
+  ink: 'amber',
+  sage: 'emerald',
+  coral: 'rose',
+  slatework: 'cyan'
 }
 
 export const layoutOptionSets = {
@@ -18,7 +24,13 @@ export const layoutOptionSets = {
     { label: 'Aurora', value: 'aurora' },
     { label: 'Canopy', value: 'canopy' },
     { label: 'Dune', value: 'dune' },
-    { label: 'Cosmos', value: 'cosmos' }
+    { label: 'Cosmos', value: 'cosmos' },
+    { label: 'Paper', value: 'paper' },
+    { label: 'Nordic', value: 'nordic' },
+    { label: 'Ink', value: 'ink' },
+    { label: 'Sage', value: 'sage' },
+    { label: 'Coral', value: 'coral' },
+    { label: 'Slatework', value: 'slatework' }
   ],
   accents: [
     { label: 'Emerald', value: 'emerald' },

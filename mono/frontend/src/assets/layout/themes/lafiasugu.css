@@ -19,6 +19,11 @@
   --layout-text-muted: rgba(203, 213, 225, 0.72);
 }
 
+:root[data-layout-gradient='solid'][data-layout-theme='lafiasugu'] {
+  --layout-shell-bg: #eef3f7;
+  --layout-sidebar-bg: #2a5d84;
+}
+
 :root.app-dark[data-layout-gradient='solid'][data-layout-theme='lafiasugu'] {
   --layout-shell-bg: #0a0a0a;
   --layout-sidebar-bg: #131e3a;

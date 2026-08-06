@@ -19,6 +19,10 @@
   transition: background var(--layout-transition-page);
 }
 
+:root[data-layout-gradient='solid'] .app-shell {
+  background: var(--layout-page-bg);
+}
+
 /* Mode Overlay */
 .app-shell--overlay {
   grid-template-columns: minmax(0, 1fr);

@@ -1,0 +1,41 @@
+:root[data-layout-theme='ink'] {
+  --layout-page-bg: #f4f4f2;
+  --layout-shell-bg: radial-gradient(circle at top left, rgba(250, 250, 248, 0.98), rgba(244, 244, 242, 0.96));
+  --layout-sidebar-bg: linear-gradient(180deg, #111111, #1a1a1a);
+  --layout-sidebar-bg-hover: rgba(255, 255, 255, 0.06);
+  --layout-sidebar-border: rgba(255, 255, 255, 0.08);
+  --layout-sidebar-text: rgba(250, 250, 249, 0.94);
+  --layout-sidebar-text-muted: rgba(212, 212, 212, 0.7);
+  --layout-topbar-bg: rgba(250, 250, 248, 0.92);
+  --layout-panel-bg: rgba(255, 255, 255, 0.96);
+  --layout-panel-border: rgba(17, 17, 17, 0.08);
+  --layout-text-color: rgba(17, 17, 17, 0.94);
+  --layout-text-muted: rgba(82, 82, 82, 0.72);
+}
+
+:root.app-dark[data-layout-theme='ink'] {
+  --layout-page-bg: #050505;
+  --layout-shell-bg:
+    radial-gradient(circle at top left, rgba(245, 158, 11, 0.1), transparent 28%),
+    linear-gradient(180deg, #050505, #0a0a0a);
+  --layout-sidebar-bg: #000000;
+  --layout-sidebar-bg-hover: rgba(255, 255, 255, 0.06);
+  --layout-sidebar-border: rgba(245, 158, 11, 0.12);
+  --layout-sidebar-text: rgba(250, 250, 249, 0.95);
+  --layout-sidebar-text-muted: rgba(212, 212, 212, 0.68);
+  --layout-topbar-bg: rgba(10, 10, 10, 0.9);
+  --layout-panel-bg: rgba(18, 18, 18, 0.94);
+  --layout-panel-border: rgba(245, 158, 11, 0.16);
+  --layout-text-color: rgba(250, 250, 249, 0.95);
+  --layout-text-muted: rgba(163, 163, 163, 0.72);
+}
+
+:root[data-layout-gradient='solid'][data-layout-theme='ink'] {
+  --layout-shell-bg: #f4f4f2;
+  --layout-sidebar-bg: #111111;
+}
+
+:root.app-dark[data-layout-gradient='solid'][data-layout-theme='ink'] {
+  --layout-shell-bg: #050505;
+  --layout-sidebar-bg: #000000;
+}

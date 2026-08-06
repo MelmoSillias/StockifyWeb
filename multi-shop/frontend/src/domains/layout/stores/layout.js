@@ -7,7 +7,8 @@ const presetAccentMap = {
   emerald: '#10b981',
   cyan: '#06b6d4',
   amber: '#f59e0b',
-  rose: '#f43f5e'
+  rose: '#f43f5e',
+  orange: '#F79E1B'
 }
 
 const layoutStorageKey = appConfig.storage.layoutPreferencesKey
