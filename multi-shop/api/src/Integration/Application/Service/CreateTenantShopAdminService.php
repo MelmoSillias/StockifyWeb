@@ -71,14 +71,17 @@ final class CreateTenantShopAdminService
             $resolvedLastName ??= $nameParts['last'];
         }
 
-        $user = new User($email, $username, 'placeholder', $resolvedFirstName, $resolvedLastName);
-        $user->setPasswordHash($this->passwordHasher->hashPassword($user, $plainPassword));
+        $user = new User($email, $username, null, $resolvedFirstName, $resolvedLastName);
+        $hasIdentity = null !== $identityId && '' !== trim($identityId);
+        if (!$hasIdentity) {
+            $user->setPasswordHash($this->passwordHasher->hashPassword($user, $plainPassword));
+        }
         if (null !== $phone && '' !== trim($phone)) {
             $user->setPhone(trim($phone));
         }
         $user->activate();
         $user->syncEmailVerification($emailVerifiedAt);
-        if (!$userProvidedPassword) {
+        if (!$userProvidedPassword && !$hasIdentity) {
             $user->requirePasswordChange();
         }
         $user->assignToShop($shop->getId());
@@ -92,7 +95,6 @@ final class CreateTenantShopAdminService
 
         $userRole = new UserRole($user, $role);
         $user->getUserRoles()->add($userRole);
-        $user->syncSymfonyRoles(['gerant']);
 
         $this->entityManager->persist($user);
         $this->entityManager->persist($userRole);

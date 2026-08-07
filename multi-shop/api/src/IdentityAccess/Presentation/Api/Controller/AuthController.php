@@ -3,9 +3,6 @@
 namespace App\IdentityAccess\Presentation\Api\Controller;
 
 use App\IdentityAccess\Application\Service\EmailVerificationSyncService;
-use App\IdentityAccess\Application\Service\GlobalAuthDisabledException;
-use App\IdentityAccess\Application\Service\GlobalAuthFailedException;
-use App\IdentityAccess\Application\Service\GlobalAuthService;
 use App\IdentityAccess\Application\Service\RefreshTokenService;
 use App\IdentityAccess\Application\Service\RegisterUserService;
 use App\IdentityAccess\Application\Service\ResendVerificationEmailService;
@@ -23,7 +20,6 @@ final class AuthController extends AbstractController
     public function __construct(
         private readonly RegisterUserService $registerUserService,
         private readonly RefreshTokenService $refreshTokenService,
-        private readonly GlobalAuthService $globalAuthService,
         private readonly ResendVerificationEmailService $resendVerificationEmailService,
         private readonly EmailVerificationSyncService $emailVerificationSyncService,
     ) {
@@ -52,54 +48,37 @@ final class AuthController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_CONFLICT);
         }
 
-        $tokens = $this->refreshTokenService->createTokenPair($user);
+        $tokens = $this->refreshTokenService->createTokenPair($user, $request);
+        $response = $this->json([
+            'access_token' => $tokens['access_token'],
+            'refresh_token' => $tokens['refresh_token'],
+        ], Response::HTTP_CREATED);
+        $response->headers->setCookie($tokens['cookie']);
 
-        return $this->json($tokens, Response::HTTP_CREATED);
+        return $response;
     }
 
     #[Route('/token/refresh', name: 'api_token_refresh', methods: ['POST'])]
     public function refresh(Request $request): JsonResponse
     {
-        $data = $request->toArray();
-        if (empty($data['refresh_token'])) {
+        $refreshToken = RefreshTokenService::extractRefreshTokenFromRequest($request);
+        if (null === $refreshToken || '' === trim($refreshToken)) {
             return $this->json(['error' => 'refresh_token is required.'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
-            $tokens = $this->refreshTokenService->refresh($data['refresh_token']);
+            $tokens = $this->refreshTokenService->refresh($refreshToken, $request);
         } catch (\InvalidArgumentException $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
 
-        return $this->json($tokens);
-    }
+        $response = $this->json([
+            'access_token' => $tokens['access_token'],
+            'refresh_token' => $tokens['refresh_token'],
+        ]);
+        $response->headers->setCookie($tokens['cookie']);
 
-    #[Route('/auth/global', name: 'api_auth_global', methods: ['POST'])]
-    public function globalLogin(Request $request): JsonResponse
-    {
-        $data = $request->toArray();
-        $email = isset($data['email']) ? (string) $data['email'] : '';
-        $password = isset($data['password']) ? (string) $data['password'] : '';
-
-        if ('' === trim($email) || '' === $password) {
-            return $this->json(['error' => 'email and password are required.'], Response::HTTP_BAD_REQUEST);
-        }
-
-        try {
-            $result = $this->globalAuthService->authenticate(
-                $email,
-                $password,
-                (string) ($data['application'] ?? 'stockify'),
-            );
-        } catch (GlobalAuthDisabledException) {
-            return $this->json(['error' => 'Global identity authentication is disabled.'], Response::HTTP_NOT_FOUND);
-        } catch (GlobalAuthFailedException $exception) {
-            $status = $exception->getCode() >= 400 ? $exception->getCode() : Response::HTTP_UNAUTHORIZED;
-
-            return $this->json(['error' => $exception->getMessage()], $status);
-        }
-
-        return $this->json($result);
+        return $response;
     }
 
     #[Route('/auth/verification/resend', name: 'api_auth_verification_resend', methods: ['POST'])]

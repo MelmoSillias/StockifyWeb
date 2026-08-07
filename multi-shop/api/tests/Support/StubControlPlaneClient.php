@@ -216,7 +216,7 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
 
         return [
             'features' => [],
-            'quotas' => ['max_shops' => 1, 'max_users' => 3],
+            'quotas' => ['max_shops' => 10, 'max_users' => 50],
             'updated_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
         ];
     }

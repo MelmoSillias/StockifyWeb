@@ -83,7 +83,11 @@ final class IntegrationV1Controller extends AbstractController
         $idempotencyKey = $request->headers->get('Idempotency-Key');
 
         if (null !== $idempotencyKey && '' !== trim($idempotencyKey)) {
-            $cached = $this->requestLogger->findIdempotentResponse($idempotencyKey);
+            $cached = $this->requestLogger->findIdempotentResponse(
+                $idempotencyKey,
+                $request->getMethod(),
+                $request->getPathInfo(),
+            );
             if (null !== $cached) {
                 return $this->json(
                     ['data' => $cached->getResponseBody()],
@@ -246,7 +250,11 @@ final class IntegrationV1Controller extends AbstractController
         $idempotencyKey = $request->headers->get('Idempotency-Key');
 
         if (null !== $idempotencyKey && '' !== trim($idempotencyKey)) {
-            $cached = $this->requestLogger->findIdempotentResponse($idempotencyKey);
+            $cached = $this->requestLogger->findIdempotentResponse(
+                $idempotencyKey,
+                $request->getMethod(),
+                $request->getPathInfo(),
+            );
             if (null !== $cached) {
                 return $this->json(
                     ['data' => $cached->getResponseBody()],

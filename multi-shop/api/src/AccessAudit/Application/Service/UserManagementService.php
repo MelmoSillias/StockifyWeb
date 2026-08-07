@@ -84,7 +84,7 @@ final class UserManagementService
         $shopContext = $this->shopContextHolder->get();
         $tenantAccountId = null;
         if (null !== $shopContext) {
-            if ($this->userRepository->findByUsernameAndShop($username, $shopContext->getShopId()) !== null) {
+            if ($this->userRepository->findByUsername($username) !== null) {
                 throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
             }
 
@@ -153,11 +153,7 @@ final class UserManagementService
 
         if ($username !== null) {
             if (strtolower($username) !== $user->getUsername()) {
-                if (null !== $user->getShopId()) {
-                    $existing = $this->userRepository->findByUsernameAndShop($username, $user->getShopId());
-                } else {
-                    $existing = $this->userRepository->findByUsername($username);
-                }
+                $existing = $this->userRepository->findByUsername($username);
                 if ($existing !== null && !$existing->getId()->equals($user->getId())) {
                     throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
                 }
@@ -233,7 +229,6 @@ final class UserManagementService
             $this->entityManager->persist($userPermission);
         }
 
-        $user->syncSymfonyRoles($assignedRoleCodes);
         $this->permissionResolver->invalidateCache($user);
     }
 
@@ -261,7 +256,7 @@ final class UserManagementService
             'roles' => $this->permissionResolver->resolveRoleCodes($user),
             'symfony_roles' => $user->getRoles(),
             'is_platform_owner' => $user->isPlatformOwner(),
-            'shop_id' => null !== $user->getShopId() ? (string) $user->getShopId() : null,
+            'shop_id' => null !== $user->getPrimaryShopId() ? (string) $user->getPrimaryShopId() : null,
             'permissions' => $this->permissionResolver->resolvePermissions($user),
             'last_login_at' => $user->getLastLoginAt()?->format(\DateTimeInterface::ATOM),
             'created_at' => $user->getCreatedAt()->format(\DateTimeInterface::ATOM),

@@ -17,9 +17,13 @@ class DoctrineIntegrationRequestLogRepository extends ServiceEntityRepository im
         parent::__construct($registry, IntegrationRequestLog::class);
     }
 
-    public function findByIdempotencyKey(string $idempotencyKey): ?IntegrationRequestLog
+    public function findByIdempotencyKey(string $idempotencyKey, string $method, string $path): ?IntegrationRequestLog
     {
-        return $this->findOneBy(['idempotencyKey' => trim($idempotencyKey)]);
+        return $this->findOneBy([
+            'idempotencyKey' => trim($idempotencyKey),
+            'method' => strtoupper($method),
+            'path' => $path,
+        ]);
     }
 
     public function save(IntegrationRequestLog $log, bool $flush = true): void

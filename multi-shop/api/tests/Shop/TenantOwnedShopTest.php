@@ -137,19 +137,17 @@ final class TenantOwnedShopTest extends ApiTestCase
             }
         }
 
-        $gerant = new User($email, 'gerant-'.substr(md5($suffix), 0, 8), 'placeholder', 'Gerant', 'Acme');
-        $gerant->setPasswordHash($hasher->hashPassword($gerant, 'Gerant123!'));
-        $gerant->activate();
-        $gerant->assignToTenantAccount($tenant->getId());
+        $gerantUser = new User($email, 'gerant-'.substr(md5($suffix), 0, 8), 'placeholder', 'Gerant', 'Acme');
+        $gerantUser->setPasswordHash($hasher->hashPassword($gerantUser, 'Gerant123!'));
+        $gerantUser->activate();
+        $gerantUser->assignToTenantAccount($tenant->getId());
         if (null !== $firstShopId) {
-            $gerant->assignToShop($firstShopId->getId());
+            $gerantUser->assignToShop($firstShopId->getId());
         }
-        $gerant->syncSymfonyRoles(['gerant']);
-
-        $role = $em->getRepository(Role::class)->findOneBy(['code' => 'gerant']);
-        self::assertInstanceOf(Role::class, $role);
-        $em->persist($gerant);
-        $em->persist(new UserRole($gerant, $role));
+        $gerantRole = $em->getRepository(Role::class)->findOneBy(['code' => 'gerant']);
+        self::assertInstanceOf(Role::class, $gerantRole);
+        $em->persist($gerantUser);
+        $em->persist(new UserRole($gerantUser, $gerantRole));
         $em->flush();
 
         return [
@@ -185,7 +183,7 @@ final class TenantOwnedShopTest extends ApiTestCase
         $auth = json_decode($client->getResponse()->getContent(), true);
 
         return [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$auth['token'],
+            'HTTP_AUTHORIZATION' => 'Bearer '.self::extractAccessToken($auth),
             'CONTENT_TYPE' => 'application/json',
         ];
     }

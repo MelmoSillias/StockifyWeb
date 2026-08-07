@@ -20,10 +20,14 @@ export const applyApiClientConfig = () => {
 
 applyApiClientConfig()
 
-const isLoginRequest = (url = '') => {
-  const loginEndpoint = appConfig.auth.loginEndpoint
-  return Boolean(loginEndpoint && url.includes(loginEndpoint))
+const isAuthBypassRequest = (url = '') => {
+  const { auth } = appConfig
+  return [auth.loginEndpoint, auth.refreshEndpoint].some(
+    (endpoint) => endpoint && url.includes(endpoint)
+  )
 }
+
+let refreshPromise = null
 
 apiClient.interceptors.request.use(
   (config) => {
@@ -61,16 +65,40 @@ apiClient.interceptors.response.use(
     if (
       error.response?.status === 401
       && auth.enabled
-      && auth.redirectOn401
       && authStore.isAuthenticated
-      && !isLoginRequest(originalRequest?.url)
+      && !originalRequest?._retry
+      && !isAuthBypassRequest(originalRequest?.url)
     ) {
-      if (router && router.currentRoute.value.name !== routes.loginRouteName) {
-        authStore.logout()
-        router.push({ name: routes.loginRouteName, query: { redirect: router.currentRoute.value.fullPath } })
-      }
+      originalRequest._retry = true
 
-      return Promise.reject(error)
+      try {
+        if (!refreshPromise) {
+          refreshPromise = authStore.refreshAccessToken().finally(() => {
+            refreshPromise = null
+          })
+        }
+        await refreshPromise
+        originalRequest.headers = originalRequest.headers || {}
+        originalRequest.headers.Authorization = `${auth.tokenType || 'Bearer'} ${authStore.accessToken}`
+        return apiClient(originalRequest)
+      } catch {
+        authStore.clearSession()
+        if (router && router.currentRoute.value.name !== routes.loginRouteName) {
+          router.push({ name: routes.loginRouteName, query: { redirect: router.currentRoute.value.fullPath } })
+        }
+      }
+    }
+
+    if (
+      error.response?.status === 401
+      && auth.enabled
+      && auth.redirectOn401
+      && !isAuthBypassRequest(originalRequest?.url)
+      && router
+      && router.currentRoute.value.name !== routes.loginRouteName
+    ) {
+      authStore.clearSession()
+      router.push({ name: routes.loginRouteName, query: { redirect: router.currentRoute.value.fullPath } })
     }
 
     if (error.response) {

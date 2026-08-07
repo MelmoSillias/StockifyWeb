@@ -39,17 +39,19 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
 
     public function findByUsernameAndShop(string $username, Uuid $shopId): ?User
     {
-        return $this->findOneBy([
-            'username' => strtolower($username),
-            'shopId' => $shopId,
-        ]);
+        $user = $this->findByUsername($username);
+        if (null === $user || !$user->belongsToShop($shopId)) {
+            return null;
+        }
+
+        return $user;
     }
 
     public function findByShopId(Uuid $shopId): array
     {
         return $this->createQueryBuilder('u')
-            ->leftJoin('u.shopMemberships', 'm')
-            ->andWhere('u.shopId = :shopId OR m.shopId = :shopId')
+            ->innerJoin('u.shopMemberships', 'm')
+            ->andWhere('m.shopId = :shopId')
             ->setParameter('shopId', $shopId, 'uuid')
             ->orderBy('u.lastName', 'ASC')
             ->addOrderBy('u.firstName', 'ASC')
@@ -85,7 +87,10 @@ class DoctrineUserRepository extends ServiceEntityRepository implements UserRepo
 
     public function loadUserByIdentifier(string $identifier): ?User
     {
-        return $this->authUserResolver->resolve($identifier, $this->loginContextHolder->getShopSlug());
+        $user = $this->authUserResolver->resolve($identifier, $this->loginContextHolder->getShopSlug());
+        $this->loginContextHolder->setAuthenticatingUser($user);
+
+        return $user;
     }
 
     public function save(User $user, bool $flush = true): void

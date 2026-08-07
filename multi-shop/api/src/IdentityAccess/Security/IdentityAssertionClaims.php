@@ -6,13 +6,14 @@ final readonly class IdentityAssertionClaims
 {
     /**
      * @param list<string> $accountIds
+     * @param list<string> $authMethods
      */
     public function __construct(
         public string $subject,
         public string $email,
         public array $accountIds,
         public bool $emailVerified = false,
-        public string $authProvider = 'local',
+        public array $authMethods = ['local'],
     ) {
     }
 }

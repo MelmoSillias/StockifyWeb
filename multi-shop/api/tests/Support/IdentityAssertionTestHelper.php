@@ -55,7 +55,7 @@ final class IdentityAssertionTestHelper
             'email' => strtolower(trim($email)),
             'accounts' => array_values($accountIds),
             'email_verified' => $emailVerified,
-            'auth_provider' => 'local',
+            'auth_methods' => ['password'],
             'iat' => $now,
             'nbf' => $now,
             'exp' => $now + 300,

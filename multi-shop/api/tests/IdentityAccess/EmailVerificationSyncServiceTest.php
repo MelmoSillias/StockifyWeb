@@ -42,37 +42,4 @@ final class EmailVerificationSyncServiceTest extends ApiTestCase
         self::assertNotNull($reloaded);
         self::assertTrue($reloaded->isEmailVerified());
     }
-
-    public function testLoginAssertionSyncMirrorsVerifiedStateFromControlPlane(): void
-    {
-        $this->initializeTestSchema();
-        self::bootKernel(['environment' => 'test']);
-        $container = static::getContainer();
-
-        $identityId = Uuid::v7();
-        $user = new User('owner@assertion.test', 'owner', 'hash', 'Owner', 'Assertion');
-        $user->setIdentityId($identityId);
-        $user->activate();
-
-        /** @var DoctrineUserRepository $users */
-        $users = $container->get(DoctrineUserRepository::class);
-        $users->save($user);
-
-        /** @var StubControlPlaneClient $controlPlane */
-        $controlPlane = $container->get(StubControlPlaneClient::class);
-        $controlPlane->registerIdentityCredentials(
-            'owner@assertion.test',
-            'Password123!',
-            (string) $identityId,
-            true,
-        );
-
-        /** @var EmailVerificationSyncService $service */
-        $service = $container->get(EmailVerificationSyncService::class);
-        self::assertTrue($service->syncFromControlPlane($user, 'Password123!'));
-
-        $reloaded = $users->findById($user->getId());
-        self::assertNotNull($reloaded);
-        self::assertTrue($reloaded->isEmailVerified());
-    }
 }

@@ -1,11 +1,12 @@
 security:
     password_hashers:
+        App\IdentityAccess\Domain\Entity\User:
+            id: App\IdentityAccess\Infrastructure\Security\IdentityLinkedPasswordHasher
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     providers:
         app_user_provider:
-            entity:
-                class: App\IdentityAccess\Domain\Entity\User
+            id: App\IdentityAccess\Infrastructure\Security\IdentityAccessUserProvider
 
     firewalls:
         dev:
@@ -43,7 +44,6 @@ security:
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/global, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/health, roles: PUBLIC_ACCESS }
         - { path: ^/api/units-of-measure, roles: PUBLIC_ACCESS }

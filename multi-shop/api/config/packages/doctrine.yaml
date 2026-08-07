@@ -1,6 +1,8 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        # Required so doctrine:database:create can run before the DB exists (no auto-detect connect).
+        server_version: '8.0'
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
     orm:

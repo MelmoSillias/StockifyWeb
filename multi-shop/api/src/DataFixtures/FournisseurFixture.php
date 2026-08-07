@@ -9,11 +9,17 @@ use App\SharedKernel\Domain\ValueObject\ShopContext;
 use App\SharedKernel\Infrastructure\Shop\ShopContextHolder;
 use App\Shop\Domain\Entity\Shop;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-final class FournisseurFixture extends Fixture implements DependentFixtureInterface
+final class FournisseurFixture extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['demo'];
+    }
+
     public function __construct(
         private readonly FournisseurRepositoryInterface $fournisseurRepository,
         private readonly AchatsService $achatsService,

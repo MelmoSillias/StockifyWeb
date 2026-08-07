@@ -16,13 +16,14 @@ final class DeleteAccountPurgeTest extends ApiTestCase
         IntegrationJwtTestHelper::ensureKeyPair();
         $this->initializeTestSchema();
         $client = static::createClient();
-        $headers = IntegrationJwtTestHelper::authHeaders('purge-guard');
+        $accountHeaders = IntegrationJwtTestHelper::authHeaders('purge-guard');
+        $shopHeaders = IntegrationJwtTestHelper::authHeaders();
 
         $suffix = uniqid('', true);
         $externalId = 'guard-'.$suffix;
-        $this->provisionWithShop($client, $headers, $externalId, 'guard-shop-'.substr(md5($suffix), 0, 8));
+        $this->provisionWithShop($client, $accountHeaders, $shopHeaders, $externalId, 'guard-shop-'.substr(md5($suffix), 0, 8));
 
-        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=guard', [], [], $headers);
+        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=guard', [], [], $accountHeaders);
         self::assertResponseStatusCodeSame(409);
     }
 
@@ -35,13 +36,14 @@ final class DeleteAccountPurgeTest extends ApiTestCase
 
         $this->initializeTestSchema();
         $client = static::createClient();
-        $headers = IntegrationJwtTestHelper::authHeaders('purge-flag-off');
+        $accountHeaders = IntegrationJwtTestHelper::authHeaders('purge-flag-off');
+        $shopHeaders = IntegrationJwtTestHelper::authHeaders();
 
         $suffix = uniqid('', true);
         $externalId = 'flag-off-'.$suffix;
-        $this->provisionWithShop($client, $headers, $externalId, 'flag-off-'.substr(md5($suffix), 0, 8));
+        $this->provisionWithShop($client, $accountHeaders, $shopHeaders, $externalId, 'flag-off-'.substr(md5($suffix), 0, 8));
 
-        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=purge', [], [], $headers);
+        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=purge', [], [], $accountHeaders);
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -53,18 +55,18 @@ final class DeleteAccountPurgeTest extends ApiTestCase
         $_SERVER['TENANT_PURGE_ENABLED'] = '1';
 
         $this->initializeTestSchema();
-        // Reboot so TenantPurgeService picks up the env flag.
         self::ensureKernelShutdown();
         $client = static::createClient();
-        $headers = IntegrationJwtTestHelper::authHeaders('purge-ok');
+        $accountHeaders = IntegrationJwtTestHelper::authHeaders('purge-ok');
+        $shopHeaders = IntegrationJwtTestHelper::authHeaders();
 
         $suffix = uniqid('', true);
         $externalId = 'purge-ok-'.$suffix;
         $slug = 'purge-ok-'.substr(md5($suffix), 0, 8);
-        $shopPayload = $this->provisionWithShop($client, $headers, $externalId, $slug, 'admin-'.$suffix.'@purge.test');
+        $shopPayload = $this->provisionWithShop($client, $accountHeaders, $shopHeaders, $externalId, $slug, 'admin-'.$suffix.'@purge.test');
         $shopId = $shopPayload['data']['id'];
 
-        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=purge', [], [], $headers);
+        $client->request('DELETE', '/integration/v1/accounts/'.$externalId.'?mode=purge', [], [], $accountHeaders);
         self::assertResponseStatusCodeSame(202);
         $body = json_decode($client->getResponse()->getContent(), true);
         self::assertSame('purge', $body['deletion_receipt']['mode']);
@@ -81,12 +83,13 @@ final class DeleteAccountPurgeTest extends ApiTestCase
     /** @return array<string, mixed> */
     private function provisionWithShop(
         \Symfony\Bundle\FrameworkBundle\KernelBrowser $client,
-        array $headers,
+        array $accountHeaders,
+        array $shopHeaders,
         string $externalId,
         string $slug,
         ?string $adminEmail = null,
     ): array {
-        $client->request('POST', '/integration/v1/accounts', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts', [], [], $accountHeaders, json_encode([
             'external_account_id' => $externalId,
             'entitlements' => ['plan' => 'pro', 'max_shops' => 5],
         ]));
@@ -100,7 +103,7 @@ final class DeleteAccountPurgeTest extends ApiTestCase
             $payload['admin_email'] = $adminEmail;
         }
 
-        $client->request('POST', '/integration/v1/accounts/'.$externalId.'/shops', [], [], $headers, json_encode($payload));
+        $client->request('POST', '/integration/v1/accounts/'.$externalId.'/shops', [], [], $shopHeaders, json_encode($payload));
         self::assertResponseStatusCodeSame(201);
 
         return json_decode($client->getResponse()->getContent(), true);

@@ -109,22 +109,23 @@ final class UserShopMembershipTest extends ApiTestCase
         $suffix = uniqid('', true);
         $externalAccountId = 'acme-membership-'.$suffix;
         $adminEmail = 'shared-admin-'.$suffix.'@acme.test';
-        $headers = IntegrationJwtTestHelper::authHeaders('membership-idempotent');
+        $accountHeaders = IntegrationJwtTestHelper::authHeaders('membership-idempotent');
+        $shopHeaders = IntegrationJwtTestHelper::authHeaders();
 
-        $client->request('POST', '/integration/v1/accounts', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts', [], [], $accountHeaders, json_encode([
             'external_account_id' => $externalAccountId,
             'entitlements' => ['plan' => 'pro', 'max_shops' => 5],
         ]));
         self::assertResponseStatusCodeSame(201);
 
-        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $shopHeaders, json_encode([
             'name' => 'Acme One',
             'slug' => 'acme-one-'.substr(md5($suffix), 0, 8),
             'admin_email' => $adminEmail,
         ]));
         self::assertResponseStatusCodeSame(201);
 
-        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $shopHeaders, json_encode([
             'name' => 'Acme Two',
             'slug' => 'acme-two-'.substr(md5($suffix.'b'), 0, 8),
             'admin_email' => $adminEmail,
@@ -179,7 +180,6 @@ final class UserShopMembershipTest extends ApiTestCase
         $member->activate();
         $member->assignToTenantAccount($tenant->getId());
         $member->assignToShop($shopA->getId());
-        $member->syncSymfonyRoles(['gerant']);
 
         $gerant = $em->getRepository(Role::class)->findOneBy(['code' => 'gerant']);
         self::assertInstanceOf(Role::class, $gerant);
@@ -208,7 +208,7 @@ final class UserShopMembershipTest extends ApiTestCase
         $auth = json_decode($client->getResponse()->getContent(), true);
 
         return [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$auth['token'],
+            'HTTP_AUTHORIZATION' => 'Bearer '.self::extractAccessToken($auth),
             'CONTENT_TYPE' => 'application/json',
         ];
     }

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DoctrineIntegrationRequestLogRepository::class)]
 #[ORM\Table(name: 'integration_request_logs')]
-#[ORM\UniqueConstraint(name: 'uniq_integration_idempotency_key', columns: ['idempotency_key'])]
+#[ORM\UniqueConstraint(name: 'uniq_integration_idempotency', columns: ['idempotency_key', 'method', 'path'])]
 #[ORM\Index(name: 'idx_integration_log_external_account', columns: ['external_account_id'])]
 class IntegrationRequestLog
 {

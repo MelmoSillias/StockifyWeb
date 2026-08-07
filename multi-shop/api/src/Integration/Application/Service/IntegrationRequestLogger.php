@@ -38,9 +38,9 @@ final class IntegrationRequestLogger
         $this->requestLogRepository->save($log);
     }
 
-    public function findIdempotentResponse(string $idempotencyKey): ?IntegrationRequestLog
+    public function findIdempotentResponse(string $idempotencyKey, string $method, string $path): ?IntegrationRequestLog
     {
-        $log = $this->requestLogRepository->findByIdempotencyKey($idempotencyKey);
+        $log = $this->requestLogRepository->findByIdempotencyKey($idempotencyKey, $method, $path);
         if (null === $log || null === $log->getResponseBody() || null === $log->getResponseStatus()) {
             return null;
         }

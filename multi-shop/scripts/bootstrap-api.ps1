@@ -1,5 +1,6 @@
 param(
     [switch]$SkipComposer,
+    [switch]$FullDemo,
     [switch]$AppendFixtures
 )
 
@@ -29,21 +30,29 @@ try {
     }
 
     Write-Host 'Preparing database...'
-    php bin/console doctrine:database:create --if-not-exists
+    php scripts/create-database.php
+    php bin/console doctrine:schema:drop --force --full-database
     php bin/console doctrine:migrations:migrate --no-interaction
 
-    $fixtureArgs = @('doctrine:fixtures:load', '--no-interaction')
-    if ($AppendFixtures) {
-        $fixtureArgs += '--append'
+    if ($FullDemo) {
+        $fixtureArgs = @('doctrine:fixtures:load', '--no-interaction', '--group=demo')
+        if ($AppendFixtures) {
+            $fixtureArgs += '--append'
+        }
+        Write-Host 'Loading demo fixtures (OWNER account + catalog)...'
+        & php bin/console @fixtureArgs
+    } else {
+        Write-Host 'Loading signup essentials (RBAC + units, no demo tenant)...'
+        php scripts/run-signup-seed.php
     }
-
-    Write-Host 'Loading fixtures...'
-    & php bin/console @fixtureArgs
 
     Write-Host ''
     Write-Host 'API bootstrap complete.'
     Write-Host 'Start server:  .\scripts\start-api.ps1'
     Write-Host 'Health check:  http://localhost:8001/api/health'
+    if (-not $FullDemo) {
+        Write-Host 'Prerequisite: seed Control Plane with sim-saas-admin seed-dev.sql or AppFixtures.'
+    }
 } finally {
     Pop-Location
 }

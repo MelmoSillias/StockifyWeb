@@ -7,8 +7,8 @@ parameters:
     integration_jwt_audience_default: 'stockify'
     identity_jwt_issuer_default: 'sim-saas-admin'
     identity_jwt_audience_default: 'stockify'
-    auth_global_identity_enabled_default: false
     tenant_purge_enabled_default: false
+    refresh_cookie_secure_default: false
     entitlement_stale_after_seconds_default: 86400
 
 services:
@@ -167,9 +167,14 @@ services:
             $expectedIssuer: '%env(default:identity_jwt_issuer_default:IDENTITY_JWT_ISSUER)%'
             $expectedAudience: '%env(default:identity_jwt_audience_default:IDENTITY_JWT_AUDIENCE)%'
 
-    App\IdentityAccess\Application\Service\GlobalAuthService:
+    App\IdentityAccess\Infrastructure\Security\IdentityAwareUserPasswordHasher:
+        decorates: security.user_password_hasher
         arguments:
-            $enabled: '%env(default:auth_global_identity_enabled_default:bool:AUTH_GLOBAL_IDENTITY_ENABLED)%'
+            $inner: '@App\IdentityAccess\Infrastructure\Security\IdentityAwareUserPasswordHasher.inner'
+
+    App\IdentityAccess\Application\Service\RefreshTokenService:
+        arguments:
+            $cookieSecure: '%env(bool:default:refresh_cookie_secure_default:REFRESH_COOKIE_SECURE)%'
 
     App\Impression\Application\Renderer\DocumentRendererInterface:
         alias: App\Impression\Infrastructure\Renderer\TwigDocumentRenderer

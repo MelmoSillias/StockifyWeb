@@ -22,7 +22,11 @@ final class ProvisionAccountHandler
         }
 
         if (null !== $command->idempotencyKey && '' !== trim($command->idempotencyKey)) {
-            $existingLog = $this->requestLogRepository->findByIdempotencyKey($command->idempotencyKey);
+            $existingLog = $this->requestLogRepository->findByIdempotencyKey(
+                $command->idempotencyKey,
+                'POST',
+                '/integration/v1/accounts',
+            );
             if (null !== $existingLog && null !== $existingLog->getResponseBody()) {
                 $cachedId = $existingLog->getResponseBody()['id'] ?? null;
                 if (is_string($cachedId)) {

@@ -228,13 +228,13 @@ export const appConfig = {
     mode: 'jwt',
     tokenType: 'Bearer',
     loginEndpoint: '/login_check',
+    refreshEndpoint: '/token/refresh',
     meEndpoint: '/me',
     redirectOn401: true,
     tokenResolver: resolveAccessToken
   },
   storage: {
     layoutPreferencesKey: 'stockify-layout-preferences',
-    authTokenKey: 'stockify-access-token',
     authUserKey: 'stockify-auth-user',
     authPermissionsKey: 'stockify-auth-permissions',
     authFeaturesKey: 'stockify-auth-features',

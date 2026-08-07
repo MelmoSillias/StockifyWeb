@@ -2,12 +2,25 @@
 
 Complément du contrat d'intégration pour l'authentification par identité globale (Gap C).
 
-## Flux
+## Modèle Control Plane
 
-1. Utilisateur → `POST /api/auth/global` (Data Plane)
-2. Data Plane → `POST /api/identity/v1/token` (Control Plane, HMAC)
-3. Control Plane vérifie `GlobalUser` + password, retourne assertion RS256
-4. Data Plane valide l'assertion, résout `User` via `identity_id`, émet JWT Lexik local
+| Entité | Rôle |
+|--------|------|
+| `Identity` | Identité globale (UUID stable = `identity_id` DP) |
+| `IdentityEmail` | E-mails (primary + `verified_at`) |
+| `Credential` | Secret PASSWORD (hash unique côté CP) |
+| `ExternalIdentity` | Liaison OAuth (scaffolding) |
+| `AccountMembership` | Appartenance Identity ↔ Account |
+
+`AdminUser` est une entité **distincte** (console plateforme uniquement).
+
+## Flux login unifié (Data Plane)
+
+1. Utilisateur → `POST /api/login_check` (Data Plane)
+2. Si `users.identity_id` est renseigné : DP → `POST /api/identity/v1/token` (Control Plane, HMAC)
+3. Control Plane vérifie `Identity` + `Credential`, retourne assertion RS256
+4. Data Plane valide l'assertion, résout `User` via `identity_id`, émet `{ access_token, refresh_token }` + cookie HttpOnly
+5. Si pas d'`identity_id` : auth locale via `users.password_hash`
 
 ## Endpoint Control Plane
 
@@ -37,26 +50,34 @@ POST /api/identity/v1/token
 }
 ```
 
-**Claims assertion :** `sub` (GlobalUser UUID), `aud` (application slug), `email`, `accounts[]`, `iss`, `iat`, `exp`.
+**Claims assertion :** `sub` (Identity UUID), `aud` (application slug), `email`, `email_verified`, `auth_methods` (ex. `["password","google"]`), `accounts[]`, `iss`, `iat`, `exp`.
 
-## Endpoint Data Plane
+Le claim legacy `auth_provider` n'est plus émis ; le DP accepte les deux formats lors de la transition.
+
+## Refresh token (Data Plane)
 
 ```
-POST /api/auth/global
+POST /api/token/refresh
 ```
 
-Feature flag : `AUTH_GLOBAL_IDENTITY_ENABLED=true`
+Refresh token via cookie HttpOnly `stockify_refresh_token` ou body `{ "refresh_token": "..." }`.
 
-**Body :**
+**Réponse :** `{ "access_token": "...", "refresh_token": "..." }` (rotation à chaque refresh).
 
-```json
-{
-  "email": "owner@example.com",
-  "password": "..."
-}
+## Frontend tokens
+
+- Access token : mémoire Pinia uniquement (pas de `localStorage`)
+- Refresh : cookie HttpOnly + interceptor axios 401
+- Permissions/features en `localStorage` : affichage UI seulement (non autoritatif)
+
+## Password reset (Control Plane)
+
+```
+POST /api/public/identity/password-reset/request
+POST /api/public/identity/password-reset/confirm
 ```
 
-**Réponse :** `{ "token": "<jwt local>" }`
+Les utilisateurs liés (`identity_id`) ne peuvent pas changer leur mot de passe côté DP (`POST /api/me/password` → 403).
 
 ## Variables d'environnement
 
@@ -67,7 +88,6 @@ Feature flag : `AUTH_GLOBAL_IDENTITY_ENABLED=true`
 | `IDENTITY_JWT_ISSUER` | CP + DP | Claim `iss` |
 | `IDENTITY_JWT_AUDIENCE` | DP | Claim `aud` attendu (`stockify`) |
 | `IDENTITY_JWT_TTL_SECONDS` | CP | TTL assertion (défaut 300) |
-| `AUTH_GLOBAL_IDENTITY_ENABLED` | DP | Active `/api/auth/global` |
 | `INTEGRATION_WEBHOOK_SECRET` | CP + DP | HMAC DP→CP token exchange |
 
 ## Sync clé publique
@@ -84,4 +104,12 @@ Wizard public LafiaSugu (3 étapes) → `POST /api/public/signup` (Data Plane) :
 2. **Connexion** — `adminEmail`, `adminPassword`
 3. **Boutique** — `accountName`, `accountSlug` (requis), `shopPhone`, `shopAddress` (optionnels) → `shops` local
 
-Le DP appelle ensuite `POST /api/public/signup` (CP) avec `adminEmail` + `adminPassword` : crée `GlobalUser` + `AccountMember` owner et retourne `identityId`. Le Data Plane persiste `users.identity_id` sur l'admin owner local. Le profil personne (prénom/nom/téléphone) n'est pas stocké sur `GlobalUser` en v1.
+Le DP appelle ensuite `POST /api/public/signup` (CP) avec `adminEmail` + `adminPassword` : crée `Identity` + `AccountMembership` owner et retourne `identityId`. Le Data Plane persiste `users.identity_id` **sans** dupliquer le hash password local.
+
+## Sync état identité (M2M)
+
+```
+PATCH /integration/v1/identities/{identityId}
+```
+
+Body : `{ "email_verified_at": "<ISO8601|null>" }` — met à jour le miroir DP `User.emailVerifiedAt`.

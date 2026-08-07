@@ -4,7 +4,6 @@ namespace App\IdentityAccess\Application\Service;
 
 use App\IdentityAccess\Domain\Entity\User;
 use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
-use App\IdentityAccess\Security\IdentityAssertionValidator;
 use App\Onboarding\Application\Service\ControlPlaneException;
 use App\Onboarding\Application\Service\ControlPlaneGatewayInterface;
 use Psr\Log\LoggerInterface;
@@ -13,13 +12,12 @@ final class EmailVerificationSyncService
 {
     public function __construct(
         private readonly ControlPlaneGatewayInterface $controlPlaneClient,
-        private readonly IdentityAssertionValidator $assertionValidator,
         private readonly UserRepositoryInterface $userRepository,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function syncFromControlPlane(User $user, ?string $password = null): bool
+    public function syncFromControlPlane(User $user): bool
     {
         if (null === $user->getIdentityId()) {
             return $user->isEmailVerified();
@@ -29,40 +27,7 @@ final class EmailVerificationSyncService
             return true;
         }
 
-        if ($this->trySyncFromIdentityAssertion($user, $password)) {
-            return true;
-        }
-
         return $this->trySyncFromVerificationPull($user);
-    }
-
-    private function trySyncFromIdentityAssertion(User $user, ?string $password): bool
-    {
-        if (null === $password || '' === trim($password)) {
-            return false;
-        }
-
-        $email = $user->getEmail();
-        if (null === $email || '' === trim($email)) {
-            return false;
-        }
-
-        try {
-            $assertion = $this->controlPlaneClient->exchangeIdentityToken($email, $password);
-            $claims = $this->assertionValidator->validate($assertion);
-            if (!$claims->emailVerified) {
-                return false;
-            }
-
-            return $this->markVerified($user, new \DateTimeImmutable());
-        } catch (ControlPlaneException $exception) {
-            $this->logger->debug('Identity assertion sync skipped during login.', [
-                'identityId' => (string) $user->getIdentityId(),
-                'error' => $exception->getMessage(),
-            ]);
-
-            return false;
-        }
     }
 
     private function trySyncFromVerificationPull(User $user): bool

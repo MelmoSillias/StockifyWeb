@@ -17,7 +17,7 @@ final class LoginRequestSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onRequest', 20],
+            KernelEvents::REQUEST => ['onRequest', 7],
         ];
     }
 
@@ -27,12 +27,14 @@ final class LoginRequestSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->loginContextHolder->clear();
-
         $request = $event->getRequest();
         if ('/api/login_check' !== $request->getPathInfo()) {
+            $this->loginContextHolder->clear();
+
             return;
         }
+
+        $this->loginContextHolder->clear();
 
         $payload = json_decode($request->getContent(), true);
         if (!is_array($payload)) {

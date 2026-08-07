@@ -2,8 +2,6 @@
 
 namespace App\Tests;
 
-use App\Catalog\Domain\Entity\UnitOfMeasure;
-use App\Catalog\Domain\Repository\UnitOfMeasureRepositoryInterface;
 use App\Finance\Application\Service\FinanceSeedService;
 use App\Tests\Support\AccessAuditTestSeeder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +17,7 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function initializeTestSchema(bool $withFinanceSeed = false): void
     {
-        $suiteKey = static::class;
+        $suiteKey = static::class.($withFinanceSeed ? ':finance' : '');
         if (isset(self::$initializedSuites[$suiteKey])) {
             return;
         }
@@ -28,20 +26,20 @@ abstract class ApiTestCase extends WebTestCase
         $container = static::getContainer();
         /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine')->getManager();
+        $connection = $em->getConnection();
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+        $schemaManager = $connection->createSchemaManager();
+        foreach ($schemaManager->listTableNames() as $tableName) {
+            $connection->executeStatement(sprintf('DROP TABLE IF EXISTS `%s`', $tableName));
+        }
         $tool = new SchemaTool($em);
         $metadata = $em->getMetadataFactory()->getAllMetadata();
-        $tool->dropSchema($metadata);
         $tool->createSchema($metadata);
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
 
         /** @var UserPasswordHasherInterface $passwordHasher */
         $passwordHasher = $container->get(UserPasswordHasherInterface::class);
         AccessAuditTestSeeder::seed($em, $passwordHasher);
-
-        /** @var UnitOfMeasureRepositoryInterface $unitRepo */
-        $unitRepo = $container->get(UnitOfMeasureRepositoryInterface::class);
-        foreach ([['piece', 'Pièce', 0], ['kg', 'Kilogramme', 3], ['liter', 'Litre', 3], ['carton', 'Carton', 0]] as [$code, $label, $decimals]) {
-            $unitRepo->save(new UnitOfMeasure($code, $label, $decimals));
-        }
 
         if ($withFinanceSeed) {
             /** @var FinanceSeedService $financeSeed */
@@ -51,6 +49,12 @@ abstract class ApiTestCase extends WebTestCase
 
         self::$initializedSuites[$suiteKey] = true;
         self::ensureKernelShutdown();
+    }
+
+    /** @param array<string, mixed> $auth */
+    protected static function extractAccessToken(array $auth): string
+    {
+        return (string) ($auth['access_token'] ?? $auth['token'] ?? '');
     }
 
     /** @return array<string, string> */
@@ -64,7 +68,7 @@ abstract class ApiTestCase extends WebTestCase
         $auth = json_decode($client->getResponse()->getContent(), true);
 
         return [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$auth['token'],
+            'HTTP_AUTHORIZATION' => 'Bearer '.self::extractAccessToken($auth),
             'CONTENT_TYPE' => 'application/json',
         ];
     }

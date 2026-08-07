@@ -43,8 +43,8 @@ final class CreateShopUserHandler
 
         $username = ShopUsername::fromString($command->username)->value();
 
-        if (null !== $this->userRepository->findByUsernameAndShop($username, $shop->getId())) {
-            throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé dans cette boutique.');
+        if (null !== $this->userRepository->findByUsername($username)) {
+            throw new \InvalidArgumentException('Ce nom d\'utilisateur est déjà utilisé.');
         }
 
         $generatedPassword = $this->passwordGenerator->generate();

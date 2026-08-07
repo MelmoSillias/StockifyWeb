@@ -49,15 +49,16 @@ final class NullableEmailAuthTest extends ApiTestCase
         $suffix = uniqid('', true);
         $externalAccountId = 'gap-a-'.$suffix;
         $slug = 'gap-a-shop-'.substr(md5($suffix), 0, 8);
-        $headers = IntegrationJwtTestHelper::authHeaders('gap-a-no-email');
+        $accountHeaders = IntegrationJwtTestHelper::authHeaders('gap-a-no-email');
+        $shopHeaders = IntegrationJwtTestHelper::authHeaders();
 
-        $client->request('POST', '/integration/v1/accounts', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts', [], [], $accountHeaders, json_encode([
             'external_account_id' => $externalAccountId,
             'entitlements' => ['plan' => 'pro', 'max_shops' => 5],
         ]));
         self::assertResponseStatusCodeSame(201);
 
-        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $headers, json_encode([
+        $client->request('POST', '/integration/v1/accounts/'.$externalAccountId.'/shops', [], [], $shopHeaders, json_encode([
             'name' => 'Gap A Shop',
             'slug' => $slug,
         ]));
@@ -78,7 +79,7 @@ final class NullableEmailAuthTest extends ApiTestCase
         self::assertResponseIsSuccessful();
     }
 
-    public function testNullifySyntheticEmailMovesAddressToLegacyEmail(): void
+    public function testNullifySyntheticEmailClearsEmailForUsernameLogin(): void
     {
         $this->initializeTestSchema();
         static::createClient();
@@ -102,7 +103,6 @@ final class NullableEmailAuthTest extends ApiTestCase
         $reloaded = $em->getRepository(User::class)->find($user->getId());
         self::assertInstanceOf(User::class, $reloaded);
         self::assertNull($reloaded->getEmail());
-        self::assertSame('synthetic-'.$suffix.'@shop.local', $reloaded->getLegacyEmail());
         self::assertSame('synthetic-'.$suffix, $reloaded->getUserIdentifier());
     }
 
@@ -121,7 +121,6 @@ final class NullableEmailAuthTest extends ApiTestCase
         $user = new User($email, 'real-'.$suffix, 'placeholder', 'Real', 'User');
         $user->setPasswordHash($hasher->hashPassword($user, 'RealUser123!'));
         $user->activate();
-        $user->syncSymfonyRoles(['gerant']);
         $gerant = $em->getRepository(Role::class)->findOneBy(['code' => 'gerant']);
         self::assertInstanceOf(Role::class, $gerant);
         $em->persist($user);
@@ -162,7 +161,7 @@ final class NullableEmailAuthTest extends ApiTestCase
         $auth = json_decode($client->getResponse()->getContent(), true);
 
         return [
-            'HTTP_AUTHORIZATION' => 'Bearer '.$auth['token'],
+            'HTTP_AUTHORIZATION' => 'Bearer '.self::extractAccessToken($auth),
             'CONTENT_TYPE' => 'application/json',
         ];
     }

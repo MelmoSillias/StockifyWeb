@@ -19,7 +19,7 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity(repositoryClass: DoctrineUserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'uniq_user_email', fields: ['email'])]
-#[ORM\UniqueConstraint(name: 'uniq_user_shop_username', columns: ['shop_id', 'username'])]
+#[ORM\UniqueConstraint(name: 'uniq_user_username', fields: ['username'])]
 #[ORM\UniqueConstraint(name: 'uniq_user_identity_id', columns: ['identity_id'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -31,14 +31,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(name: 'legacy_email', length: 180, nullable: true)]
-    private ?string $legacyEmail = null;
-
     #[ORM\Column(length: 50)]
     private string $username;
 
-    #[ORM\Column]
-    private string $passwordHash;
+    #[ORM\Column(nullable: true)]
+    private ?string $passwordHash = null;
 
     #[ORM\Column(length: 100)]
     private string $firstName;
@@ -57,13 +54,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastLoginAt = null;
-
-    /** @var list<string> */
-    #[ORM\Column]
-    private array $roles = [];
-
-    #[ORM\Column(type: 'uuid', nullable: true)]
-    private ?Uuid $shopId = null;
 
     #[ORM\Column]
     private bool $isPlatformOwner = false;
@@ -92,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct(
         ?string $email,
         string $username,
-        string $passwordHash,
+        ?string $passwordHash,
         string $firstName,
         string $lastName,
     ) {
@@ -129,19 +119,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->touch();
     }
 
-    public function getLegacyEmail(): ?string
-    {
-        return $this->legacyEmail;
-    }
-
-    public function setLegacyEmail(?string $legacyEmail): void
-    {
-        $this->legacyEmail = self::normalizeEmail($legacyEmail);
-        $this->touch();
-    }
-
     /**
-     * Moves a synthetic .local address into legacy_email and clears email.
+     * Clears a synthetic .local address so username becomes the login identifier.
      */
     public function nullifySyntheticEmail(): void
     {
@@ -149,7 +128,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return;
         }
 
-        $this->legacyEmail = $this->email;
         $this->email = null;
         $this->touch();
     }
@@ -187,27 +165,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
+        $roles = ['ROLE_USER'];
+
+        if ($this->isPlatformOwner) {
+            $roles[] = 'ROLE_PLATFORM_OWNER';
+        }
+
+        foreach ($this->userRoles as $userRole) {
+            $roles[] = PermissionCatalog::symfonyRole($userRole->getRole()->getCode());
+        }
 
         return array_values(array_unique($roles));
     }
 
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): void
-    {
-        $this->roles = $roles;
-        $this->touch();
-    }
-
     public function getPassword(): ?string
     {
+        if (null !== $this->identityId) {
+            return '';
+        }
+
         return $this->passwordHash;
     }
 
-    public function setPasswordHash(string $passwordHash): void
+    public function setPasswordHash(?string $passwordHash): void
     {
         $this->passwordHash = $passwordHash;
         $this->touch();
@@ -314,31 +294,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->touch();
     }
 
-    /**
-     * @param list<string> $roleCodes
-     */
-    public function syncSymfonyRoles(array $roleCodes): void
-    {
-        $symfonyRoles = array_map(
-            static fn (string $code): string => PermissionCatalog::symfonyRole($code),
-            $roleCodes,
-        );
-        $this->roles = array_values(array_unique($symfonyRoles));
-        $this->touch();
-    }
-
-    public function getShopId(): ?Uuid
-    {
-        return $this->shopId;
-    }
-
     public function assignToShop(Uuid $shopId): void
     {
         if ($this->isPlatformOwner) {
             throw new \DomainException('Platform owner cannot be assigned to a shop.');
         }
 
-        $this->shopId = $shopId;
         $this->addShopMembership($shopId, true);
         $this->touch();
     }
@@ -357,12 +318,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $ids[$membership->getShopId()->toRfc4122()] = $membership->getShopId();
         }
 
-        // The legacy column is still authoritative for users not yet backfilled.
-        if (null !== $this->shopId) {
-            $ids[$this->shopId->toRfc4122()] = $this->shopId;
+        return array_values($ids);
+    }
+
+    public function getPrimaryShopId(): ?Uuid
+    {
+        foreach ($this->shopMemberships as $membership) {
+            if ($membership->isPrimary()) {
+                return $membership->getShopId();
+            }
         }
 
-        return array_values($ids);
+        $first = $this->shopMemberships->first();
+
+        return false !== $first ? $first->getShopId() : null;
     }
 
     public function addShopMembership(Uuid $shopId, bool $primary = false): void
@@ -398,11 +367,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 continue;
             }
 
+            $wasPrimary = $membership->isPrimary();
             $this->shopMemberships->removeElement($membership);
 
-            if (null !== $this->shopId && $this->shopId->equals($shopId)) {
+            if ($wasPrimary) {
                 $remaining = $this->shopMemberships->first();
-                $this->shopId = false !== $remaining ? $remaining->getShopId() : null;
                 if (false !== $remaining) {
                     $remaining->markAsPrimary();
                 }
@@ -424,8 +393,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
             $membership->demoteFromPrimary();
         }
-
-        $this->shopId = $primary->getShopId();
     }
 
     public function isPlatformOwner(): bool
@@ -436,22 +403,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function promoteToPlatformOwner(): void
     {
         $this->isPlatformOwner = true;
-        $this->shopId = null;
         $this->shopMemberships->clear();
-        $roles = $this->roles;
-        if (!in_array('ROLE_PLATFORM_OWNER', $roles, true)) {
-            $roles[] = 'ROLE_PLATFORM_OWNER';
-            $this->roles = $roles;
-        }
         $this->touch();
     }
 
     public function belongsToShop(Uuid $shopId): bool
     {
-        if (null !== $this->shopId && $this->shopId->equals($shopId)) {
-            return true;
-        }
-
         foreach ($this->shopMemberships as $membership) {
             if ($membership->getShopId()->equals($shopId)) {
                 return true;

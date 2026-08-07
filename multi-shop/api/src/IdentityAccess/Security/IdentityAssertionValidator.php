@@ -64,7 +64,7 @@ final class IdentityAssertionValidator
             (string) $parsed->claims()->get('email', ''),
             $this->extractAccounts($parsed),
             (bool) $parsed->claims()->get('email_verified', false),
-            (string) $parsed->claims()->get('auth_provider', 'local'),
+            $this->extractAuthMethods($parsed),
         );
     }
 
@@ -77,6 +77,24 @@ final class IdentityAssertionValidator
         }
 
         return array_values(array_filter(array_map('strval', $accounts), static fn (string $id): bool => '' !== $id));
+    }
+
+    /** @return list<string> */
+    private function extractAuthMethods(Plain $token): array
+    {
+        $authMethods = $token->claims()->get('auth_methods');
+        if (is_array($authMethods)) {
+            $methods = array_values(array_filter(array_map('strval', $authMethods), static fn (string $method): bool => '' !== $method));
+
+            return [] !== $methods ? $methods : ['local'];
+        }
+
+        $legacyProvider = $token->claims()->get('auth_provider');
+        if (is_string($legacyProvider) && '' !== trim($legacyProvider)) {
+            return [trim($legacyProvider)];
+        }
+
+        return ['local'];
     }
 
     private function getConfiguration(): Configuration

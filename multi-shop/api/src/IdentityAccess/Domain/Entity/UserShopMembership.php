@@ -7,11 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Attaches a user to a shop. Replaces the single users.shop_id column, which
- * could not express "member of 2 shops out of 5" within one tenant.
- *
- * users.shop_id is kept in sync as the primary membership for the duration of
- * the migration so a rollback stays possible.
+ * Attaches a user to a shop for multi-shop membership within a tenant.
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'user_shop_memberships')]

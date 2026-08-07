@@ -7,6 +7,11 @@ export const authService = {
     return response.data
   },
 
+  async refresh() {
+    const response = await apiClient.post(appConfig.auth.refreshEndpoint)
+    return response.data
+  },
+
   async me() {
     const response = await apiClient.get(appConfig.auth.meEndpoint)
     return response.data

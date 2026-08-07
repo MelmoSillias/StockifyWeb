@@ -22,6 +22,10 @@ final class ChangePasswordHandler
     {
         $user = $command->user;
 
+        if (null !== $user->getIdentityId()) {
+            throw new \DomainException('Password is managed by your global identity account.');
+        }
+
         if (!$this->passwordHasher->isPasswordValid($user, $command->currentPassword)) {
             throw new \DomainException('Mot de passe actuel incorrect.');
         }

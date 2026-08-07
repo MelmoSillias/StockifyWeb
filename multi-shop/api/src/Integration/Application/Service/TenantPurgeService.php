@@ -164,7 +164,7 @@ final class TenantPurgeService
                 ->select('u')
                 ->from(User::class, 'u')
                 ->leftJoin('u.shopMemberships', 'm')
-                ->andWhere('u.shopId = :shopId OR m.shopId = :shopId')
+                ->andWhere('m.shopId = :shopId')
                 ->setParameter('shopId', $shopId, 'uuid')
                 ->getQuery()
                 ->getResult();

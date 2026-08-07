@@ -19,7 +19,7 @@ final class EmailVerifiedRequestSubscriber implements EventSubscriberInterface
         '/api/auth/verification/sync',
         '/api/login',
         '/api/login_check',
-        '/api/auth/global',
+        '/api/token/refresh',
     ];
 
     public function __construct(

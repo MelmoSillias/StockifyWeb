@@ -89,8 +89,9 @@ final class ShopContextSubscriber implements EventSubscriberInterface
         }
 
         if (!$user->isPlatformOwner() && !$request->headers->has('X-Shop-Id')) {
-            if (null !== $user->getShopId()) {
-                $request->headers->set('X-Shop-Id', (string) $user->getShopId());
+            $primaryShopId = $user->getPrimaryShopId();
+            if (null !== $primaryShopId) {
+                $request->headers->set('X-Shop-Id', (string) $primaryShopId);
             }
         }
 

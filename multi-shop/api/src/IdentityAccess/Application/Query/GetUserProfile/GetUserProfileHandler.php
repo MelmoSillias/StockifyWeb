@@ -49,7 +49,7 @@ final class GetUserProfileHandler
                 'roles' => $roleCodes,
                 'symfony_roles' => $user->getRoles(),
                 'is_platform_owner' => $user->isPlatformOwner(),
-                'shop_id' => null !== $user->getShopId() ? (string) $user->getShopId() : null,
+                'shop_id' => null !== $user->getPrimaryShopId() ? (string) $user->getPrimaryShopId() : null,
                 'tenant_account_id' => null !== $user->getTenantAccountId() ? (string) $user->getTenantAccountId() : null,
                 'identity_id' => null !== $user->getIdentityId() ? (string) $user->getIdentityId() : null,
                 'must_change_password' => $user->mustChangePassword(),

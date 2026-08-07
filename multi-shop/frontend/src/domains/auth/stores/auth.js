@@ -53,7 +53,7 @@ const normalizeUsage = (usage) => {
 }
 
 const createInitialState = () => ({
-  accessToken: localStorage.getItem(storage.authTokenKey) || null,
+  accessToken: null,
   user: parseStoredUser(localStorage.getItem(storage.authUserKey)),
   permissions: parseStoredList(localStorage.getItem(storage.authPermissionsKey)),
   features: parseStoredList(localStorage.getItem(storage.authFeaturesKey)),
@@ -182,13 +182,6 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     setAccessToken(accessToken) {
       this.accessToken = accessToken
-
-      if (accessToken) {
-        localStorage.setItem(storage.authTokenKey, accessToken)
-        return
-      }
-
-      localStorage.removeItem(storage.authTokenKey)
     },
 
     setUser(user) {
@@ -203,6 +196,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     setPermissions(permissions) {
+      // UI cache only — authorization is enforced server-side on each request.
       this.permissions = Array.isArray(permissions) ? permissions : []
       localStorage.setItem(storage.authPermissionsKey, JSON.stringify(this.permissions))
     },
@@ -263,22 +257,33 @@ export const useAuthStore = defineStore('auth', {
       return user
     },
 
+    async refreshAccessToken() {
+      const data = await authService.refresh()
+      const accessToken = auth.tokenResolver(data)
+      if (!accessToken) {
+        throw new Error('Refresh token invalid.')
+      }
+      this.setAccessToken(accessToken)
+      return accessToken
+    },
+
     async restoreSession() {
       if (!auth.enabled) {
         this.clearSession()
         return null
       }
 
-      if (!this.accessToken) {
-        this.setUser(null)
-        this.setPermissions([])
-        this.setFeatures([])
-        this.setQuotas(null)
-        this.setUsage(null)
-        return null
+      if (this.accessToken) {
+        try {
+          return await this.fetchCurrentUser()
+        } catch {
+          this.clearSession()
+          return null
+        }
       }
 
       try {
+        await this.refreshAccessToken()
         return await this.fetchCurrentUser()
       } catch {
         this.clearSession()
