@@ -167,6 +167,11 @@ services:
             $expectedIssuer: '%env(default:identity_jwt_issuer_default:IDENTITY_JWT_ISSUER)%'
             $expectedAudience: '%env(default:identity_jwt_audience_default:IDENTITY_JWT_AUDIENCE)%'
 
+    App\System\Application\Service\DeploymentReadinessChecker:
+        arguments:
+            $identityJwtPublicKeyPath: '%env(resolve:IDENTITY_JWT_PUBLIC_KEY)%'
+            $integrationJwtPublicKeyPath: '%env(resolve:INTEGRATION_JWT_PUBLIC_KEY)%'
+
     App\IdentityAccess\Infrastructure\Security\IdentityAwareUserPasswordHasher:
         decorates: security.user_password_hasher
         arguments:

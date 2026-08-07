@@ -13,5 +13,8 @@ COPY . .
 RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader \
     || composer install --no-interaction --prefer-dist
 
+RUN chmod +x docker-entrypoint.sh
+
 EXPOSE 8001
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["php", "-S", "0.0.0.0:8001", "-t", "public"]
