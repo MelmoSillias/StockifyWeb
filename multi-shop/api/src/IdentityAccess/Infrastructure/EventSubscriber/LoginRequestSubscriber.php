@@ -49,6 +49,10 @@ final class LoginRequestSubscriber implements EventSubscriberInterface
 
         $password = $payload['password'] ?? null;
 
+        if (is_string($password)) {
+            $this->loginContextHolder->setPassword($password);
+        }
+
         if (!is_string($identifier) || !is_string($password)) {
             return;
         }

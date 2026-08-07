@@ -13,7 +13,12 @@ export const authService = {
   },
 
   async resendVerificationEmail() {
-    const response = await apiClient.post('/api/auth/verification/resend')
+    const response = await apiClient.post('/auth/verification/resend')
+    return response.data
+  },
+
+  async syncVerificationStatus() {
+    const response = await apiClient.post('/auth/verification/sync')
     return response.data
   }
 }

@@ -4,8 +4,10 @@ namespace App\AccessAudit\Infrastructure\EventSubscriber;
 
 use App\AccessAudit\Application\Service\AuditLoggerService;
 use App\AccessAudit\Domain\Enum\AuditStatus;
+use App\IdentityAccess\Application\Service\EmailVerificationSyncService;
 use App\IdentityAccess\Domain\Entity\User;
 use App\IdentityAccess\Domain\Repository\UserRepositoryInterface;
+use App\IdentityAccess\Infrastructure\Security\LoginContextHolder;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,6 +20,8 @@ final class LoginAuditSubscriber implements EventSubscriberInterface
         private readonly AuditLoggerService $auditLogger,
         private readonly RequestStack $requestStack,
         private readonly UserRepositoryInterface $userRepository,
+        private readonly EmailVerificationSyncService $emailVerificationSyncService,
+        private readonly LoginContextHolder $loginContextHolder,
     ) {
     }
 
@@ -36,6 +40,8 @@ final class LoginAuditSubscriber implements EventSubscriberInterface
         if (!$user instanceof User) {
             return;
         }
+
+        $this->emailVerificationSyncService->syncFromControlPlane($user, $this->loginContextHolder->getPassword());
 
         $user->recordLogin();
         $this->userRepository->save($user);

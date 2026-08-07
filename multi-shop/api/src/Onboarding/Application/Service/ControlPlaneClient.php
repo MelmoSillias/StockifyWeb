@@ -157,6 +157,26 @@ class ControlPlaneClient implements ControlPlaneGatewayInterface
     }
 
     /**
+     * @return array{identityId: string, emailVerified: bool, emailVerifiedAt: ?string}
+     */
+    public function pullIdentityVerification(string $identityId): array
+    {
+        $baseUrl = $this->requireBaseUrl();
+        $payload = json_encode([], JSON_THROW_ON_ERROR);
+        $path = '/api/integration/v1/identities/'.rawurlencode($identityId).'/verification/pull';
+        $body = $this->signedPost(rtrim($baseUrl, '/').$path, $payload, 15);
+        $data = is_array($body['data'] ?? null) ? $body['data'] : [];
+
+        return [
+            'identityId' => (string) ($data['identityId'] ?? $identityId),
+            'emailVerified' => (bool) ($data['emailVerified'] ?? false),
+            'emailVerifiedAt' => isset($data['emailVerifiedAt']) && is_string($data['emailVerifiedAt'])
+                ? $data['emailVerifiedAt']
+                : null,
+        ];
+    }
+
+    /**
      * @return array{features: list<string>, quotas: array<string, int|float>, updated_at: ?string}
      */
     public function pullEntitlements(string $externalAccountId, string $applicationSlug = 'stockify'): array

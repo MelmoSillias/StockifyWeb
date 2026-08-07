@@ -34,6 +34,7 @@ final class IdentityAssertionTestHelper
         array $accountIds = [],
         string $audience = 'stockify',
         string $issuer = 'sim-saas-admin',
+        bool $emailVerified = false,
     ): string {
         self::ensureKeyPair();
         if (null === self::$privateKeyPath || !is_file(self::$privateKeyPath)) {
@@ -53,6 +54,8 @@ final class IdentityAssertionTestHelper
             'sub' => $subject,
             'email' => strtolower(trim($email)),
             'accounts' => array_values($accountIds),
+            'email_verified' => $emailVerified,
+            'auth_provider' => 'local',
             'iat' => $now,
             'nbf' => $now,
             'exp' => $now + 300,

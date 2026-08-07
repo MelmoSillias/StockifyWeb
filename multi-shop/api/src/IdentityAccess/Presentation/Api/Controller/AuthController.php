@@ -2,6 +2,7 @@
 
 namespace App\IdentityAccess\Presentation\Api\Controller;
 
+use App\IdentityAccess\Application\Service\EmailVerificationSyncService;
 use App\IdentityAccess\Application\Service\GlobalAuthDisabledException;
 use App\IdentityAccess\Application\Service\GlobalAuthFailedException;
 use App\IdentityAccess\Application\Service\GlobalAuthService;
@@ -24,6 +25,7 @@ final class AuthController extends AbstractController
         private readonly RefreshTokenService $refreshTokenService,
         private readonly GlobalAuthService $globalAuthService,
         private readonly ResendVerificationEmailService $resendVerificationEmailService,
+        private readonly EmailVerificationSyncService $emailVerificationSyncService,
     ) {
     }
 
@@ -120,5 +122,22 @@ final class AuthController extends AbstractController
         }
 
         return $this->json(['message' => 'If your account requires verification, a new email has been sent.']);
+    }
+
+    #[Route('/auth/verification/sync', name: 'api_auth_verification_sync', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function syncVerificationEmail(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->json(['error' => 'Authentication required.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $verified = $this->emailVerificationSyncService->syncFromControlPlane($user);
+
+        return $this->json([
+            'email_verified' => $verified,
+            'email_verified_at' => $user->getEmailVerifiedAt()?->format(\DateTimeInterface::ATOM),
+        ]);
     }
 }

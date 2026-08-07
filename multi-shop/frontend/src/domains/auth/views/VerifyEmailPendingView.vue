@@ -89,10 +89,19 @@ const handleResend = async () => {
 const handleRefresh = async () => {
   refreshing.value = true
   try {
+    await authService.syncVerificationStatus()
     await authStore.fetchCurrentUser()
     if (authStore.isEmailVerified) {
       await router.replace({ name: 'home' })
+      return
     }
+
+    toast.add({
+      severity: 'warn',
+      summary: 'Statut inchangé',
+      detail: 'Votre e-mail n\'est pas encore vérifié.',
+      life: 3000
+    })
   } catch {
     toast.add({
       severity: 'warn',

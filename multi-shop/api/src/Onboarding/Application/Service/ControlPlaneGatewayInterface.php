@@ -33,6 +33,11 @@ interface ControlPlaneGatewayInterface
     public function pullEntitlements(string $externalAccountId, string $applicationSlug = 'stockify'): array;
 
     /**
+     * @return array{identityId: string, emailVerified: bool, emailVerifiedAt: ?string}
+     */
+    public function pullIdentityVerification(string $identityId): array;
+
+    /**
      * @param array<string, mixed> $payload
      *
      * @return array<string, mixed>

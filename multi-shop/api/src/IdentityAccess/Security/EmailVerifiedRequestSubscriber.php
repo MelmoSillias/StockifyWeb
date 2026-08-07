@@ -16,6 +16,7 @@ final class EmailVerifiedRequestSubscriber implements EventSubscriberInterface
     private const ALLOWED_PATHS = [
         '/api/me',
         '/api/auth/verification/resend',
+        '/api/auth/verification/sync',
         '/api/login',
         '/api/login_check',
         '/api/auth/global',

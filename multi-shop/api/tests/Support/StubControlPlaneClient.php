@@ -24,11 +24,17 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
     /** @var array{features: list<string>, quotas: array<string, int|float>, updated_at: ?string}|null */
     public ?array $pullEntitlementsResponse = null;
 
+    /** @var array{identityId: string, emailVerified: bool, emailVerifiedAt: ?string}|null */
+    public ?array $pullIdentityVerificationResponse = null;
+
     /** @var array<string, string> email => password */
     private array $identityCredentials = [];
 
     /** @var array<string, string> email => identityId */
     private array $identityIds = [];
+
+    /** @var array<string, bool> email => verified */
+    private array $identityEmailVerified = [];
 
     /**
      * @return array<string, mixed>
@@ -156,7 +162,41 @@ final class StubControlPlaneClient implements ControlPlaneGatewayInterface
             $normalizedEmail,
             [],
             $applicationSlug,
+            'sim-saas-admin',
+            $this->identityEmailVerified[$normalizedEmail] ?? false,
         );
+    }
+
+    public function resendVerificationEmail(string $email): void
+    {
+    }
+
+    public function registerIdentityCredentials(
+        string $email,
+        string $password,
+        string $identityId,
+        bool $emailVerified = false,
+    ): void {
+        $normalizedEmail = strtolower(trim($email));
+        $this->identityCredentials[$normalizedEmail] = $password;
+        $this->identityIds[$normalizedEmail] = $identityId;
+        $this->identityEmailVerified[$normalizedEmail] = $emailVerified;
+    }
+
+    /**
+     * @return array{identityId: string, emailVerified: bool, emailVerifiedAt: ?string}
+     */
+    public function pullIdentityVerification(string $identityId): array
+    {
+        if (null !== $this->pullIdentityVerificationResponse) {
+            return $this->pullIdentityVerificationResponse;
+        }
+
+        return [
+            'identityId' => $identityId,
+            'emailVerified' => false,
+            'emailVerifiedAt' => null,
+        ];
     }
 
     /**
