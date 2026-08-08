@@ -32,6 +32,7 @@
   --content-surface-soft: color-mix(in srgb, var(--layout-panel-bg) 88%, var(--layout-page-bg));
   --content-surface-contrast-soft: color-mix(in srgb, var(--layout-text-color) 6%, var(--layout-panel-bg));
   --content-border-subtle: var(--layout-panel-border);
+  --content-surface-empty: var(--content-surface-panel);
   --content-hero-bg:
     radial-gradient(circle at top right, color-mix(in srgb, var(--layout-accent-soft) 80%, transparent), transparent 34%),
     var(--layout-shell-bg);

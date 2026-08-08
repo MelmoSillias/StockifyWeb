@@ -78,17 +78,10 @@ defineEmits(['retry'])
   gap: 1rem;
   padding: 3rem 1.5rem;
   border: 1px dashed color-mix(in srgb, var(--pv-surface-border) 78%, transparent);
-  border-radius: 1.25rem;
-  background:
-    radial-gradient(
-      circle at top center,
-      color-mix(in srgb, var(--pv-accent-soft) 72%, transparent),
-      transparent 58%
-    ),
-    var(--pv-surface-bg);
+  border-radius: var(--layout-radius-lg, 0.5rem);
+  background: var(--content-surface-empty, var(--content-surface-panel));
   text-align: center;
   color: var(--pv-text);
-  backdrop-filter: blur(16px);
   box-shadow: var(--layout-shadow-panel);
 }
 

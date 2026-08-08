@@ -1,11 +1,11 @@
 <template>
-  <div class="register-success">
+  <div class="register-success auth-light-surface">
     <div class="register-success__icon">
       <i class="pi pi-check"></i>
     </div>
     <h2>Compte créé avec succès</h2>
     <p>
-      Votre espace LafiaSugu est prêt.
+      Votre espace Lafia Sugu est prêt.
       Consultez votre boîte mail et cliquez sur le lien de confirmation pour activer votre compte.
     </p>
 
@@ -19,7 +19,7 @@
     <Button
       label="Se connecter"
       icon="pi pi-sign-in"
-      size="large"
+      fluid
       @click="goToLogin"
     />
 
@@ -60,111 +60,61 @@ const goToLogin = () => {
 </script>
 
 <style scoped>
-.register-success {
-  --p-primary-color: var(--mkt-accent);
-  --p-primary-contrast-color: #ffffff;
-  --p-primary-hover-color: var(--mkt-accent-strong);
-  --p-primary-active-color: var(--mkt-accent-strong);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border-radius: var(--mkt-radius);
-  background: white;
-  box-shadow: var(--mkt-shadow);
-  color: var(--mkt-light-text);
-  color-scheme: light;
-}
-
 .register-success__icon {
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  background: var(--mkt-accent-soft);
-  color: var(--mkt-accent);
+  border-radius: 50%;
+  background: var(--mkt-primary-soft);
+  color: var(--mkt-primary);
 }
 
 .register-success h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--mkt-light-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--mkt-text);
 }
 
 .register-success p {
-  color: var(--mkt-light-muted);
+  color: var(--mkt-text-muted);
   line-height: 1.6;
+  font-size: 0.9375rem;
 }
 
 .register-success__credentials {
-  padding: 1rem;
-  border-radius: 0.85rem;
-  background: var(--mkt-light);
-  border: 1px solid var(--mkt-border-light);
+  padding: 0.875rem;
+  border-radius: var(--mkt-radius-sm);
+  background: var(--mkt-surface-muted);
+  border: 1px solid var(--mkt-border);
 }
 
 .register-success__credentials p {
   margin: 0;
-  color: var(--mkt-light-text);
-  font-size: 0.92rem;
+  color: var(--mkt-text);
+  font-size: 0.875rem;
 }
 
 .register-success__back {
   justify-content: center;
-  color: var(--mkt-light-muted);
-  font-size: 0.92rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .register-success__hint {
-  color: var(--mkt-light-muted);
-  font-size: 0.88rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.8125rem;
   line-height: 1.5;
   text-align: center;
 }
 
 @media (max-width: 400px) {
-  .register-success {
-    padding: 0.95rem 0.8rem;
-    gap: 0.75rem;
-    border-radius: 0.95rem;
-  }
-
-  .register-success__icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 0.95rem;
-  }
-
   .register-success h2 {
-    font-size: 1.15rem;
+    font-size: 1.125rem;
   }
 
   .register-success p {
-    font-size: 0.85rem;
-    line-height: 1.5;
-  }
-
-  .register-success__credentials {
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-  }
-
-  .register-success__credentials p {
-    font-size: 0.82rem;
-  }
-
-  .register-success__back {
-    font-size: 0.82rem;
-  }
-
-  .register-success :deep(.p-button) {
-    font-size: 0.85rem;
-    padding: 0.65rem 0.85rem;
+    font-size: 0.875rem;
   }
 }
 </style>

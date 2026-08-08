@@ -12,19 +12,19 @@ const routes = [
     path: '/register',
     name: 'register',
     component: () => import('@/domains/marketing/views/RegisterView.vue'),
-    meta: { requiresGuest: true }
+    meta: { requiresGuest: true, forceLight: true }
   },
   {
     path: '/login',
     name: 'login',
     component: () => import('@/domains/auth/views/LoginView.vue'),
-    meta: { requiresGuest: true }
+    meta: { requiresGuest: true, forceLight: true }
   },
   {
     path: '/verify-email/pending',
     name: 'verify-email-pending',
     component: () => import('@/domains/auth/views/VerifyEmailPendingView.vue'),
-    meta: { requiresAuth: appConfig.auth.enabled, requiresVerifiedEmail: false }
+    meta: { requiresAuth: appConfig.auth.enabled, requiresVerifiedEmail: false, forceLight: true }
   },
   {
     path: '/app',

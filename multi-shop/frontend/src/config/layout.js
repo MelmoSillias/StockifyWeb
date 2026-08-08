@@ -1,5 +1,5 @@
 export const themeDefaultAccents = {
-  lafiasugu: 'orange',
+  lafiasugu: 'commerce',
   graphite: 'emerald',
   ocean: 'cyan',
   ember: 'amber',
@@ -35,6 +35,7 @@ export const layoutOptionSets = {
     { label: 'Glass', value: 'glass' }
   ],
   accents: [
+    { label: 'Commerce', value: 'commerce' },
     { label: 'Emerald', value: 'emerald' },
     { label: 'Cyan', value: 'cyan' },
     { label: 'Amber', value: 'amber' },
@@ -126,16 +127,16 @@ export const layoutOptionSets = {
 export const layoutDefaults = {
   appearance: {
     themeName: 'lafiasugu',
-    accentName: 'orange',
+    accentName: 'commerce',
     accentColor: null,
     surfaceName: 'slate',
-    fontName: 'jakarta',
+    fontName: 'manrope',
     density: 'comfortable',
     textScale: 'normal',
     radius: 'soft',
-    darkMode: 'dark',
+    darkMode: 'light',
     motionPreset: 'expressive',
-    gradientMode: 'gradient'
+    gradientMode: 'solid'
   },
   layout: {
     layoutStyle: 'attached',

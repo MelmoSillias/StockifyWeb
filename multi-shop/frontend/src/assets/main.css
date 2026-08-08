@@ -27,6 +27,7 @@
 @import "./layout/primevue-tokens.css";
 @import "./layout/primevue.css";
 @import "./layout/themes/primevue-surfaces.css";
+@import "./layout/solid-mode.css";
 
 html,
 body,

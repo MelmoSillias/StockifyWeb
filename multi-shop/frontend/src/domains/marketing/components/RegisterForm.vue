@@ -1,7 +1,6 @@
 <template>
-  <div class="register-form">
+  <div class="register-form auth-light-surface">
     <div class="register-form__header">
-      <h2>Créez votre compte</h2>
       <p>Identité, boutique, connexion, plan, puis récapitulatif.</p>
     </div>
 
@@ -48,7 +47,7 @@
                 <InputText
                   id="phone"
                   v-model="phone"
-                  placeholder="+227 90 00 00 00"
+                  placeholder="+223 70 00 00 00"
                   fluid
                   :invalid="!!errors.phone"
                 />
@@ -91,7 +90,7 @@
                 <InputText
                   id="shopPhone"
                   v-model="shopPhone"
-                  placeholder="+227 20 00 00 00"
+                  placeholder="+223 20 00 00 00"
                   fluid
                   :invalid="!!errors.shopPhone"
                 />
@@ -103,7 +102,7 @@
                 <InputText
                   id="shopAddress"
                   v-model="shopAddress"
-                  placeholder="Niamey, Niger"
+                  placeholder="Bamako, Mali"
                   fluid
                   :invalid="!!errors.shopAddress"
                 />
@@ -410,108 +409,31 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.register-form {
-  /* Force a light PrimeVue island when the app root is .app-dark */
-  --p-content-background: #ffffff;
-  --p-content-hover-background: #f1f5f9;
-  --p-content-border-color: #e2e8f0;
-  --p-content-color: #0f172a;
-  --p-text-color: #0f172a;
-  --p-text-muted-color: #64748b;
-  --p-text-hover-color: #1e293b;
-  --p-form-field-background: #ffffff;
-  --p-form-field-disabled-background: #e2e8f0;
-  --p-form-field-filled-background: #f8fafc;
-  --p-form-field-filled-hover-background: #f8fafc;
-  --p-form-field-filled-focus-background: #f8fafc;
-  --p-form-field-border-color: #cbd5e1;
-  --p-form-field-hover-border-color: #94a3b8;
-  --p-form-field-color: #0f172a;
-  --p-form-field-placeholder-color: #94a3b8;
-  --p-form-field-icon-color: #94a3b8;
-  --p-form-field-shadow: none;
-  --p-primary-color: var(--mkt-accent);
-  --p-primary-contrast-color: #ffffff;
-  --p-primary-hover-color: var(--mkt-accent-strong);
-  --p-primary-active-color: var(--mkt-accent-strong);
-  --p-surface-0: #ffffff;
-  --p-surface-50: #f8fafc;
-  --p-surface-100: #f1f5f9;
-  --p-surface-200: #e2e8f0;
-  --p-surface-300: #cbd5e1;
-  --p-surface-400: #94a3b8;
-  --p-surface-500: #64748b;
-  --p-surface-600: #475569;
-  --p-surface-700: #334155;
-  --p-surface-800: #1e293b;
-  --p-surface-900: #0f172a;
-  --p-button-secondary-background: #f1f5f9;
-  --p-button-secondary-hover-background: #e2e8f0;
-  --p-button-secondary-active-background: #cbd5e1;
-  --p-button-secondary-border-color: #e2e8f0;
-  --p-button-secondary-color: #334155;
-  --p-button-outlined-secondary-border-color: #cbd5e1;
-  --p-button-outlined-secondary-color: #334155;
-  --p-stepper-step-number-background: #ffffff;
-  --p-stepper-step-number-active-background: #ffffff;
-  --p-stepper-step-number-border-color: #cbd5e1;
-  --p-stepper-step-number-active-border-color: var(--mkt-accent);
-  --p-stepper-step-number-color: #64748b;
-  --p-stepper-step-number-active-color: var(--mkt-accent-strong);
-  --p-stepper-step-title-color: #64748b;
-  --p-stepper-step-title-active-color: var(--mkt-light-text);
-  --p-stepper-separator-background: #e2e8f0;
-  --p-stepper-separator-active-background: var(--mkt-accent);
-  --p-stepper-steppanel-background: transparent;
-  --p-stepper-steppanel-color: var(--mkt-light-text);
-
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border-radius: var(--mkt-radius);
-  background: white;
-  box-shadow: var(--mkt-shadow);
-  color: var(--mkt-light-text);
-  color-scheme: light;
-}
-
-.register-form__header h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--mkt-light-text);
-}
-
 .register-form__header p,
 .register-form__footer {
-  color: var(--mkt-light-muted);
-  font-size: 0.92rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .register-form__header p {
-  margin-top: 0.35rem;
+  margin: 0;
 }
 
 .register-form__badge {
   align-self: flex-start;
   max-width: 100%;
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--mkt-radius-pill);
-  background: var(--mkt-accent-soft);
-  color: var(--mkt-accent-strong);
-  font-size: 0.82rem;
-  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--mkt-radius-sm);
+  background: var(--mkt-primary-soft);
+  color: var(--mkt-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
   line-height: 1.35;
 }
 
 .register-form__optional {
   font-weight: 500;
-  color: var(--mkt-light-muted);
+  color: var(--mkt-text-muted);
 }
 
 .register-form__panel {
@@ -523,7 +445,7 @@ onMounted(async () => {
 
 .register-form__recap p {
   margin: 0 0 0.5rem;
-  color: var(--mkt-light-text);
+  color: var(--mkt-text);
 }
 
 .register-form__field {
@@ -534,9 +456,9 @@ onMounted(async () => {
 }
 
 .register-form__field label {
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--mkt-light-text);
+  color: var(--mkt-text);
 }
 
 .register-form__error {
@@ -552,8 +474,8 @@ onMounted(async () => {
 }
 
 .register-form__footer a {
-  color: var(--mkt-accent);
-  font-weight: 700;
+  color: var(--mkt-primary);
+  font-weight: 600;
 }
 
 .register-form :deep(.stepper-animated),
@@ -603,13 +525,12 @@ onMounted(async () => {
 }
 
 .register-form :deep(.p-step-active .p-step-number) {
-  --step-size: 2rem;
-  font-size: 0.92rem;
+  --step-size: 1.75rem;
+  font-size: 0.8125rem;
   border-width: 2px;
-  background: var(--mkt-accent);
-  border-color: var(--mkt-accent);
+  background: var(--mkt-primary);
+  border-color: var(--mkt-primary);
   color: #ffffff;
-  box-shadow: none;
 }
 
 .register-form :deep(.p-step-header:disabled),
@@ -619,9 +540,9 @@ onMounted(async () => {
 }
 
 .register-form :deep(.p-step:has(~ .p-step-active) .p-step-number) {
-  background: var(--mkt-accent-soft);
-  border-color: var(--mkt-accent);
-  color: var(--mkt-accent-strong);
+  background: var(--mkt-primary-soft);
+  border-color: var(--mkt-primary);
+  color: var(--mkt-primary-strong);
 }
 
 .register-form :deep(.p-step-title) {
@@ -661,13 +582,13 @@ onMounted(async () => {
 
 .register-form :deep(.p-steppanel) {
   background: transparent;
-  color: var(--mkt-light-text);
+  color: var(--mkt-text);
 }
 
 .register-form :deep(.p-inputtext),
 .register-form :deep(.p-password-input) {
   background: #ffffff;
-  color: var(--mkt-light-text);
+  color: var(--mkt-text);
   border-color: #cbd5e1;
   box-shadow: none;
 }
@@ -717,20 +638,13 @@ onMounted(async () => {
 
 @media (max-width: 400px) {
   .register-form {
-    padding: 0.95rem 0.8rem;
+    padding: 0;
     gap: 0.75rem;
-    border-radius: 0.95rem;
-    box-shadow: 0 16px 40px rgba(15, 19, 31, 0.18);
-  }
-
-  .register-form__header h2 {
-    font-size: 1.15rem;
   }
 
   .register-form__header p,
   .register-form__footer {
-    font-size: 0.8rem;
-    line-height: 1.45;
+    font-size: 0.8125rem;
   }
 
   .register-form__badge {

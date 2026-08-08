@@ -1,16 +1,17 @@
 <template>
-  <section id="tarifs" class="landing-pricing mkt-section mkt-section--muted">
+  <section id="tarifs" class="landing-pricing mkt-section mkt-section--light">
     <div class="mkt-container">
-      <div class="mkt-section-header mkt-section-header--center mkt-reveal" :ref="register">
+      <div class="mkt-section-header mkt-section-header--center">
         <p class="mkt-eyebrow">Tarifs</p>
-        <h2 class="mkt-title mkt-title--sm">Des plans adaptés à chaque étape.</h2>
+        <h2 class="mkt-title mkt-title--sm">Des formules adaptées à votre activité</h2>
         <p class="mkt-lead">
-          Démarrez avec 1 mois d’essai gratuit sur Starter, puis choisissez le plan qui suit votre croissance.
+          Commencez avec 1 mois d'essai gratuit sur Starter, puis choisissez
+          la formule qui correspond à votre commerce.
         </p>
       </div>
 
       <div v-if="loading" class="landing-pricing__state">
-        <Skeleton v-for="index in 4" :key="index" height="20rem" class="landing-pricing__skeleton" />
+        <Skeleton v-for="index in 4" :key="index" height="18rem" class="landing-pricing__skeleton" />
       </div>
 
       <div v-else-if="error" class="landing-pricing__state landing-pricing__error">
@@ -18,7 +19,7 @@
         <Button label="Réessayer" icon="pi pi-refresh" @click="loadPlans" />
       </div>
 
-      <div v-else class="landing-pricing__grid mkt-reveal" :ref="register">
+      <div v-else class="landing-pricing__grid">
         <PricingCard
           v-for="plan in plans"
           :key="plan.id"
@@ -38,9 +39,7 @@ import Skeleton from 'primevue/skeleton'
 import PricingCard from '@/domains/marketing/components/PricingCard.vue'
 import QuoteRequestCard from '@/domains/marketing/components/QuoteRequestCard.vue'
 import { plansService } from '@/domains/marketing/services/plansService'
-import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
 
-const { register } = useScrollReveal()
 const plans = ref([])
 const loading = ref(true)
 const error = ref('')
@@ -67,7 +66,7 @@ onMounted(loadPlans)
 .landing-pricing__state {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-  gap: 1.25rem;
+  gap: 1rem;
   max-width: 72rem;
   margin-inline: auto;
 }
@@ -78,7 +77,7 @@ onMounted(loadPlans)
   gap: 1rem;
   align-items: center;
   text-align: center;
-  color: var(--mkt-light-muted);
+  color: var(--mkt-text-muted);
 }
 
 .landing-pricing__skeleton {
@@ -89,7 +88,6 @@ onMounted(loadPlans)
   .landing-pricing__grid,
   .landing-pricing__state {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0.85rem;
   }
 }
 </style>

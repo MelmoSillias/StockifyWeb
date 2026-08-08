@@ -1,4 +1,5 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { palette, updatePrimaryPalette } from '@primeuix/themes'
 
@@ -6,6 +7,7 @@ import { layoutOptionSets } from '@/domains/layout/config/appLayout'
 import { useLayoutStore } from '@/domains/layout/stores/layout'
 
 const accentColorMap = {
+  commerce: '#176b4d',
   emerald: '#10b981',
   cyan: '#06b6d4',
   amber: '#f59e0b',
@@ -91,6 +93,7 @@ const resolveQuery = () => {
 }
 
 export function useLayoutTheme() {
+  const route = useRoute()
   const layoutStore = useLayoutStore()
   const {
     themeName,
@@ -125,8 +128,16 @@ export function useLayoutTheme() {
     return prefersDark.value
   })
 
+  const shouldApplyDarkMode = computed(() => {
+    if (route.meta.forceLight) {
+      return false
+    }
+
+    return isDarkModeActive.value
+  })
+
   watch(
-    [themeName, accentName, accentColor, surfaceName, fontName, density, textScale, radius, motionPreset, gradientMode, isDarkModeActive],
+    [themeName, accentName, accentColor, surfaceName, fontName, density, textScale, radius, motionPreset, gradientMode, shouldApplyDarkMode],
     () => {
       if (typeof document === 'undefined') {
         return
@@ -143,7 +154,7 @@ export function useLayoutTheme() {
       root.dataset.layoutRadius = radius.value
       root.dataset.layoutMotion = motionPreset.value
       root.dataset.layoutGradient = gradientMode.value
-      root.classList.toggle('app-dark', isDarkModeActive.value)
+      root.classList.toggle('app-dark', shouldApplyDarkMode.value)
 
       const resolvedAccent = resolveAccentHex(accentName.value, accentColor.value)
 

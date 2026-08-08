@@ -136,35 +136,26 @@ const submit = async () => {
 <style scoped>
 .pricing-card {
   position: relative;
-  padding: 2rem 1.75rem;
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   min-height: 100%;
   border-radius: var(--mkt-radius);
-  border: 1px solid var(--mkt-border-light);
-  background: white;
-  box-shadow: var(--mkt-shadow-sm);
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-.pricing-card:hover {
-  transform: translateY(-5px);
+  border: 1px solid var(--mkt-border);
+  background: var(--mkt-surface);
   box-shadow: var(--mkt-shadow);
 }
 
 .pricing-card__name {
-  color: var(--mkt-light-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.78rem;
-  font-weight: 700;
+  color: var(--mkt-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 .pricing-card__price strong {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.75rem;
+  font-weight: 600;
 }
 
 .pricing-card__features {
@@ -180,39 +171,38 @@ const submit = async () => {
 .pricing-card__features li {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  color: var(--mkt-light-muted);
-  font-size: 0.92rem;
+  gap: 0.5rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .pricing-card__features i {
-  color: var(--mkt-accent);
-  font-size: 0.85rem;
+  color: var(--mkt-primary);
+  font-size: 0.8125rem;
 }
 
 .pricing-card__cta {
   display: inline-flex;
   justify-content: center;
-  padding: 0.85rem 1rem;
-  border-radius: var(--mkt-radius-pill);
-  border: 1px solid var(--mkt-border-light);
-  color: var(--mkt-light-text);
-  font-weight: 700;
+  padding: 0.625rem 1rem;
+  border-radius: var(--mkt-radius);
+  border: 1px solid var(--mkt-border);
+  color: var(--mkt-text);
+  font-weight: 600;
   background: white;
   cursor: pointer;
 }
 
 .pricing-card__cta--primary {
-  background: var(--mkt-accent);
+  background: var(--mkt-primary);
   border-color: transparent;
   color: white;
-  box-shadow: 0 10px 32px var(--mkt-accent-glow);
 }
 
 .quote-card__hint {
   margin: 0.35rem 0 0;
-  color: var(--mkt-light-muted);
-  font-size: 0.9rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .quote-form {

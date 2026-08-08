@@ -87,6 +87,12 @@
   --layout-accent-soft: rgba(247, 158, 27, 0.16);
 }
 
+:root[data-layout-accent='commerce'] {
+  --layout-accent: #176b4d;
+  --layout-accent-strong: #125a40;
+  --layout-accent-soft: rgba(23, 107, 77, 0.12);
+}
+
 :root[data-layout-surface='slate'] {
   --layout-panel-bg: rgba(255, 255, 255, 0.88);
   --layout-panel-border: rgba(148, 163, 184, 0.2);
@@ -239,11 +245,6 @@
 :root[data-layout-gradient='solid'] {
   --layout-shell-bg: var(--layout-page-bg);
   --layout-sidebar-bg: #0f172a;
-}
-
-:root[data-layout-gradient='solid'][data-layout-theme='lafiasugu'] {
-  --layout-shell-bg: #eef3f7;
-  --layout-sidebar-bg: #2a5d84;
 }
 
 :root[data-layout-gradient='solid'][data-layout-theme='graphite'] {

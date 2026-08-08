@@ -1,23 +1,20 @@
 <template>
   <section id="fonctionnalites" class="landing-features mkt-section mkt-section--muted">
     <div class="mkt-container">
-      <div class="mkt-section-header mkt-reveal" :ref="register">
+      <div class="mkt-section-header mkt-section-header--center">
         <p class="mkt-eyebrow">Fonctionnalités</p>
-        <h2 class="mkt-title mkt-title--sm">Tout ce qu'il faut pour piloter votre activité.</h2>
+        <h2 class="mkt-title mkt-title--sm">Ce que Lafia Sugu vous permet de faire</h2>
         <p class="mkt-lead">
-          Des modules métier complets, cohérents entre eux, pour couvrir l'ensemble de vos
-          opérations quotidiennes sans multiplier les outils.
+          Stock, ventes, clients, fournisseurs et rapports réunis dans un outil
+          conçu pour le suivi quotidien d'un commerce.
         </p>
       </div>
 
       <div class="landing-features__grid">
         <article
-          v-for="(item, index) in featureModules"
+          v-for="item in featureModules"
           :key="item.title"
-          class="landing-features__card mkt-glass mkt-reveal"
-          :class="`landing-features__card--${item.span}`"
-          :ref="register"
-          :style="{ transitionDelay: `${index * 70}ms` }"
+          class="landing-features__card mkt-card"
         >
           <span class="mkt-icon-wrap landing-features__icon">
             <i :class="item.icon"></i>
@@ -34,84 +31,58 @@
 
 <script setup>
 import { featureModules } from '@/domains/marketing/config/marketingContent'
-import { useScrollReveal } from '@/domains/marketing/composables/useScrollReveal'
-
-const { register } = useScrollReveal()
 </script>
 
 <style scoped>
 .landing-features__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.875rem;
 }
 
 .landing-features__card {
-  padding: 1.35rem;
+  padding: 1.125rem;
   display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.landing-features__card--wide {
-  grid-column: span 2;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .landing-features__icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  font-size: 1.1rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1rem;
 }
 
 .landing-features__card h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
   line-height: 1.35;
+  color: var(--mkt-text);
 }
 
 .landing-features__card p {
-  color: var(--mkt-light-muted);
-  line-height: 1.65;
-  font-size: 0.925rem;
+  color: var(--mkt-text-muted);
+  line-height: 1.55;
+  font-size: 0.875rem;
   margin: 0;
 }
 
 @media (max-width: 960px) {
   .landing-features__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .landing-features__card--wide {
-    grid-column: auto;
+@media (max-width: 560px) {
+  .landing-features__grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 400px) {
-  .landing-features__grid {
-    gap: 0.75rem;
-  }
-
   .landing-features__card {
     padding: 1rem;
-    gap: 0.75rem;
-  }
-
-  .landing-features__icon {
-    width: 2.35rem;
-    height: 2.35rem;
-    font-size: 1rem;
-  }
-
-  .landing-features__card h3 {
-    font-size: 0.92rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .landing-features__card p {
-    font-size: 0.85rem;
-    line-height: 1.5;
   }
 }
 </style>

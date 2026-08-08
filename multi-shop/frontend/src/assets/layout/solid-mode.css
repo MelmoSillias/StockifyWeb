@@ -1,0 +1,126 @@
+/*
+ * Centralized overrides when gradientMode = solid (data-layout-gradient='solid').
+ * Removes decorative gradients, glow and glass effects across the in-app shell.
+ */
+
+:root[data-layout-gradient='solid'] {
+  --content-hero-bg: var(--layout-page-bg);
+  --content-gradient-accent: var(--content-tone-accent);
+  --content-gradient-info: var(--content-tone-info);
+  --content-gradient-success: var(--content-tone-success);
+  --content-gradient-danger: var(--content-tone-danger);
+}
+
+:root[data-layout-gradient='solid'] .app-table-state {
+  background: var(--content-surface-panel);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-layout-gradient='solid'] .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary) {
+  background: var(--pv-accent);
+  border-color: var(--pv-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+:root[data-layout-gradient='solid'] .p-button:not(.p-button-text):not(.p-button-outlined):not(.p-button-secondary):not(.p-disabled):hover {
+  background: var(--pv-accent-strong);
+  border-color: var(--pv-accent-strong);
+  transform: none;
+}
+
+:root[data-layout-gradient='solid'] .p-button.p-button-secondary,
+:root[data-layout-gradient='solid'] .p-button.p-button-outlined {
+  box-shadow: none;
+  transform: none;
+}
+
+:root[data-layout-gradient='solid'] .p-button:not(.p-disabled):hover {
+  transform: none;
+}
+
+:root[data-layout-gradient='solid'] .p-dialog .p-dialog-header {
+  background: var(--pv-surface-bg);
+  border-bottom: 1px solid var(--pv-surface-border);
+  color: var(--pv-text);
+}
+
+:root[data-layout-gradient='solid'] .p-dialog .p-dialog-title {
+  color: var(--pv-text);
+}
+
+:root[data-layout-gradient='solid'] .p-dialog .p-dialog-header-actions .p-button {
+  background: var(--pv-surface-bg);
+  border: 1px solid var(--pv-surface-border);
+  color: var(--pv-text-muted);
+  box-shadow: none;
+}
+
+:root[data-layout-gradient='solid'] .dashboard-panel,
+:root[data-layout-gradient='solid'] .dashboard-kpi-card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--layout-panel-bg);
+}
+
+:root[data-layout-gradient='solid'] .dashboard-panel .p-card-title {
+  background: var(--layout-panel-bg);
+}
+
+:root[data-layout-gradient='solid'] .app-topbar {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--layout-topbar-bg);
+}
+
+:root[data-layout-gradient='solid'] .app-sidebar__logo-mark:not(.app-sidebar__logo-mark--brand),
+:root[data-layout-gradient='solid'] .app-topbar__brand-mark:not(.app-topbar__brand-mark--brand) {
+  background: var(--layout-accent);
+}
+
+:root[data-layout-gradient='solid'] .analytics-period-toolbar,
+:root[data-layout-gradient='solid'] .analytics-kpi-card,
+:root[data-layout-gradient='solid'] .analytics-panel,
+:root[data-layout-gradient='solid'] .analytics-chart-panel,
+:root[data-layout-gradient='solid'] .analytics-stat-card,
+:root[data-layout-gradient='solid'] .analytics-empty {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--layout-panel-bg);
+}
+
+:root[data-layout-gradient='solid'] .analytics-kpi-card::before,
+:root[data-layout-gradient='solid'] .analytics-chart-panel--accented::before,
+:root[data-layout-gradient='solid'] .analytics-stat-card::before {
+  display: none;
+}
+
+:root[data-layout-gradient='solid'] .analytics-kpi-card:hover,
+:root[data-layout-gradient='solid'] .analytics-panel:hover,
+:root[data-layout-gradient='solid'] .analytics-chart-panel:hover,
+:root[data-layout-gradient='solid'] .analytics-stat-card:hover {
+  transform: none;
+}
+
+:root[data-layout-gradient='solid'] .analytics-empty--page {
+  background: var(--layout-panel-bg);
+}
+
+:root[data-layout-gradient='solid'] .shop-selector__avatar,
+:root[data-layout-gradient='solid'] .shop-selector__trigger-mark {
+  background: var(--layout-accent);
+}
+
+:root[data-layout-gradient='solid'] *::-webkit-scrollbar-thumb {
+  background: var(--layout-accent);
+}
+
+:root[data-layout-gradient='solid'] *::-webkit-scrollbar-thumb:hover {
+  background: var(--layout-accent-strong);
+}
+
+:root[data-layout-gradient='solid'] html,
+:root[data-layout-gradient='solid'] * {
+  scrollbar-color: var(--layout-accent) transparent;
+}

@@ -50,15 +50,15 @@ defineProps({
 
 <style scoped>
 .mockup-dashboard {
-  padding: 0.85rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  min-height: 18rem;
+  gap: 0.75rem;
+  min-height: 14rem;
 }
 
 .mockup-dashboard--light {
-  background: #f3f5fa;
+  background: var(--mkt-surface-muted);
 }
 
 .mockup-dashboard__header {
@@ -95,7 +95,7 @@ defineProps({
 
 .mockup-dashboard--light .mockup-dashboard__stat {
   background: white;
-  box-shadow: 0 4px 16px rgba(17, 24, 39, 0.06);
+  border: 1px solid var(--mkt-border);
 }
 
 .mockup-dashboard__stat small,
@@ -116,16 +116,17 @@ defineProps({
   display: flex;
   align-items: flex-end;
   gap: 0.3rem;
-  height: 5rem;
+  height: 4.5rem;
   padding: 0.45rem;
-  border-radius: 0.75rem;
-  background: var(--mkt-accent-soft);
+  border-radius: var(--mkt-radius-sm);
+  background: var(--mkt-primary-soft);
+  border: 1px solid var(--mkt-border);
 }
 
 .mockup-dashboard__chart div {
   flex: 1;
-  border-radius: 0.35rem 0.35rem 0.1rem 0.1rem;
-  background: linear-gradient(180deg, var(--mkt-accent), color-mix(in srgb, var(--mkt-accent) 40%, transparent));
+  border-radius: 0.2rem 0.2rem 0 0;
+  background: var(--mkt-primary);
 }
 
 .mockup-dashboard__rows {
@@ -154,8 +155,8 @@ defineProps({
 .mockup-dashboard__rows span {
   width: 0.5rem;
   height: 0.5rem;
-  border-radius: 999px;
-  background: var(--mkt-accent);
+  border-radius: 50%;
+  background: var(--mkt-primary);
   flex-shrink: 0;
 }
 </style>

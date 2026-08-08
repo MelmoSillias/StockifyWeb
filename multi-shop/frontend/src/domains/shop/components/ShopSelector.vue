@@ -207,7 +207,7 @@ const selectShopMobile = async (shopId) => {
   align-items: center;
   justify-content: center;
   border-radius: calc(var(--layout-radius-sm, 0.5rem) - 2px);
-  background: linear-gradient(135deg, var(--layout-accent, var(--p-primary-500)), var(--layout-accent-strong, var(--p-primary-600)));
+  background: var(--layout-accent, var(--p-primary-500));
   color: white;
   font-size: 0.68rem;
   font-weight: 700;

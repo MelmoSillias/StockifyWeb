@@ -1,7 +1,7 @@
 <template>
   <article class="pricing-card" :class="{ 'pricing-card--featured': featured }">
     <span v-if="featured" class="pricing-card__badge">Recommandé</span>
-    <span v-if="isStarter" class="pricing-card__trial">1 mois d’essai gratuit</span>
+    <span v-if="isStarter" class="pricing-card__trial">1 mois d'essai gratuit</span>
 
     <div class="pricing-card__head">
       <p class="pricing-card__name">{{ plan.name }}</p>
@@ -88,7 +88,7 @@ const ctaTo = signupTo({ plan: props.plan.code })
 
 const ctaLabel = computed(() => {
   if (isAuthenticated.value) {
-    return 'Accéder au dashboard'
+    return 'Accéder au tableau de bord'
   }
 
   if (isStarter.value) {
@@ -102,71 +102,58 @@ const ctaLabel = computed(() => {
 <style scoped>
 .pricing-card {
   position: relative;
-  padding: 2rem 1.75rem;
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   min-height: 100%;
   border-radius: var(--mkt-radius);
-  border: 1px solid var(--mkt-border-light);
-  background: white;
-  box-shadow: var(--mkt-shadow-sm);
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-.pricing-card:hover {
-  transform: translateY(-5px);
+  border: 1px solid var(--mkt-border);
+  background: var(--mkt-surface);
   box-shadow: var(--mkt-shadow);
 }
 
 .pricing-card--featured {
-  border-color: color-mix(in srgb, var(--mkt-accent) 40%, transparent);
-  background: linear-gradient(180deg, var(--mkt-accent-soft) 0%, white 45%);
-  box-shadow: 0 20px 56px var(--mkt-accent-glow);
+  border-color: var(--mkt-primary);
 }
 
 .pricing-card__badge {
   position: absolute;
-  top: -0.65rem;
+  top: -0.55rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.3rem 0.85rem;
-  border-radius: var(--mkt-radius-pill);
-  background: var(--mkt-accent);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--mkt-radius-sm);
+  background: var(--mkt-primary);
   color: white;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.6875rem;
+  font-weight: 600;
 }
 
 .pricing-card__trial {
   align-self: flex-start;
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--mkt-radius-pill);
-  background: color-mix(in srgb, var(--mkt-accent) 12%, white);
-  color: var(--mkt-accent);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--mkt-radius-sm);
+  background: var(--mkt-primary-soft);
+  color: var(--mkt-primary);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .pricing-card__name {
-  color: var(--mkt-light-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.78rem;
-  font-weight: 700;
+  color: var(--mkt-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 .pricing-card__price strong {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.75rem;
+  font-weight: 600;
 }
 
 .pricing-card__price span {
-  color: var(--mkt-light-muted);
-  font-size: 0.95rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .pricing-card__features {
@@ -175,76 +162,53 @@ const ctaLabel = computed(() => {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.5rem;
   flex: 1;
 }
 
 .pricing-card__features li {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  color: var(--mkt-light-muted);
-  font-size: 0.92rem;
+  gap: 0.5rem;
+  color: var(--mkt-text-muted);
+  font-size: 0.875rem;
 }
 
 .pricing-card__features i {
-  color: var(--mkt-accent);
-  font-size: 0.85rem;
+  color: var(--mkt-primary);
+  font-size: 0.8125rem;
 }
 
 .pricing-card__cta {
   display: inline-flex;
   justify-content: center;
-  padding: 0.85rem 1rem;
-  border-radius: var(--mkt-radius-pill);
-  border: 1px solid var(--mkt-border-light);
-  color: var(--mkt-light-text);
-  font-weight: 700;
-  transition: transform 180ms ease;
+  padding: 0.625rem 1rem;
+  border-radius: var(--mkt-radius);
+  border: 1px solid var(--mkt-border);
+  color: var(--mkt-text);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease;
 }
 
 .pricing-card__cta--primary {
-  background: var(--mkt-accent);
+  background: var(--mkt-primary);
   border-color: transparent;
   color: white;
-  box-shadow: 0 10px 32px var(--mkt-accent-glow);
+}
+
+.pricing-card__cta--primary:hover {
+  background: var(--mkt-primary-strong);
 }
 
 @media (max-width: 400px) {
   .pricing-card {
-    padding: 1.25rem 1rem;
-    gap: 0.95rem;
-  }
-
-  .pricing-card__badge {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.65rem;
-  }
-
-  .pricing-card__name {
-    font-size: 0.7rem;
+    padding: 1.125rem 1rem;
   }
 
   .pricing-card__price strong {
-    font-size: 1.85rem;
-  }
-
-  .pricing-card__price span {
-    font-size: 0.85rem;
-  }
-
-  .pricing-card__features {
-    gap: 0.55rem;
-  }
-
-  .pricing-card__features li {
-    font-size: 0.85rem;
-    gap: 0.45rem;
-  }
-
-  .pricing-card__cta {
-    padding: 0.7rem 0.85rem;
-    font-size: 0.88rem;
+    font-size: 1.5rem;
   }
 }
 </style>
